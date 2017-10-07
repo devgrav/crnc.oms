@@ -1,13 +1,14 @@
-import * as React from 'react';
-import {Container, Header} from 'semantic-ui-react'
-import 'semantic-ui-css/semantic.css'; 
+import * as React from "react";
+import "semantic-ui-css/semantic.css";
+import {Container, Header} from "semantic-ui-react";
+import Layout from "./components/layout/Layout";
 
 export default class App extends React.Component {
-    render() {
+    public render() {
         return (
-            <Container fluid> 
-                <Header as="h1" content="Order management system"/>                                   
-            </Container>           
+            <Container fluid>
+                <Layout/>
+            </Container>
         );
     }
 }
