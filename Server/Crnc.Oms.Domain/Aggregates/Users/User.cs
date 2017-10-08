@@ -85,10 +85,24 @@ namespace Crnc.Oms.Domain.Aggregates.Users
         [MaxLength(200)]
         public string Email { get; private set; }
 
+        [MaxLength(200)]
+        public string Phone { get; set; }
+
         /// <summary>
         /// Property of active user
         /// </summary>
         public bool IsActive { get; private set; }
+
+        /// <summary>
+        /// Photo of user
+        /// </summary>
+        public byte[] Photo { get; set; }
+
+        /// <summary>
+        /// Mime type of photo
+        /// </summary>
+        [MaxLength(50)]
+        public string PhotoMimeType { get; set; }
 
         /// <summary>
         /// Avaliable roles
