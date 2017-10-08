@@ -24,6 +24,8 @@ namespace Crnc.Oms.WebApi
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
+
+            
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -34,6 +36,9 @@ namespace Crnc.Oms.WebApi
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options => {
+                options.AddPolicy("AllOrigins", builder => builder.AllowAnyOrigin());
+            });
             services.AddMvc();
             services.AddScoped<DataContext>(_ => new DataContext(Configuration.GetConnectionString("oms")));
             services.AddScoped<IUserRepository, UserRepository>();
@@ -52,6 +57,7 @@ namespace Crnc.Oms.WebApi
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
 
+            app.UseCors("AllOrigins");
             app.UseMvc();
         }
     }

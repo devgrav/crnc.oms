@@ -19,9 +19,9 @@ namespace Crnc.Oms.DataAccess
             {
                 var users = new List<User>()
                 {
-                    User.CreateNew("admin","111111","Jack","Richer"),
-                    User.CreateNew("manager","111111","Shon","Beam"),
-                    User.CreateNew("designer","111111","Brad","Peat")
+                    User.CreateNew("admin","111111","Jack","Richer","jack_richer@crnc.com"),
+                    User.CreateNew("manager","111111","Shon","Bean","shon_bean@crnc.com"),
+                    User.CreateNew("designer","111111","Brad","Peat","jack_peat@crnc.com")
                 };
 
                 dbContext.Users.AddRange(users);
@@ -34,11 +34,11 @@ namespace Crnc.Oms.DataAccess
                 {
                     var stringBuilder = new StringBuilder();
                     stringBuilder.AppendLine(
-                        $"Сущность типа \"{eve.Entry.Entity.GetType().Name}\" в состоянии \"{eve.Entry.State}\" имеет следующие ошибки валидации:");
+                        $"Entity of type \"{eve.Entry.Entity.GetType().Name}\" in state \"{eve.Entry.State}\" has validation errors:");
 
                     foreach (var ve in eve.ValidationErrors)
                         stringBuilder.AppendLine(
-                            $"- Свойство: \"{ve.PropertyName}\", Значение: \"{eve.Entry.CurrentValues.GetValue<object>(ve.PropertyName)}\", Ошибка: \"{ve.ErrorMessage}\"");
+                           $"- Property: \"{ve.PropertyName}\", Value: \"{eve.Entry.CurrentValues.GetValue<object>(ve.PropertyName)}\", Error: \"{ve.ErrorMessage}\"");
 
                     var message = stringBuilder.ToString();
                     Debug.WriteLine(message);
