@@ -23,7 +23,8 @@ namespace Crnc.Oms.Domain.Aggregates.Users
         /// <param name="firstName">FirstName</param>
         /// <param name="lastName">LastName</param>
         /// <returns></returns>
-        public static User CreateNew(string login, string passwordHash, string firstName, string lastName)
+        public static User CreateNew(string login, string passwordHash, 
+            string firstName, string lastName, string email)
         {
             return new User()
             {
@@ -31,6 +32,7 @@ namespace Crnc.Oms.Domain.Aggregates.Users
                 PasswordHash = passwordHash,
                 FirstName = firstName,
                 LastName = lastName,
+                Email = email,
                 IsActive = true
             };
         }
