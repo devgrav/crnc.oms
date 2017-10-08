@@ -3,22 +3,17 @@ import { Menu, MenuItemProps } from "semantic-ui-react";
 import * as Logo from "../../assets/images/logo.png";
 
 export default class TopMenu
-    extends React.Component<{}, TopMenuState> {
+    extends React.Component<TopMenuProps> {
 
-    constructor() {
-        super();
-        this.state = {
-            activeItem: "users"
-        };
+    constructor(props: TopMenuProps) {
+        super(props);
 
-        this.handleMenuItemClick = this.handleMenuItemClick.bind(this);
+        this.onMenuItemClick = this.onMenuItemClick.bind(this);
     }
 
-    private handleMenuItemClick(event: React.MouseEvent<HTMLAnchorElement>,
-                                data: MenuItemProps): void{
-        this.setState({
-            activeItem: data.name
-        });
+    private onMenuItemClick(event: React.MouseEvent<HTMLAnchorElement>,
+                            data: MenuItemProps): void{
+        this.props.onChangeActivePage(data.name);
     }
 
     public render(){
@@ -27,20 +22,33 @@ export default class TopMenu
                 <Menu.Item>
                    <img src={Logo}/>
                 </Menu.Item>
-                <Menu.Item onClick={this.handleMenuItemClick} active={this.state.activeItem === "users"}>
-                    users
+                <Menu.Item
+                    name="users"
+                    onClick={this.onMenuItemClick}
+                    active={this.props.activeItem === "users"}
+                >
+                    Users
                 </Menu.Item>
-                <Menu.Item onClick={this.handleMenuItemClick} active={this.state.activeItem === "estimates"}>
-                    estimates
+                <Menu.Item
+                    name="estimates"
+                    onClick={this.onMenuItemClick}
+                    active={this.props.activeItem === "estimates"}
+                >
+                    Estimates
                 </Menu.Item>
-                <Menu.Item onClick={this.handleMenuItemClick} active={this.state.activeItem === "jobs"}>
-                    jobs
+                <Menu.Item
+                    name="jobs"
+                    onClick={this.onMenuItemClick}
+                    active={this.props.activeItem === "jobs"}
+                >
+                    Jobs
                 </Menu.Item>
             </Menu>
         );
     }
 }
 
-export interface TopMenuState{
+export interface TopMenuProps{
     activeItem: string;
+    onChangeActivePage(page: string): void;
 }
