@@ -13,6 +13,10 @@ namespace CrncOmsWeb.DTO
 
         public string Email { get; set; }
 
+        public string Login { get; set; }
+
+        public string Phone { get; set; }
+
         public bool IsActive { get; set; }
     }
 }

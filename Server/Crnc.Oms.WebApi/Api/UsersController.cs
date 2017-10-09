@@ -9,12 +9,12 @@ using CrncOmsWeb.DTO;
 namespace CrncOmsWeb.Api
 {
     [Route("api/[controller]")]
-    public class UserController 
+    public class UsersController 
         : Controller
     {
         private readonly IUserRepository _userRepository;
 
-        public UserController(IUserRepository userRepository)
+        public UsersController(IUserRepository userRepository)
         {
             _userRepository = userRepository;
         }
@@ -30,6 +30,8 @@ namespace CrncOmsWeb.Api
                 Id = u.Id,
                 FullName = u.FullName,
                 Email = u.Email,
+                Login = u.Login,
+                Phone = u.Phone,
                 IsActive = u.IsActive
             }).ToList();           
         }

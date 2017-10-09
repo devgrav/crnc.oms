@@ -9,6 +9,7 @@
       "no-submodule-imports" : false,
       "trailing-comma" : false,
       "one-line" : false,
-      "member-ordering" : false
+      "member-ordering" : false,
+      "jsx-no-multiline-js": false
     }
   }
