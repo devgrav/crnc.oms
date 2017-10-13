@@ -5,52 +5,22 @@ import UsersGrid from "../users/UsersGrid";
 import Content from "./Content";
 import TopMenu from "./TopMenu";
 
-class Layout extends React.Component<{}, LayoutState> {
+class Layout extends React.Component<{}> {
 
-    constructor() {
-        super();
-
-        this.state = {
-            activePage: "users"
-        };
-
-        this.onActivePageChange = this.onActivePageChange.bind(this);
-    }
-
-    private onActivePageChange(page: string): void{
-        this.setState({
-            activePage: page
-        });
-    }
-
-    private getChildrenContent(): React.ReactElement<any>{
-        switch (this.state.activePage){
-            case "users":
-                return <UsersGrid/>;
-            case "estimates":
-                return <EstimatesGrid/>;
-            default :
-                return <div/>;
-        }
+    constructor(props: any) {
+        super(props);
     }
 
     public render(){
         return (
             <Container fluid>
-                <TopMenu
-                    activeItem={this.state.activePage}
-                    onChangeActivePage={this.onActivePageChange}
-                />
-                <Content
-                    children={this.getChildrenContent()}
-                />
+                <TopMenu/>
+                <Content>
+                    {this.props.children}
+                </Content>
             </Container>
         );
     }
 }
 
 export default Layout;
-
-interface LayoutState{
-    activePage: string;
-}
