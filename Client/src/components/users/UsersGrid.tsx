@@ -2,6 +2,7 @@ import * as React from "react";
 import { Button, Dimmer, Header, Icon, Loader, Menu, Segment, Table } from "semantic-ui-react";
 import {UserGridItem, UserService} from "../../services/UserService";
 import UsersGridRow from "./UsersGridRow";
+import { withRouter } from "react-router";
 
 export default class UsersGrid extends React.Component<{}, UsersGridState> {
     constructor(props){
@@ -91,7 +92,7 @@ export default class UsersGrid extends React.Component<{}, UsersGridState> {
                                     <Menu.Item as="a">3</Menu.Item>
                                     <Menu.Item as="a">4</Menu.Item>
                                     <Menu.Item as="a" icon>
-                                    <Icon name="right chevron" />
+                                        <Icon name="right chevron" />
                                     </Menu.Item>
                                 </Menu>
                             </Table.HeaderCell>

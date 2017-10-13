@@ -46,7 +46,8 @@ module.exports = {
 		inline: true,
 		host: "localhost",
 		port: "8090",
-		open :true		
+		open :true,
+		historyApiFallback: true		
 		//Enable this if you want to never refresh (this allows hot-reloading app.tsx, but won't auto-refresh if you change index.tsx)
 		//hotOnly: true
 	}
