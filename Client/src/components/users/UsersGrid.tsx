@@ -1,8 +1,7 @@
 import * as React from "react";
 import { Button, Dimmer, Header, Icon, Loader, Menu, Segment, Table } from "semantic-ui-react";
-import {UserGridItem, UserService} from "../../services/UserService";
+import {UserItemDto, UserService} from "../../services/UserService";
 import UsersGridRow from "./UsersGridRow";
-import { withRouter } from "react-router";
 
 export default class UsersGrid extends React.Component<{}, UsersGridState> {
     constructor(props){
@@ -105,6 +104,6 @@ export default class UsersGrid extends React.Component<{}, UsersGridState> {
 }
 
 interface UsersGridState{
-    users: UserGridItem[];
+    users: UserItemDto[];
     isLoading: boolean;
 }

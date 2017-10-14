@@ -17,15 +17,26 @@ namespace Crnc.Oms.DataAccess
         {
             try
             {
+
+                var roles = new List<Role>()
+                {
+                    new Role("Admin"),
+                    new Role("Main manager"),
+                    new Role("Manager"),
+                };
+
+                dbContext.Roles.AddRange(roles);
+                dbContext.SaveChanges();
+
                 var users = new List<User>()
                 {
-                    User.CreateNew("admin","111111","Jack","Richer","jack_richer@crnc.com"),
-                    User.CreateNew("manager","111111","Shon","Bean","shon_bean@crnc.com"),
-                    User.CreateNew("designer","111111","Brad","Peat","jack_peat@crnc.com")
+                    User.CreateNew("jack_richer","111111","Jack","Richer","jack_richer@crnc.com",dbContext.Roles.First(r=> r.Title.Equals("Admin"))),
+                    User.CreateNew("shon_bean","111111","Shon","Bean","shon_bean@crnc.com",dbContext.Roles.First(r=> r.Title.Equals("Main manager"))),
+                    User.CreateNew("helen_smith","111111","Helen","Smith","helen_smith@crnc.com",dbContext.Roles.First(r=> r.Title.Equals("Manager"))),
+                    User.CreateNew("agness_stuart","111111","Agness","Stuart","agness_stuart@crnc.com",dbContext.Roles.First(r=> r.Title.Equals("Manager")))
                 };
 
                 dbContext.Users.AddRange(users);
-
                 dbContext.SaveChanges();
             }
             catch (DbEntityValidationException ex)
