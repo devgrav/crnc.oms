@@ -6,6 +6,7 @@ import * as avatarHelen from "../../assets/images/woman1.jpg";
 import * as avatarAgness from "../../assets/images/woman2.jpg";
 import { UserItemDto, UserService } from "../../services/UserService";
 import UserCard from "./UserCard";
+import UserCardEdit from "./UserCardEdit";
 
 export default class UserCards extends React.Component<any, UserCardsState>{
 
@@ -16,42 +17,49 @@ export default class UserCards extends React.Component<any, UserCardsState>{
             users: [],
             isLoading: false
         };
+
+        this.onEdit = this.onEdit.bind(this);
     }
 
-    private async getUsers(): Promise<void>{
+    private getUsers(): void{
         this.showLoading();
 
-        const users = await UserService.getUsersGrid();
-
-        this.setState({
-            users
+        UserService.getUsersGrid()
+        .then((users) => {
+            this.setState({
+                ...this.state, users
+            });
+            this.hideLoading();
         });
-
-        this.hideLoading();
     }
 
     public componentDidMount(): void{
         this.getUsers();
     }
 
-    public showLoading(){
+    private showLoading(): void{
         this.setState({
             ...this.state, isLoading: true
         });
     }
 
-    public hideLoading(){
+    private hideLoading(): void{
         this.setState({
             ...this.state, isLoading: false
         });
     }
 
+    private onEdit(userId: number){
+        console.log(this.state.users);
+    }
+
     public render(){
         return (
-            <Segment loading={this.state.isLoading} color="blue">
+            <Segment loading={this.state.isLoading} basic>
                 <Card.Group>
-                    {this.state.users.map((u) =>
-                        <UserCard key={u.id} userItem={u}/>)}
+                    {this.state.users.map((u) => {
+                        return <UserCard key={u.id} userItem={u} onEdit={this.onEdit}/>;
+                    })}
                 </Card.Group>
             </Segment>
         );

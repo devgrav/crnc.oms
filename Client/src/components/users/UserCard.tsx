@@ -1,10 +1,12 @@
 import * as React from "react";
-import { Button, Card, Divider, Form } from "semantic-ui-react";
+import { Button, ButtonProps, Card, Divider, Form } from "semantic-ui-react";
 import * as avatarJack from "../../assets/images/man1.jpg";
 import * as avatarShon from "../../assets/images/man2.jpg";
 import * as avatarHelen from "../../assets/images/woman1.jpg";
 import * as avatarAgness from "../../assets/images/woman2.jpg";
 import { UserItemDto } from "../../services/UserService";
+import UserCardEdit from "./UserCardEdit";
+import UserCardView from "./UserCardView";
 
 const avatarsMap = [
     {
@@ -29,48 +31,24 @@ export default class UserCard extends React.Component<UserCardProps>{
 
     constructor(props: UserCardProps){
         super(props);
+
+        this.onEdit = this.onEdit.bind(this);
     }
 
-    private renderCardInfo(){
-        return (
-            <Form>
-                <Form.Field inline>
-                    <label>Login:</label>
-                    <text>{this.props.userItem.login}</text>
-                </Form.Field>
-                <Form.Field inline>
-                    <label>Email:</label>
-                    <text>{this.props.userItem.email}</text>
-                </Form.Field>
-                <Form.Field inline>
-                    <label>Name:</label>
-                    <text>{this.props.userItem.fullName}</text>
-                </Form.Field>
-                <Form.Field inline>
-                    <label>Phone:</label>
-                    <text>{this.props.userItem.phone || ""}</text>
-                </Form.Field>
-                <Form.Checkbox label="Active" disabled checked={this.props.userItem.isActive}/>
-            </Form>
-        );
-    }
-
-    private getAvatar(userId: number){
-        return avatarsMap.find((p) => p.userId === userId).avatar;
+    private onEdit(){
+        this.props.onEdit(this.props.userItem.id);
     }
 
     public render(){
-        return (
-            <Card
-                image={this.getAvatar(this.props.userItem.id)}
-                header={this.props.userItem.fullName}
-                meta={this.props.userItem.role}
-                extra={this.renderCardInfo()}
-            />
-        );
+        if (this.props.userItem.isEdited){
+            return (<UserCardEdit userItem={this.props.userItem}/>);
+        }
+
+        return (<UserCardView userItem={this.props.userItem} onCardEdit={this.onEdit}/>);
     }
 }
 
 interface UserCardProps{
     userItem: UserItemDto;
+    onEdit(userId: number);
 }

@@ -22,4 +22,5 @@ export interface UserItemDto{
     phone: string;
     role: string;
     isActive: boolean;
+    isEdited: boolean;
 }
