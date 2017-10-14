@@ -19,5 +19,15 @@ namespace Crnc.Oms.Domain.Aggregates.Users
         [MaxLength(50)]
         [Required]
         public string Title { get; set; }
+
+        public Role()
+        {
+
+        }
+
+        public Role(string title)
+        {
+            Title = title;
+        }
     }
 }

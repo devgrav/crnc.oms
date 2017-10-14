@@ -1,12 +1,13 @@
 import * as React from "react";
+import { Link } from "react-router-dom";
 import { Checkbox, Icon, Label, Table } from "semantic-ui-react";
-import {UserGridItem, UserService} from "../../services/UserService";
+import {UserItemDto, UserService} from "../../services/UserService";
 
 const UsersGrid: React.StatelessComponent<UsersGridRowProps> = (props) => {
         return (
                 <Table.Row>
                     <Table.Cell>
-                        <Label as="a" color="blue">
+                        <Label color="blue" as={Link} to={`/users/${props.userItem.id}`}>
                             <Icon name="pencil"/>
                             Edit
                         </Label>
@@ -33,5 +34,5 @@ const UsersGrid: React.StatelessComponent<UsersGridRowProps> = (props) => {
 export default UsersGrid;
 
 interface UsersGridRowProps{
-    userItem: UserGridItem;
+    userItem: UserItemDto;
 }

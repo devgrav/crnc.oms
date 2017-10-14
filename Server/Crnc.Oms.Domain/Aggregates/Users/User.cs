@@ -24,7 +24,7 @@ namespace Crnc.Oms.Domain.Aggregates.Users
         /// <param name="lastName">LastName</param>
         /// <returns></returns>
         public static User CreateNew(string login, string passwordHash, 
-            string firstName, string lastName, string email)
+            string firstName, string lastName, string email, Role role=null)
         {
             return new User()
             {
@@ -33,6 +33,7 @@ namespace Crnc.Oms.Domain.Aggregates.Users
                 FirstName = firstName,
                 LastName = lastName,
                 Email = email,
+                Role = role,
                 IsActive = true
             };
         }
@@ -105,9 +106,9 @@ namespace Crnc.Oms.Domain.Aggregates.Users
         public string PhotoMimeType { get; set; }
 
         /// <summary>
-        /// Avaliable roles
+        /// Role
         /// </summary>
-        public ICollection<Role> Roles { get; private set; }
+        public Role Role { get; private set; }
 
         #endregion
 

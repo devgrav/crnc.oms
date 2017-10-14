@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data.Entity;
 using Crnc.Oms.Domain.Aggregates.Users;
 using Crnc.Oms.Domain.IRepositories;
 using Crnc.Oms.DataAccess.Exceptions;
@@ -59,7 +60,7 @@ namespace Crnc.Oms.DataAccess.Repositories
 
         public IEnumerable<User> FindAll()
         {
-            return _dbContext.Users.AsNoTracking().ToList();
+            return _dbContext.Users.Include(u => u.Role).AsNoTracking().ToList();
         }
 
         public User FindById(int id)

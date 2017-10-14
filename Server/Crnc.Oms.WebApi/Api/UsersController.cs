@@ -21,17 +21,21 @@ namespace CrncOmsWeb.Api
 
         // GET: api/users
         [HttpGet]
-        public IEnumerable<UserGridItemDto> Get()
+        public IEnumerable<UserItemDto> Get()
         {
             var users = _userRepository.FindAll();
 
-            return users.Select(u => new UserGridItemDto()
+            return users.Select(u => new UserItemDto()
             {
                 Id = u.Id,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
                 FullName = u.FullName,
                 Email = u.Email,
+                Password = u.PasswordHash,
                 Login = u.Login,
                 Phone = u.Phone,
+                Role = u.Role.Title,
                 IsActive = u.IsActive
             }).ToList();           
         }
