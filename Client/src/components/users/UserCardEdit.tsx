@@ -25,32 +25,27 @@ const avatarsMap = [
     }
 ];
 
-export default class UserCard extends React.Component<UserCardProps>{
+export default class UserCardEdit extends React.Component<UserCardEditProps>{
 
-    constructor(props: UserCardProps){
+    constructor(props: UserCardEditProps){
         super(props);
     }
 
-    private renderCardInfo(){
+    private renderForm(){
         return (
             <Form>
-                <Form.Field inline>
-                    <label>Login:</label>
-                    <text>{this.props.userItem.login}</text>
-                </Form.Field>
-                <Form.Field inline>
-                    <label>Email:</label>
-                    <text>{this.props.userItem.email}</text>
-                </Form.Field>
-                <Form.Field inline>
-                    <label>Name:</label>
-                    <text>{this.props.userItem.fullName}</text>
-                </Form.Field>
-                <Form.Field inline>
-                    <label>Phone:</label>
-                    <text>{this.props.userItem.phone || ""}</text>
-                </Form.Field>
-                <Form.Checkbox label="Active" disabled checked={this.props.userItem.isActive}/>
+                <Form.Input placeholder="Login" value={this.props.userItem.login}/>
+                <Form.Input type="password" placeholder="Password" value={this.props.userItem.password}/>
+                <Form.Input placeholder="First name" value={this.props.userItem.firstName}/>
+                <Form.Input placeholder="Last name" value={this.props.userItem.lastName}/>
+                <Form.Input type="email" placeholder="Email" value={this.props.userItem.email}/>
+                <Form.Input placeholder="Phone" value={this.props.userItem.phone || ""}/>
+                <Form.Checkbox label="Activity" slider checked={this.props.userItem.isActive}/>
+                <Divider/>
+                <div className="ui right floated">
+                    <Button basic color="green" type="submit" content="Save"/>
+                    <Button basic color="red" type="reset" content="Cancel"/>
+                </div>
             </Form>
         );
     }
@@ -65,12 +60,12 @@ export default class UserCard extends React.Component<UserCardProps>{
                 image={this.getAvatar(this.props.userItem.id)}
                 header={this.props.userItem.fullName}
                 meta={this.props.userItem.role}
-                extra={this.renderCardInfo()}
+                extra={this.renderForm()}
             />
         );
     }
 }
 
-interface UserCardProps{
+interface UserCardEditProps{
     userItem: UserItemDto;
 }
