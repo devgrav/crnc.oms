@@ -51,7 +51,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps>{
     }
 
     private getAvatar(userId: number){
-        return avatarsMap.find((p) => p.userId === userId).avatar;
+        return avatarsMap.filter((p) => p.userId === userId)[0].avatar;
     }
 
     public render(){

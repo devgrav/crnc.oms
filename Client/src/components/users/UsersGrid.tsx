@@ -13,16 +13,14 @@ export default class UsersGrid extends React.Component<{}, UsersGridState> {
         };
     }
 
-    private async getUsers(): Promise<void>{
-        this.showLoading();
-
-        const users = await UserService.getUsersGrid();
-
-        this.setState({
-            users
+    private getUsers(): void{
+        UserService.getUsersGrid()
+        .then((users) => {
+            this.setState({
+                ...this.state, users
+            });
+            this.hideLoading();
         });
-
-        this.hideLoading();
     }
 
     public componentDidMount(): void{

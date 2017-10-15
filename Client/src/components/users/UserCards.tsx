@@ -17,8 +17,6 @@ export default class UserCards extends React.Component<any, UserCardsState>{
             users: [],
             isLoading: false
         };
-
-        this.onEdit = this.onEdit.bind(this);
     }
 
     private getUsers(): void{
@@ -49,16 +47,12 @@ export default class UserCards extends React.Component<any, UserCardsState>{
         });
     }
 
-    private onEdit(userId: number){
-        console.log(this.state.users);
-    }
-
     public render(){
         return (
             <Segment loading={this.state.isLoading} basic>
                 <Card.Group>
                     {this.state.users.map((u) => {
-                        return <UserCard key={u.id} userItem={u} onEdit={this.onEdit}/>;
+                        return <UserCard key={u.id} userItem={u}/>
                     })}
                 </Card.Group>
             </Segment>
