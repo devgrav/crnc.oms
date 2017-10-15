@@ -1,7 +1,14 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
-        "jsx": "react",
-        "sourceMap": true
-    }
-}
+      "module": "commonjs",
+      "target": "es2015", 
+      "allowSyntheticDefaultImports": true, 
+      "sourceMap": true, 
+      "outDir": "ts-build",
+      "jsx": "preserve", 
+      "strict": true,
+    },
+    "exclude": [
+      "node_modules" 
+    ]
+  }

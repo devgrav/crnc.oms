@@ -86,5 +86,5 @@ export default class UserCardView extends React.Component<UserCardViewProps>{
 
 interface UserCardViewProps{
     userItem: UserItemDto;
-    onCardEdit();
+    onCardEdit(): void;
 }

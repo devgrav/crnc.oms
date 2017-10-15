@@ -19,16 +19,16 @@ export default class UserCards extends React.Component<any, UserCardsState>{
         };
     }
 
-    private getUsers(): void{
+    private async getUsers(): Promise<void>{
         this.showLoading();
 
-        UserService.getUsersGrid()
-        .then((users) => {
-            this.setState({
-                ...this.state, users
-            });
-            this.hideLoading();
+        const users = await UserService.getUsersGrid();
+
+        this.setState({
+            ...this.state, users
         });
+
+        this.hideLoading();
     }
 
     public componentDidMount(): void{
@@ -52,7 +52,7 @@ export default class UserCards extends React.Component<any, UserCardsState>{
             <Segment loading={this.state.isLoading} basic>
                 <Card.Group>
                     {this.state.users.map((u) => {
-                        return <UserCard key={u.id} userItem={u}/>
+                        return <UserCard key={u.id} userItem={u}/>;
                     })}
                 </Card.Group>
             </Segment>

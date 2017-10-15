@@ -3,8 +3,9 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 var path = require("path");
 
 module.exports = {
-	devtool: 'cheap-module-source-map',
+	devtool: 'eval',
 	entry: [
+		'babel-polyfill',
 		'react-hot-loader/patch',
 		'./index.tsx'
 	],
@@ -21,7 +22,7 @@ module.exports = {
 		loaders: [
 			{
 				test: /\.(ts|tsx)$/,
-				loader: ['react-hot-loader/webpack', 'ts-loader']
+				loader: ['react-hot-loader/webpack','babel-loader', 'ts-loader']
 			},
 			{
 				test: /\.css$/,
