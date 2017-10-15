@@ -36,8 +36,7 @@ namespace CrncOmsWeb.Api
                 Login = u.Login,
                 Phone = u.Phone,
                 Role = u.Role.Title,
-                IsActive = u.IsActive,
-                IsEdited = false
+                IsActive = u.IsActive
             }).ToList();           
         }
 

@@ -54,7 +54,7 @@ export default class UserCardView extends React.Component<UserCardViewProps>{
     }
 
     private getAvatar(userId: number){
-        return avatarsMap.find((p) => p.userId === userId).avatar;
+        return avatarsMap.filter((p) => p.userId === userId)[0].avatar;
     }
 
     private onEditClick(event: React.MouseEvent<HTMLButtonElement>, data: ButtonProps){
