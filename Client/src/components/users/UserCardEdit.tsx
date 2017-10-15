@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button, Card, Divider, Form } from "semantic-ui-react";
+import { Button, Card, Divider, Form, Image, Grid, Modal, ModalProps } from "semantic-ui-react";
 import * as avatarJack from "../../assets/images/man1.jpg";
 import * as avatarShon from "../../assets/images/man2.jpg";
 import * as avatarHelen from "../../assets/images/woman1.jpg";
@@ -29,43 +29,56 @@ export default class UserCardEdit extends React.Component<UserCardEditProps>{
 
     constructor(props: UserCardEditProps){
         super(props);
-    }
 
-    private renderForm(){
-        return (
-            <Form>
-                <Form.Input placeholder="Login" value={this.props.userItem.login}/>
-                <Form.Input type="password" placeholder="Password" value={this.props.userItem.password}/>
-                <Form.Input placeholder="First name" value={this.props.userItem.firstName}/>
-                <Form.Input placeholder="Last name" value={this.props.userItem.lastName}/>
-                <Form.Input type="email" placeholder="Email" value={this.props.userItem.email}/>
-                <Form.Input placeholder="Phone" value={this.props.userItem.phone || ""}/>
-                <Form.Checkbox label="Activity" slider checked={this.props.userItem.isActive}/>
-                <Divider/>
-                <div className="ui right floated">
-                    <Button basic color="green" type="submit" content="Save"/>
-                    <Button basic color="red" type="reset" content="Cancel"/>
-                </div>
-            </Form>
-        );
+        this.onClose = this.onClose.bind(this);
     }
 
     private getAvatar(userId: number){
         return avatarsMap.filter((p) => p.userId === userId)[0].avatar;
     }
 
+    private onClose(event: React.MouseEvent<HTMLElement>, data: ModalProps){
+        this.props.onCancelEdit();
+    }
+
     public render(){
         return (
-            <Card
-                image={this.getAvatar(this.props.userItem.id)}
-                header={this.props.userItem.fullName}
-                meta={this.props.userItem.role}
-                extra={this.renderForm()}
-            />
+            <Modal open={true} closeIcon onClose={this.onClose}>
+                <Modal.Header>Edit user</Modal.Header>
+                <Modal.Content image>
+                    <Form className="ui form">
+                        <Grid columns={2}>
+                            <Grid.Column>
+                                <Image size="medium" src={this.getAvatar(this.props.userItem.id)} />
+                            </Grid.Column>
+                            <Grid.Column>
+                                <Form.Group>
+                                    <Form.Input label="Login" value={this.props.userItem.login}/>
+                                    <Form.Input label="Password" type="password" value={this.props.userItem.password}/>
+                                </Form.Group>
+                                <Form.Group>
+                                    <Form.Input label="First name" value={this.props.userItem.firstName}/>
+                                    <Form.Input label="Last name" value={this.props.userItem.lastName}/>
+                                </Form.Group>
+                                <Form.Group>
+                                    <Form.Input label="Email" type="email" value={this.props.userItem.email}/>
+                                    <Form.Input label="Phone" value={this.props.userItem.phone || ""}/>
+                                </Form.Group>
+                                <Form.Checkbox label="Active" checked={this.props.userItem.isActive}/>
+                            </Grid.Column>
+                        </Grid>
+                    </Form>
+                </Modal.Content>
+                <Modal.Actions>
+                    <Button basic color="green" type="submit" content="Save"/>
+                    <Button basic color="red" type="reset" content="Cancel"/>
+                </Modal.Actions>
+            </Modal>
         );
     }
 }
 
 interface UserCardEditProps{
     userItem: UserItemDto;
+    onCancelEdit(): void;
 }
