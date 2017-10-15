@@ -4,7 +4,7 @@ import {UserItemDto, UserService} from "../../services/UserService";
 import UsersGridRow from "./UsersGridRow";
 
 export default class UsersGrid extends React.Component<{}, UsersGridState> {
-    constructor(props){
+    constructor(props: any){
         super(props);
 
         this.state = {
@@ -27,13 +27,13 @@ export default class UsersGrid extends React.Component<{}, UsersGridState> {
         this.getUsers();
     }
 
-    public showLoading(){
+    public showLoading(): void{
         this.setState({
             ...this.state, isLoading: true
         });
     }
 
-    public hideLoading(){
+    public hideLoading(): void{
         this.setState({
             ...this.state, isLoading: false
         });
