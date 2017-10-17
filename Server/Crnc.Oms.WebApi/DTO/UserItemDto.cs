@@ -25,6 +25,10 @@ namespace CrncOmsWeb.DTO
 
         public string Role { get; set; }
 
+        public string PhotoBase64 { get; set; }
+
+        public string PhotoMimeType { get; set; }
+
         public bool IsActive { get; set; }
     }
 }

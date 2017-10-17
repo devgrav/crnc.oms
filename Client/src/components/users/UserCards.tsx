@@ -1,9 +1,5 @@
 import * as React from "react";
 import { Button, Card, Divider, Form, Segment } from "semantic-ui-react";
-import * as avatarJohn from "../../assets/images/man1.jpg";
-import * as avatarShon from "../../assets/images/man2.jpg";
-import * as avatarHelen from "../../assets/images/woman1.jpg";
-import * as avatarAgness from "../../assets/images/woman2.jpg";
 import { UserItemDto, UserService } from "../../services/UserService";
 import UserCard from "./UserCard";
 import UserCardEdit from "./UserCardEdit";

@@ -11,6 +11,7 @@ namespace Crnc.Oms.Domain.Aggregates.Users
     /// <summary>
     /// User of application
     /// </summary>
+    [Table("Users")]
     public class User
         : DomainEntity, IAggregateRoot
     {
@@ -24,7 +25,7 @@ namespace Crnc.Oms.Domain.Aggregates.Users
         /// <param name="lastName">LastName</param>
         /// <returns></returns>
         public static User CreateNew(string login, string passwordHash, 
-            string firstName, string lastName, string email, Role role=null)
+            string firstName, string lastName, string email, string phone=null, Role role=null, UserPhoto photo = null)
         {
             return new User()
             {
@@ -34,6 +35,8 @@ namespace Crnc.Oms.Domain.Aggregates.Users
                 LastName = lastName,
                 Email = email,
                 Role = role,
+                Phone = phone,
+                Photo = photo,
                 IsActive = true
             };
         }
@@ -97,18 +100,12 @@ namespace Crnc.Oms.Domain.Aggregates.Users
         /// <summary>
         /// Photo of user
         /// </summary>
-        public byte[] Photo { get; set; }
-
-        /// <summary>
-        /// Mime type of photo
-        /// </summary>
-        [MaxLength(50)]
-        public string PhotoMimeType { get; set; }
+        public virtual UserPhoto Photo { get; set; }
 
         /// <summary>
         /// Role
         /// </summary>
-        public Role Role { get; private set; }
+        public virtual Role Role { get; private set; }
 
         #endregion
 

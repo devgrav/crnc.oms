@@ -21,5 +21,7 @@ export interface UserItemDto{
     email: string;
     phone: string;
     role: string;
+    photoBase64: string;
+    photoMimeType: string;
     isActive: boolean;
 }
