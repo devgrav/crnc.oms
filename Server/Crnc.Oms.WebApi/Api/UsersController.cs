@@ -36,6 +36,8 @@ namespace CrncOmsWeb.Api
                 Login = u.Login,
                 Phone = u.Phone,
                 Role = u.Role.Title,
+                PhotoBase64 = u.Photo.ContentBase64,
+                PhotoMimeType = u.Photo.MimeType,
                 IsActive = u.IsActive
             }).ToList();           
         }

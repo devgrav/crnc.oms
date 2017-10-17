@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Crnc.Oms.DataAccess.DbInitialize;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.SqlServer;

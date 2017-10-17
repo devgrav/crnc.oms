@@ -52,6 +52,7 @@
     <Compile Include="Aggregates\Estimates\JobType.cs" />
     <Compile Include="Aggregates\Estimates\MaterialSource.cs" />
     <Compile Include="Aggregates\Estimates\SignoffType.cs" />
+    <Compile Include="Aggregates\Users\UserPhoto.cs" />
     <Compile Include="IRepositories\IRepository.cs" />
     <Compile Include="IRepositories\IUserRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

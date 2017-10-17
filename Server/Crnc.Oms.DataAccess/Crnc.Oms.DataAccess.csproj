@@ -52,7 +52,7 @@
   <ItemGroup>
     <Compile Include="DataContext.cs" />
     <Compile Include="DataContextConfiguration.cs" />
-    <Compile Include="DataContextDbInitializer.cs" />
+    <Compile Include="DbInitialize\DataContextDbInitializer.cs" />
     <Compile Include="Exceptions\MissingEntityException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
@@ -66,6 +66,9 @@
       <Project>{da213852-5dca-4d5b-97f8-557124c5b739}</Project>
       <Name>Crnc.Oms.Domain</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Data\UserPhotos.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

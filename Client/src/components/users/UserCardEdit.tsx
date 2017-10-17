@@ -1,29 +1,6 @@
 import * as React from "react";
-import { Button, Card, Divider, Form, Image, Grid, Modal, ModalProps } from "semantic-ui-react";
-import * as avatarJack from "../../assets/images/man1.jpg";
-import * as avatarShon from "../../assets/images/man2.jpg";
-import * as avatarHelen from "../../assets/images/woman1.jpg";
-import * as avatarAgness from "../../assets/images/woman2.jpg";
+import { Button, Card, Divider, Form, Grid, Image, Modal, ModalProps } from "semantic-ui-react";
 import { UserItemDto } from "../../services/UserService";
-
-const avatarsMap = [
-    {
-        userId: 1,
-        avatar: avatarJack
-    },
-    {
-        userId: 2,
-        avatar: avatarShon
-    },
-    {
-        userId: 3,
-        avatar: avatarHelen
-    },
-    {
-        userId: 4,
-        avatar: avatarAgness
-    }
-];
 
 export default class UserCardEdit extends React.Component<UserCardEditProps>{
 
@@ -31,10 +8,6 @@ export default class UserCardEdit extends React.Component<UserCardEditProps>{
         super(props);
 
         this.onClose = this.onClose.bind(this);
-    }
-
-    private getAvatar(userId: number){
-        return avatarsMap.filter((p) => p.userId === userId)[0].avatar;
     }
 
     private onClose(event: React.MouseEvent<HTMLElement>, data: ModalProps){
@@ -49,7 +22,11 @@ export default class UserCardEdit extends React.Component<UserCardEditProps>{
                     <Form className="ui form">
                         <Grid columns={2}>
                             <Grid.Column>
-                                <Image size="medium" src={this.getAvatar(this.props.userItem.id)} />
+                                <Image
+                                    size="medium"
+                                    src={`data:${this.props.userItem.photoMimeType};base64,
+                                        ${this.props.userItem.photoBase64}`}
+                                />
                             </Grid.Column>
                             <Grid.Column>
                                 <Form.Group>

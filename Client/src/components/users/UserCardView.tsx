@@ -6,25 +6,6 @@ import * as avatarHelen from "../../assets/images/woman1.jpg";
 import * as avatarAgness from "../../assets/images/woman2.jpg";
 import { UserItemDto } from "../../services/UserService";
 
-const avatarsMap = [
-    {
-        userId: 1,
-        avatar: avatarJack
-    },
-    {
-        userId: 2,
-        avatar: avatarShon
-    },
-    {
-        userId: 3,
-        avatar: avatarHelen
-    },
-    {
-        userId: 4,
-        avatar: avatarAgness
-    }
-];
-
 export default class UserCardView extends React.Component<UserCardViewProps>{
 
     constructor(props: UserCardViewProps){
@@ -53,10 +34,6 @@ export default class UserCardView extends React.Component<UserCardViewProps>{
         );
     }
 
-    private getAvatar(userId: number){
-        return avatarsMap.filter((p) => p.userId === userId)[0].avatar;
-    }
-
     private onEditClick(event: React.MouseEvent<HTMLButtonElement>, data: ButtonProps){
         this.props.onCardEdit();
     }
@@ -65,7 +42,11 @@ export default class UserCardView extends React.Component<UserCardViewProps>{
         return (
             <Card>
                 <Card.Content>
-                    <Image floated="left" size="mini" src={this.getAvatar(this.props.userItem.id)}/>
+                    <Image
+                        floated="left"
+                        size="mini"
+                        src={`data:${this.props.userItem.photoMimeType};base64, ${this.props.userItem.photoBase64}`}
+                    />
                     <div className="ui right floated ">
                         <Button basic icon="pencil" content="Edit" size="mini" onClick={this.onEditClick}/>
                     </div>
