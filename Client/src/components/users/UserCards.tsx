@@ -1,8 +1,8 @@
 import * as React from "react";
 import { Button, Card, Divider, Form, Segment } from "semantic-ui-react";
 import { UserItemDto, UserService } from "../../services/UserService";
-import UserCard from "./UserCard";
 import UserCardEdit from "./UserCardEdit";
+import UserCardView from "./UserCardView";
 
 export default class UserCards extends React.Component<any, UserCardsState>{
 
@@ -13,6 +13,11 @@ export default class UserCards extends React.Component<any, UserCardsState>{
             users: [],
             isLoading: false
         };
+
+        this.showLoading = this.showLoading.bind(this);
+        this.hideLoading = this.hideLoading.bind(this);
+        this.onCancelEdit = this.onCancelEdit.bind(this);
+        this.onCardEdit = this.onCardEdit.bind(this);
     }
 
     private async getUsers(): Promise<void>{
@@ -22,9 +27,21 @@ export default class UserCards extends React.Component<any, UserCardsState>{
 
         this.setState({
             ...this.state, users
-        });
+        }, () => this.getEditedUserFromRouter());
 
         this.hideLoading();
+    }
+
+    private getEditedUserFromRouter(): void{
+        const id = Number(this.props.match.params.id);
+        if (id && !isNaN(id)){
+            const user = this.state.users.find((u) => u.id === id);
+            if (user){
+                this.setState({
+                    ...this.state, editedUser: user
+                });
+            }
+        }
     }
 
     public componentDidMount(): void{
@@ -43,14 +60,31 @@ export default class UserCards extends React.Component<any, UserCardsState>{
         });
     }
 
+    private onCardEdit(user: UserItemDto){
+        this.setState({
+            ...this.state, editedUser: user
+        });
+    }
+
+    private onCancelEdit(){
+        this.setState({
+            ...this.state, editedUser: undefined
+        });
+    }
+
     public render(){
         return (
             <Segment loading={this.state.isLoading} basic>
                 <Card.Group>
                     {this.state.users.map((u) => {
-                        return <UserCard key={u.id} userItem={u}/>;
+                        return <UserCardView key={u.id} userItem={u} onCardEdit={this.onCardEdit}/>;
                     })}
                 </Card.Group>
+                {this.state.editedUser &&
+                    <UserCardEdit
+                        userItem={this.state.editedUser}
+                        onCancelEdit={this.onCancelEdit}
+                    />}
             </Segment>
         );
     }
@@ -58,5 +92,6 @@ export default class UserCards extends React.Component<any, UserCardsState>{
 
 interface UserCardsState{
     users: UserItemDto[];
+    editedUser?: UserItemDto;
     isLoading: boolean;
 }

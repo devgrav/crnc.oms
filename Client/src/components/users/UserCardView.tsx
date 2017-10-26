@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button, Card, Divider, Form, Image, Icon, ButtonProps } from "semantic-ui-react";
+import { Button, ButtonProps, Card, Divider, Form, Icon, Image } from "semantic-ui-react";
 import * as avatarJack from "../../assets/images/man1.jpg";
 import * as avatarShon from "../../assets/images/man2.jpg";
 import * as avatarHelen from "../../assets/images/woman1.jpg";
@@ -35,7 +35,7 @@ export default class UserCardView extends React.Component<UserCardViewProps>{
     }
 
     private onEditClick(event: React.MouseEvent<HTMLButtonElement>, data: ButtonProps){
-        this.props.onCardEdit();
+        this.props.onCardEdit(this.props.userItem);
     }
 
     public render(){
@@ -67,5 +67,5 @@ export default class UserCardView extends React.Component<UserCardViewProps>{
 
 interface UserCardViewProps{
     userItem: UserItemDto;
-    onCardEdit(): void;
+    onCardEdit(user: UserItemDto): void;
 }
