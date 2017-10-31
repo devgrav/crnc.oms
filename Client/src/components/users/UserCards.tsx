@@ -1,9 +1,9 @@
 import * as React from "react";
+import { Redirect } from "react-router";
 import { Button, Card, Divider, Form, Segment } from "semantic-ui-react";
 import { UserItemDto, UserService } from "../../services/UserService";
 import UserCardEdit from "./UserCardEdit";
 import UserCardView from "./UserCardView";
-import { Redirect } from "react-router";
 
 export default class UserCards extends React.Component<any, UserCardsState>{
 
@@ -91,7 +91,6 @@ export default class UserCards extends React.Component<any, UserCardsState>{
     }
 
     public componentWillReceiveProps(nextProps: any): void{
-        console.log(nextProps);
         this.handleEditedUserByRoute(nextProps, this.state.users);
     }
 
@@ -109,7 +108,7 @@ export default class UserCards extends React.Component<any, UserCardsState>{
                 </Card.Group>
                 {this.state.editedUser &&
                     <UserCardEdit
-                        userItem={this.state.editedUser}
+                        user={this.state.editedUser}
                         onCancelEdit={this.onCancelEdit}
                     />}
             </Segment>
