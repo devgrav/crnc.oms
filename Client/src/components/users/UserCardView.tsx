@@ -1,17 +1,12 @@
 import * as React from "react";
+import { Link } from "react-router-dom";
 import { Button, ButtonProps, Card, Divider, Form, Icon, Image } from "semantic-ui-react";
-import * as avatarJack from "../../assets/images/man1.jpg";
-import * as avatarShon from "../../assets/images/man2.jpg";
-import * as avatarHelen from "../../assets/images/woman1.jpg";
-import * as avatarAgness from "../../assets/images/woman2.jpg";
 import { UserItemDto } from "../../services/UserService";
 
 export default class UserCardView extends React.Component<UserCardViewProps>{
 
     constructor(props: UserCardViewProps){
         super(props);
-
-        this.onEditClick = this.onEditClick.bind(this);
     }
 
     private renderCardInfo(){
@@ -34,10 +29,6 @@ export default class UserCardView extends React.Component<UserCardViewProps>{
         );
     }
 
-    private onEditClick(event: React.MouseEvent<HTMLButtonElement>, data: ButtonProps){
-        this.props.onCardEdit(this.props.userItem);
-    }
-
     public render(){
         return (
             <Card>
@@ -48,7 +39,14 @@ export default class UserCardView extends React.Component<UserCardViewProps>{
                         src={`data:${this.props.userItem.photoMimeType};base64, ${this.props.userItem.photoBase64}`}
                     />
                     <div className="ui right floated ">
-                        <Button basic icon="pencil" content="Edit" size="mini" onClick={this.onEditClick}/>
+                        <Button
+                            as={Link}
+                            to={`/users/${this.props.userItem.id}`}
+                            basic
+                            icon="pencil"
+                            content="Edit"
+                            size="mini"
+                        />
                     </div>
                     <Card.Header>
                         {this.props.userItem.fullName}
@@ -67,5 +65,4 @@ export default class UserCardView extends React.Component<UserCardViewProps>{
 
 interface UserCardViewProps{
     userItem: UserItemDto;
-    onCardEdit(user: UserItemDto): void;
 }
