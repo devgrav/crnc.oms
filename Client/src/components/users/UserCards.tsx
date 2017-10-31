@@ -3,6 +3,7 @@ import { Button, Card, Divider, Form, Segment } from "semantic-ui-react";
 import { UserItemDto, UserService } from "../../services/UserService";
 import UserCardEdit from "./UserCardEdit";
 import UserCardView from "./UserCardView";
+import { Redirect } from "react-router";
 
 export default class UserCards extends React.Component<any, UserCardsState>{
 
@@ -11,41 +12,54 @@ export default class UserCards extends React.Component<any, UserCardsState>{
 
         this.state = {
             users: [],
-            isLoading: false
+            isLoading: false,
+            isRequiredRedirectToNotFound: false
         };
 
         this.showLoading = this.showLoading.bind(this);
         this.hideLoading = this.hideLoading.bind(this);
         this.onCancelEdit = this.onCancelEdit.bind(this);
-        this.onCardEdit = this.onCardEdit.bind(this);
     }
 
-    private async getUsers(): Promise<void>{
+    private async getUsers(): Promise<UserItemDto[]>{
         this.showLoading();
-
         const users = await UserService.getUsersGrid();
-
-        this.setState({
-            ...this.state, users
-        }, () => this.getEditedUserFromRouter());
-
         this.hideLoading();
+
+        return users;
     }
 
-    private getEditedUserFromRouter(): void{
-        const id = Number(this.props.match.params.id);
+    private getEditedUserByRouteId(users: UserItemDto[], idString: string): UserItemDto | undefined{
+        const id = Number(idString);
         if (id && !isNaN(id)){
-            const user = this.state.users.find((u) => u.id === id);
+            return users.find((u) => u.id === id);
+        }
+        if (isNaN(id)){
+            return undefined;
+        }
+
+        return undefined;
+    }
+
+    private handleEditedUserByRoute(props: any, users: UserItemDto[]): void{
+        if (props.match.params.id){
+            const user = this.getEditedUserByRouteId(users, props.match.params.id);
             if (user){
                 this.setState({
                     ...this.state, editedUser: user
                 });
             }
+            else{
+                this.setState({
+                    ...this.state, isRequiredRedirectToNotFound: true
+                });
+            }
         }
-    }
-
-    public componentDidMount(): void{
-        this.getUsers();
+        else{
+            this.setState({
+                ...this.state, editedUser: undefined
+            });
+        }
     }
 
     private showLoading(): void{
@@ -60,24 +74,37 @@ export default class UserCards extends React.Component<any, UserCardsState>{
         });
     }
 
-    private onCardEdit(user: UserItemDto){
+    private onCancelEdit(): void{
         this.setState({
-            ...this.state, editedUser: user
+            editedUser: undefined
         });
+
+        this.props.history.push("/users");
     }
 
-    private onCancelEdit(){
+    public async componentDidMount(): Promise<void>{
+        const users = await this.getUsers();
         this.setState({
-            ...this.state, editedUser: undefined
+            ...this.state, users
         });
+        this.handleEditedUserByRoute(this.props, users);
+    }
+
+    public componentWillReceiveProps(nextProps: any): void{
+        console.log(nextProps);
+        this.handleEditedUserByRoute(nextProps, this.state.users);
     }
 
     public render(){
+        if (this.state.isRequiredRedirectToNotFound){
+            return <Redirect to="/404"/>;
+        }
+
         return (
             <Segment loading={this.state.isLoading} basic>
                 <Card.Group>
                     {this.state.users.map((u) => {
-                        return <UserCardView key={u.id} userItem={u} onCardEdit={this.onCardEdit}/>;
+                        return <UserCardView key={u.id} userItem={u}/>;
                     })}
                 </Card.Group>
                 {this.state.editedUser &&
@@ -94,4 +121,5 @@ interface UserCardsState{
     users: UserItemDto[];
     editedUser?: UserItemDto;
     isLoading: boolean;
+    isRequiredRedirectToNotFound: boolean;
 }
