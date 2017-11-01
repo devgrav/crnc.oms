@@ -41,6 +41,24 @@ namespace Crnc.Oms.Domain.Aggregates.Users
             };
         }
 
+        public static User CreateExisted(int id,string login, string passwordHash,
+            string firstName, string lastName, string email, string phone = null, Role role = null, UserPhoto photo = null)
+        {
+            return new User()
+            {
+                Id = id,
+                Login = login,
+                PasswordHash = passwordHash,
+                FirstName = firstName,
+                LastName = lastName,
+                Email = email,
+                Role = role,
+                Phone = phone,
+                Photo = photo,
+                IsActive = true
+            };
+        }
+
         protected User()
         {
 
