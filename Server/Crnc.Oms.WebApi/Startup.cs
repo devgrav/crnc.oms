@@ -37,7 +37,10 @@ namespace Crnc.Oms.WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors(options => {
-                options.AddPolicy("AllOrigins", builder => builder.AllowAnyOrigin());
+                options.AddPolicy("AllOrigins", builder => builder
+                    .AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod());
             });
             services.AddMvc();
             services.AddScoped<DataContext>(_ => new DataContext(Configuration.GetConnectionString("oms")));

@@ -1,6 +1,6 @@
 import * as React from "react";
-import { Button, Card, Divider, Form, Grid, Image, InputOnChangeData, Modal, ModalProps } from "semantic-ui-react";
-import { UserItemDto } from "../../services/UserService";
+import { Button, ButtonProps, Card, Divider, Form, Grid, Image, InputOnChangeData, Modal, ModalProps } from "semantic-ui-react";
+import { UserItemDto, UserService } from "../../services/UserService";
 
 export default class UserCardEdit extends React.Component<UserCardEditProps, UserCardEditState>{
 
@@ -8,15 +8,44 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
         super(props);
 
         this.state = {
-            user: props.user
+            user: props.user,
+            isLoading: false
         };
 
         this.onClose = this.onClose.bind(this);
         this.onChange = this.onChange.bind(this);
+        this.onCancel = this.onCancel.bind(this);
+        this.onSave = this.onSave.bind(this);
     }
 
-    private onClose(event: React.MouseEvent<HTMLElement>, data: ModalProps){
+    private showLoader(){
+        this.setState({
+            isLoading: true
+        });
+    }
+
+    private hideLoader(){
+        this.setState({
+            isLoading: false
+        });
+    }
+
+    private onClose(event: React.MouseEvent<HTMLElement>, data: ModalProps): void{
         this.props.onCancelEdit();
+    }
+
+    private onCancel(event: React.MouseEvent<HTMLButtonElement>, data: ButtonProps): void{
+        this.props.onCancelEdit();
+    }
+
+    private async onSave(event: React.MouseEvent<HTMLButtonElement>, data: ButtonProps): Promise<void>{
+       try{
+           this.showLoader();
+           await UserService.putUser(this.props.user);
+           this.hideLoader();
+       }catch (error){
+            this.hideLoader();
+        }
     }
 
     private onChange(event: any, data: any): void{
@@ -33,7 +62,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
             <Modal open={true} closeIcon onClose={this.onClose}>
                 <Modal.Header>Edit user</Modal.Header>
                 <Modal.Content image>
-                    <Form className="ui form">
+                    <Form id="userForm" loading={this.state.isLoading} className="ui form" onSubmit={this.onSave}>
                         <Grid columns={2}>
                             <Grid.Column>
                                 <Image
@@ -98,8 +127,8 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                     </Form>
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button basic color="green" type="submit" content="Save"/>
-                    <Button basic color="red" type="reset" content="Cancel"/>
+                    <Button basic color="green" type="submit" content="Save" form="userForm"/>
+                    <Button basic color="red" type="reset" content="Cancel" onClick={this.onCancel}/>
                 </Modal.Actions>
             </Modal>
         );
@@ -113,4 +142,5 @@ interface UserCardEditProps{
 
 interface UserCardEditState{
     user: UserItemDto;
+    isLoading: boolean;
 }

@@ -9,6 +9,27 @@ export class UserService{
                 return response.data;
             });
     }
+
+    public static postUser(user: UserItemDto): Promise<void>{
+        return axios.post(APP_CONFIG.usersUrl, user)
+            .then((response) => {
+                return;
+            });
+    }
+
+    public static putUser(user: UserItemDto): Promise<void>{
+        return axios.put(`${APP_CONFIG.usersUrl}/${user.id}`, {user})
+            .then((response) => {
+                return;
+            });
+    }
+
+    public static deleteUser(id: number): Promise<void>{
+        return axios.delete(APP_CONFIG.usersUrl, {data: {id}})
+            .then((response) => {
+                return;
+            });
+    }
 }
 
 export interface UserItemDto{
