@@ -108,7 +108,7 @@ namespace Crnc.Oms.Domain.Aggregates.Users
         public string Email { get; private set; }
 
         [MaxLength(200)]
-        public string Phone { get; set; }
+        public string Phone { get; private set; }
 
         /// <summary>
         /// Property of active user
@@ -164,6 +164,7 @@ namespace Crnc.Oms.Domain.Aggregates.Users
 
             LastName = lastName;
         }
+
         /// <summary>
         /// Change email
         /// </summary>
@@ -174,6 +175,18 @@ namespace Crnc.Oms.Domain.Aggregates.Users
                 throw new ArgumentNullException("Changed email is empty");
 
             Email = email;
+        }
+
+        /// <summary>
+        /// Change phone
+        /// </summary>
+        /// <param name="phone">email</param>
+        public void ChangePhone(string phone)
+        {
+            if (string.IsNullOrWhiteSpace(phone))
+                throw new ArgumentNullException("Changed phone is empty");
+
+            Phone = phone;
         }
 
         /// <summary>

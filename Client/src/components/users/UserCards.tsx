@@ -22,11 +22,16 @@ export default class UserCards extends React.Component<any, UserCardsState>{
     }
 
     private async getUsers(): Promise<UserItemDto[]>{
-        this.showLoading();
-        const users = await UserService.getUsersGrid();
-        this.hideLoading();
+        try{
+            this.showLoading();
+            const users = await UserService.getUsersGrid();
+            this.hideLoading();
 
-        return users;
+            return users;
+        }catch (error) {
+            this.hideLoading();
+            return Promise.reject(new Error("500"));
+        }
     }
 
     private getEditedUserByRouteId(users: UserItemDto[], idString: string): UserItemDto | undefined{
