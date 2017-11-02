@@ -41,8 +41,10 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
     private async onSave(event: React.MouseEvent<HTMLButtonElement>, data: ButtonProps): Promise<void>{
        try{
            this.showLoader();
-           await UserService.putUser(this.props.user);
+           await UserService.putUser(this.state.user);
            this.hideLoader();
+           this.props.onCancelEdit();
+           this.props.onSaved();
        }catch (error){
             this.hideLoader();
         }
@@ -138,6 +140,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
 interface UserCardEditProps{
     user: UserItemDto;
     onCancelEdit(): void;
+    onSaved(): void;
 }
 
 interface UserCardEditState{

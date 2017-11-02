@@ -4,6 +4,7 @@ import { Button, Card, Divider, Form, Segment } from "semantic-ui-react";
 import { UserItemDto, UserService } from "../../services/UserService";
 import UserCardEdit from "./UserCardEdit";
 import UserCardView from "./UserCardView";
+import { Link } from "react-router-dom";
 
 export default class UserCards extends React.Component<any, UserCardsState>{
 
@@ -19,6 +20,7 @@ export default class UserCards extends React.Component<any, UserCardsState>{
         this.showLoading = this.showLoading.bind(this);
         this.hideLoading = this.hideLoading.bind(this);
         this.onCancelEdit = this.onCancelEdit.bind(this);
+        this.onSaved = this.onSaved.bind(this);
     }
 
     private async getUsers(): Promise<UserItemDto[]>{
@@ -30,7 +32,7 @@ export default class UserCards extends React.Component<any, UserCardsState>{
             return users;
         }catch (error) {
             this.hideLoading();
-            return Promise.reject(new Error("500"));
+            return Promise.reject(error);
         }
     }
 
@@ -87,6 +89,13 @@ export default class UserCards extends React.Component<any, UserCardsState>{
         this.props.history.push("/users");
     }
 
+    private async onSaved(): Promise<void> {
+        const users = await this.getUsers();
+        this.setState({
+            users
+        });
+    }
+
     public async componentDidMount(): Promise<void>{
         const users = await this.getUsers();
         this.setState({
@@ -115,6 +124,7 @@ export default class UserCards extends React.Component<any, UserCardsState>{
                     <UserCardEdit
                         user={this.state.editedUser}
                         onCancelEdit={this.onCancelEdit}
+                        onSaved={this.onSaved}
                     />}
             </Segment>
         );

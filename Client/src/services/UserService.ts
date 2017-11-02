@@ -18,7 +18,7 @@ export class UserService{
     }
 
     public static putUser(user: UserItemDto): Promise<void>{
-        return axios.put(`${APP_CONFIG.usersUrl}/${user.id}`, {user})
+        return axios.put(`${APP_CONFIG.usersUrl}/${user.id}`, user)
             .then((response) => {
                 return;
             });
