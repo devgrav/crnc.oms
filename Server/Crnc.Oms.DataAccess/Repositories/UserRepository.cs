@@ -89,6 +89,8 @@ namespace Crnc.Oms.DataAccess.Repositories
             currentUser.ChangeFirstName(modifiedUser.FirstName);
             currentUser.ChangeLastName(modifiedUser.LastName);
             currentUser.ChangePassword(modifiedUser.PasswordHash);
+
+            _dbContext.SaveChanges();
         } 
 
         #endregion
