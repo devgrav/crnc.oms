@@ -1,7 +1,5 @@
 import * as React from "react";
 import {Container} from "semantic-ui-react";
-import EstimatesGrid from "../estimates/EstimatesGrid";
-import UsersGrid from "../users/UsersGrid";
 import Content from "./Content";
 import TopMenu from "./TopMenu";
 
