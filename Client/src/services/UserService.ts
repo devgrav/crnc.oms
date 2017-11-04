@@ -34,15 +34,15 @@ export class UserService{
 
 export interface UserItemDto{
     id: number;
-    fullName: string;
-    firstName: string;
-    lastName: string;
-    login: string;
-    password: string;
-    email: string;
-    phone: string;
-    role: string;
-    photoBase64: string;
-    photoMimeType: string;
+    fullName?: string;
+    firstName?: string;
+    lastName?: string;
+    login?: string;
+    password?: string;
+    email?: string;
+    phone?: string;
+    role?: string;
+    photoBase64?: string;
+    photoMimeType?: string;
     isActive: boolean;
 }
