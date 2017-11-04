@@ -37,6 +37,13 @@ export default class UserCards extends React.Component<any, UserCardsState>{
     }
 
     private getEditedUserByRouteId(users: UserItemDto[], idString: string): UserItemDto | undefined{
+        if (idString === "new"){
+            return {
+                id: 0,
+                isActive: true
+            };
+        }
+
         const id = Number(idString);
         if (id && !isNaN(id)){
             return users.find((u) => u.id === id);
@@ -114,19 +121,30 @@ export default class UserCards extends React.Component<any, UserCardsState>{
         }
 
         return (
-            <Segment loading={this.state.isLoading} basic>
-                <Card.Group>
-                    {this.state.users.map((u) => {
-                        return <UserCardView key={u.id} userItem={u}/>;
-                    })}
-                </Card.Group>
-                {this.state.editedUser &&
-                    <UserCardEdit
-                        user={this.state.editedUser}
-                        onCancelEdit={this.onCancelEdit}
-                        onSaved={this.onSaved}
-                    />}
-            </Segment>
+            <div>
+                <Segment loading={this.state.isLoading} basic>
+                    <Button
+                         as={Link}
+                         to="/users/new"
+                         floated="right"
+                         icon="plus"
+                         title="Add new user"
+                         primary
+                         circular
+                    />
+                    <Card.Group>
+                        {this.state.users.map((u) => {
+                            return <UserCardView key={u.id} userItem={u}/>;
+                        })}
+                    </Card.Group>
+                    {this.state.editedUser &&
+                        <UserCardEdit
+                            user={this.state.editedUser}
+                            onCancelEdit={this.onCancelEdit}
+                            onSaved={this.onSaved}
+                        />}
+                </Segment>
+            </div>
         );
     }
 }

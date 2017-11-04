@@ -1,5 +1,6 @@
 import * as React from "react";
-import { Button, ButtonProps, Card, Divider, Form, Grid, Image, InputOnChangeData, Modal, ModalProps } from "semantic-ui-react";
+import { Button, ButtonProps, Card, Divider, Form, Grid, Image, InputOnChangeData, Modal, ModalProps, Segment } from "semantic-ui-react";
+import * as noAvatar from "../../assets/images/noavatar.png";
 import { UserItemDto, UserService } from "../../services/UserService";
 
 export default class UserCardEdit extends React.Component<UserCardEditProps, UserCardEditState>{
@@ -41,7 +42,12 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
     private async onSave(event: React.MouseEvent<HTMLButtonElement>, data: ButtonProps): Promise<void>{
        try{
            this.showLoader();
-           await UserService.putUser(this.state.user);
+           if (this.state.user.id === 0){
+                await UserService.postUser(this.state.user);
+           }
+           else{
+                await UserService.putUser(this.state.user);
+           }
            this.hideLoader();
            this.props.onCancelEdit();
            this.props.onSaved();
@@ -62,19 +68,24 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
     public render(){
         return (
             <Modal open={true} closeIcon onClose={this.onClose}>
-                <Modal.Header>Edit user</Modal.Header>
-                <Modal.Content image>
-                    <Form id="userForm" loading={this.state.isLoading} className="ui form" onSubmit={this.onSave}>
+                <Modal.Header>{this.props.user.id === 0 ? "Add new user" : "Edit user"}</Modal.Header>
+                <Modal.Content as={Segment} basic clearing loading={this.state.isLoading}>
+                    <Form id="userForm" className="ui form" onSubmit={this.onSave}>
                         <Grid columns={2}>
-                            <Grid.Column>
+                        <Grid.Row>
+                            <Grid.Column width={5}>
                                 <Image
-                                    size="medium"
-                                    src={`data:${this.state.user.photoMimeType};base64,
+                                    bordered
+                                    fluid
+                                    src={this.props.user.id === 0 || this.props.user.photoBase64 === null
+                                        ? noAvatar
+                                        : `data:${this.state.user.photoMimeType};base64,
                                         ${this.state.user.photoBase64}`}
                                 />
+                                <Button attached="top" icon="upload" content="Upload photo"/>
                             </Grid.Column>
-                            <Grid.Column>
-                                <Form.Group>
+                            <Grid.Column  width={11}>
+                                <Form.Group widths="equal">
                                     <Form.Input
                                         name="login"
                                         onChange={this.onChange}
@@ -89,7 +100,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                         value={this.state.user.password}
                                     />
                                 </Form.Group>
-                                <Form.Group>
+                                <Form.Group widths="equal">
                                     <Form.Input
                                         name="firstName"
                                         onChange={this.onChange}
@@ -103,7 +114,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                         value={this.state.user.lastName}
                                     />
                                 </Form.Group>
-                                <Form.Group>
+                                <Form.Group widths="equal">
                                     <Form.Input
                                         name="email"
                                         onChange={this.onChange}
@@ -123,8 +134,10 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                     onChange={this.onChange}
                                     label="Active"
                                     checked={this.state.user.isActive}
+                                    disabled={this.props.user.id === 0}
                                 />
                             </Grid.Column>
+                            </Grid.Row>
                         </Grid>
                     </Form>
                 </Modal.Content>

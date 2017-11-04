@@ -38,8 +38,8 @@ namespace CrncOmsWeb.Api
                 Login = u.Login,
                 Phone = u.Phone,
                 Role = u.Role.Title,
-                PhotoBase64 = u.Photo.ContentBase64,
-                PhotoMimeType = u.Photo.MimeType,
+                PhotoBase64 = u.Photo?.ContentBase64,
+                PhotoMimeType = u.Photo?.MimeType,
                 IsActive = u.IsActive
             }).ToList();           
         }
@@ -61,8 +61,8 @@ namespace CrncOmsWeb.Api
                 Login = user.Login,
                 Phone = user.Phone,
                 Role = user.Role.Title,
-                PhotoBase64 = user.Photo.ContentBase64,
-                PhotoMimeType = user.Photo.MimeType,
+                PhotoBase64 = user.Photo?.ContentBase64,
+                PhotoMimeType = user.Photo?.MimeType,
                 IsActive = user.IsActive
             };
         }
@@ -71,7 +71,8 @@ namespace CrncOmsWeb.Api
         [HttpPost]
         public void Post([FromBody]UserItemDto user)
         {
-            var entity = UserEntity.CreateNew(user.Login, user.Password, user.FirstName, user.LastName, user.Email, user.Phone);
+            var entity = UserEntity.CreateNew(user.Login, user.Password, 
+                user.FirstName, user.LastName, user.Email, user.Phone);
             _userRepository.Add(entity);
         }
 
@@ -79,7 +80,9 @@ namespace CrncOmsWeb.Api
         [HttpPut("{id}")]
         public void Put(int id, [FromBody]UserItemDto user)
         {
-            var entity = UserEntity.CreateExisted(id,user.Login, user.Password, user.FirstName, user.LastName, user.Email, user.Phone);
+            var entity = UserEntity.CreateExisted(id,user.Login, user.Password, 
+                user.FirstName, user.LastName, user.Email, new Role(user.Role), user.IsActive, user.Phone);
+
             _userRepository.Save(entity);
         }
 

@@ -40,7 +40,7 @@ namespace Crnc.Oms.DataAccess.Repositories
         {
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
-
+           
             _dbContext.Users.Add(entity);
 
             _dbContext.SaveChanges();                       
@@ -89,6 +89,11 @@ namespace Crnc.Oms.DataAccess.Repositories
             currentUser.ChangeFirstName(modifiedUser.FirstName);
             currentUser.ChangeLastName(modifiedUser.LastName);
             currentUser.ChangePassword(modifiedUser.PasswordHash);
+
+            if (modifiedUser.IsActive)
+                currentUser.Activate();
+            else
+                currentUser.Deactivate();
 
             _dbContext.SaveChanges();
         } 

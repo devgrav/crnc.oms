@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
 import { Button, ButtonProps, Card, Divider, Form, Icon, Image } from "semantic-ui-react";
+import * as noAvatar from "../../assets/images/noavatar.png";
 import { UserItemDto } from "../../services/UserService";
 
 export default class UserCardView extends React.Component<UserCardViewProps>{
@@ -36,7 +37,10 @@ export default class UserCardView extends React.Component<UserCardViewProps>{
                     <Image
                         floated="left"
                         size="mini"
-                        src={`data:${this.props.userItem.photoMimeType};base64, ${this.props.userItem.photoBase64}`}
+                        src={this.props.userItem.photoBase64 === null
+                            ? noAvatar
+                            : `data:${this.props.userItem.photoMimeType};base64,
+                            ${this.props.userItem.photoBase64}`}
                     />
                     <div className="ui right floated ">
                         <Button
