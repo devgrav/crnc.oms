@@ -50,5 +50,11 @@ namespace Crnc.Oms.Domain.Aggregates.Users
         {
 
         }
+
+        public UserPhoto(string base64Content, string mimeType)
+        {
+            this.Content = Convert.FromBase64String(base64Content);
+            this.MimeType = mimeType;
+        }
     }
 }

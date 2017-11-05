@@ -72,7 +72,7 @@ namespace CrncOmsWeb.Api
         public void Post([FromBody]UserItemDto user)
         {
             var entity = UserEntity.CreateNew(user.Login, user.Password, 
-                user.FirstName, user.LastName, user.Email, user.Phone);
+                user.FirstName, user.LastName, user.Email, user.Phone,null,new UserPhoto(user.PhotoBase64,user.PhotoMimeType));
             _userRepository.Add(entity);
         }
 
