@@ -17,7 +17,11 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
         this.onChange = this.onChange.bind(this);
         this.onCancel = this.onCancel.bind(this);
         this.onSave = this.onSave.bind(this);
+        this.onFileUploadClick = this.onFileUploadClick.bind(this);
+        this.onFileSelected = this.onFileSelected.bind(this);
     }
+
+    private fileInput: HTMLInputElement | null;
 
     private showLoader(){
         this.setState({
@@ -37,6 +41,30 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
 
     private onCancel(event: React.MouseEvent<HTMLButtonElement>, data: ButtonProps): void{
         this.props.onCancelEdit();
+    }
+
+    private onFileUploadClick(event: React.MouseEvent<HTMLButtonElement>, data: ButtonProps): void{
+        if (this.fileInput){
+            this.fileInput.click();
+        }
+    }
+
+    private onFileSelected(event: any): void{
+        const files: FileList = event.nativeEvent.target.files;
+        if (files && files.length > 0){
+            const file = files[0];
+            const fileReader = new FileReader();
+            fileReader.onload = (e: any) => {
+                const binaryString = fileReader.result;
+                const base64StringPhoto = btoa(binaryString);
+                const user = {...this.state.user, ...{photoBase64: base64StringPhoto, photoMimeType: file.type}};
+                this.setState({
+                    user
+                });
+            };
+
+            fileReader.readAsBinaryString(file);
+        }
     }
 
     private async onSave(event: React.MouseEvent<HTMLButtonElement>, data: ButtonProps): Promise<void>{
@@ -77,12 +105,26 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                 <Image
                                     bordered
                                     fluid
-                                    src={this.props.user.id === 0 || this.props.user.photoBase64 === null
+                                    src={this.state.user.photoBase64 === null
+                                        || this.state.user.photoBase64 === undefined
                                         ? noAvatar
                                         : `data:${this.state.user.photoMimeType};base64,
                                         ${this.state.user.photoBase64}`}
                                 />
-                                <Button attached="top" icon="upload" content="Upload photo"/>
+                                <Button
+                                    attached="top"
+                                    icon="upload"
+                                    content="Upload photo"
+                                    onClick={this.onFileUploadClick}
+                                />
+                                <input
+                                    ref={(input) => this.fileInput = input}
+                                    style={{display: "none"}}
+                                    onChange={this.onFileSelected}
+                                    id="uploadPhoto"
+                                    type="file"
+                                    accept="image/*"
+                                />
                             </Grid.Column>
                             <Grid.Column  width={11}>
                                 <Form.Group widths="equal">

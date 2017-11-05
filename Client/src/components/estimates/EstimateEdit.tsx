@@ -1,6 +1,6 @@
 import * as React from "react";
 
-export default class UserEdit extends React.Component<any>{
+export default class EstimateEdit extends React.Component<any>{
 
     constructor(props: any){
         super(props);
@@ -10,7 +10,7 @@ export default class UserEdit extends React.Component<any>{
 
         return(
             <div>
-                {`Edit user ${this.props.match.params.id}`}
+                {`Edit estimate ${this.props.match.params.id}`}
             </div>
         );
     }

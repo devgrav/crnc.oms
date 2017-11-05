@@ -6,6 +6,7 @@ import JobsGrid from "./components/jobs/JobsGrid";
 import NotFound from "./components/notFound/NotFound";
 import UserCardEdit from "./components/users/UserCardEdit";
 import UserCards from "./components/users/UserCards";
+import EstimateEdit from "./components/estimates/EstimateEdit";
 
 const Routes: React.StatelessComponent = () => {
     return (
@@ -13,6 +14,7 @@ const Routes: React.StatelessComponent = () => {
             <Route exact path="/" component={UserCards}/>
             <Route path="/users/:id" component={UserCards}/>
             <Route path="/users" component={UserCards}/>
+            <Route path="/estimates/:id" component={EstimateEdit}/>
             <Route path="/estimates" component={EstimatesGrid}/>
             <Route path="/jobs" component={JobsGrid}/>
             <Route component={NotFound}/>
