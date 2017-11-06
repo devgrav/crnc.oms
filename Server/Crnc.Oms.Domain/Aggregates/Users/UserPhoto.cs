@@ -32,7 +32,10 @@ namespace Crnc.Oms.Domain.Aggregates.Users
         public string ContentBase64 {
             get
             {
-                return Convert.ToBase64String(this.Content);
+                if(this.Content != null)
+                    return Convert.ToBase64String(this.Content);
+
+                return null;
             }
         }
 
@@ -53,8 +56,10 @@ namespace Crnc.Oms.Domain.Aggregates.Users
 
         public UserPhoto(string base64Content, string mimeType)
         {
-            this.Content = Convert.FromBase64String(base64Content);
-            this.MimeType = mimeType;
+            if(!string.IsNullOrWhiteSpace(base64Content))
+                this.Content = Convert.FromBase64String(base64Content);
+            if (!string.IsNullOrWhiteSpace(mimeType))
+                this.MimeType = mimeType;
         }
     }
 }
