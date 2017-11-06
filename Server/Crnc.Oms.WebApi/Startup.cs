@@ -11,6 +11,8 @@ using Microsoft.Extensions.Options;
 using Crnc.Oms.DataAccess;
 using Crnc.Oms.Domain.IRepositories;
 using Crnc.Oms.DataAccess.Repositories;
+using System.Globalization;
+using Newtonsoft.Json.Serialization;
 
 namespace Crnc.Oms.WebApi
 {
@@ -42,7 +44,8 @@ namespace Crnc.Oms.WebApi
                     .AllowAnyHeader()
                     .AllowAnyMethod());
             });
-            services.AddMvc();
+            services.AddMvc()
+                .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver());
             services.AddScoped<DataContext>(_ => new DataContext(Configuration.GetConnectionString("oms")));
             services.AddScoped<IUserRepository, UserRepository>();
         }
@@ -59,6 +62,10 @@ namespace Crnc.Oms.WebApi
 
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
+
+            var cultureInfo = new CultureInfo("en-US");
+            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
             app.UseCors("AllOrigins");
             app.UseMvc();

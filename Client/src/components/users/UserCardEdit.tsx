@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button, ButtonProps, Card, Divider, Form, Grid, Image, InputOnChangeData, Modal, ModalProps, Segment } from "semantic-ui-react";
+import { Button, ButtonProps, Card, Divider, Form, Grid, Image, InputOnChangeData, Modal, ModalProps, Segment, Message } from "semantic-ui-react";
 import * as noAvatar from "../../assets/images/noavatar.png";
 import { UserItemDto, UserService } from "../../services/UserService";
 
@@ -81,6 +81,13 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
            this.props.onSaved();
        }catch (error){
             this.hideLoader();
+            if (error.response){
+                if (error.response.status === 400){
+                    this.setState({
+                        validationInfo: error.response.data
+                    });
+                }
+            }
         }
     }
 
@@ -88,9 +95,40 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
         const name = data.name;
         const value = data.type === "checkbox" ? data.checked : data.value;
         const user = {...this.state.user, ...{[name]: value}};
+
+        let validationInfo;
+        if (this.state.validationInfo && this.state.validationInfo[name]){
+            validationInfo = {...this.state.validationInfo};
+            delete validationInfo[name];
+            if (Object.keys(validationInfo).length === 0){
+                validationInfo = undefined;
+            }
+        }
+
         this.setState({
-            user
+            user, validationInfo
         });
+    }
+
+    private getValidationMessages(): string[]{
+        if (this.state.validationInfo){
+            let messages: string[] = [];
+            Object.keys(this.state.validationInfo).forEach((key) => {
+                messages = messages.concat(this.state.validationInfo[key]);
+              });
+
+            return messages;
+        }
+
+        return [];
+    }
+
+    private hasFieldValidationError(name: string){
+        if (this.state.validationInfo && this.state.validationInfo[name]){
+            return true;
+        }
+
+        return false;
     }
 
     public render(){
@@ -98,6 +136,11 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
             <Modal open={true} closeIcon onClose={this.onClose}>
                 <Modal.Header>{this.props.user.id === 0 ? "Add new user" : "Edit user"}</Modal.Header>
                 <Modal.Content as={Segment} basic clearing loading={this.state.isLoading}>
+                    {this.state.validationInfo && <Message
+                        error
+                        header="There was some errors with your submission"
+                        list={this.getValidationMessages()}
+                    />}
                     <Form id="userForm" className="ui form" onSubmit={this.onSave}>
                         <Grid columns={2}>
                         <Grid.Row>
@@ -130,13 +173,17 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                 <Form.Group widths="equal">
                                     <Form.Input
                                         name="login"
+                                        className="required"
                                         onChange={this.onChange}
+                                        error={this.hasFieldValidationError("login")}
                                         label="Login"
                                         value={this.state.user.login}
                                     />
                                     <Form.Input
                                         name="password"
+                                        className="required"
                                         onChange={this.onChange}
+                                        error={this.hasFieldValidationError("password")}
                                         label="Password"
                                         type="password"
                                         value={this.state.user.password}
@@ -145,13 +192,17 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                 <Form.Group widths="equal">
                                     <Form.Input
                                         name="firstName"
+                                        className="required"
                                         onChange={this.onChange}
+                                        error={this.hasFieldValidationError("firstName")}
                                         label="First name"
                                         value={this.state.user.firstName}
                                     />
                                     <Form.Input
                                         name="lastName"
+                                        className="required"
                                         onChange={this.onChange}
+                                        error={this.hasFieldValidationError("lastName")}
                                         label="Last name"
                                         value={this.state.user.lastName}
                                     />
@@ -159,7 +210,9 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                 <Form.Group widths="equal">
                                     <Form.Input
                                         name="email"
+                                        className="required"
                                         onChange={this.onChange}
+                                        error={this.hasFieldValidationError("email")}
                                         label="Email"
                                         type="email"
                                         value={this.state.user.email}
@@ -167,6 +220,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                     <Form.Input
                                         name="phone"
                                         onChange={this.onChange}
+                                        error={this.hasFieldValidationError("phone")}
                                         label="Phone"
                                         value={this.state.user.phone || ""}
                                     />
@@ -200,5 +254,6 @@ interface UserCardEditProps{
 
 interface UserCardEditState{
     user: UserItemDto;
+    validationInfo?: any;
     isLoading: boolean;
 }
