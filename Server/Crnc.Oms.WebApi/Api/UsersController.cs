@@ -74,7 +74,9 @@ namespace CrncOmsWeb.Api
             if (ModelState.IsValid)
             {
                 var entity = UserEntity.CreateNew(user.Login, user.Password,
-                    user.FirstName, user.LastName, user.Email, user.Phone, null, new UserPhoto(user.PhotoBase64, user.PhotoMimeType));
+                    user.FirstName, user.LastName, user.Email, user.Phone, null, !string.IsNullOrWhiteSpace(user.PhotoBase64)
+                        && !string.IsNullOrWhiteSpace(user.PhotoMimeType)
+                    ? new UserPhoto(user.PhotoBase64, user.PhotoMimeType) : null);
                 _userRepository.Add(entity);
 
                 return Ok();
@@ -90,7 +92,10 @@ namespace CrncOmsWeb.Api
             if (ModelState.IsValid)
             {
                 var entity = UserEntity.CreateExisted(id, user.Login, user.Password,
-                    user.FirstName, user.LastName, user.Email, new Role(user.Role), user.IsActive, user.Phone);
+                    user.FirstName, user.LastName, user.Email, new Role(user.Role), 
+                    user.IsActive, user.Phone, !string.IsNullOrWhiteSpace(user.PhotoBase64) 
+                        && !string.IsNullOrWhiteSpace(user.PhotoMimeType)
+                    ? new UserPhoto(user.PhotoBase64, user.PhotoMimeType) : null);
 
                 _userRepository.Save(entity);
 
