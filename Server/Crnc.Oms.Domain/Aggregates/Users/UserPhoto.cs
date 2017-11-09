@@ -54,12 +54,16 @@ namespace Crnc.Oms.Domain.Aggregates.Users
 
         }
 
-        public UserPhoto(string base64Content, string mimeType)
+        public UserPhoto(string base64Content, string mimeType, User user=null)
         {
-            if(!string.IsNullOrWhiteSpace(base64Content))
-                this.Content = Convert.FromBase64String(base64Content);
-            if (!string.IsNullOrWhiteSpace(mimeType))
-                this.MimeType = mimeType;
+            if (string.IsNullOrWhiteSpace(base64Content))
+                throw new ArgumentNullException("Photo content is empty");
+            if (string.IsNullOrWhiteSpace(mimeType))
+                throw new ArgumentNullException("Photo mimy type content is empty");
+
+            this.Content = Convert.FromBase64String(base64Content);
+            this.MimeType = mimeType;
+            this.User = user;
         }
     }
 }

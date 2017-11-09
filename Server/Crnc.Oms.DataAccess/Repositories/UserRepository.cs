@@ -85,10 +85,12 @@ namespace Crnc.Oms.DataAccess.Repositories
             if (currentUser == null)
                 throw new MissingEntityException($"User with Id={entity.Id} is not found");
 
+            currentUser.ChangeLogin(modifiedUser.Login);
             currentUser.ChangeEmail(modifiedUser.Email);
             currentUser.ChangeFirstName(modifiedUser.FirstName);
             currentUser.ChangeLastName(modifiedUser.LastName);
-            currentUser.ChangePassword(modifiedUser.PasswordHash);
+            currentUser.ChangePassword(modifiedUser.PasswordHash);            
+            currentUser.ChangePhoto(modifiedUser.Photo);
 
             if (modifiedUser.IsActive)
                 currentUser.Activate();

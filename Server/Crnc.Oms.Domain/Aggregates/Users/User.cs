@@ -56,7 +56,7 @@ namespace Crnc.Oms.Domain.Aggregates.Users
                 Phone = phone,
                 Photo = photo,
                 IsActive = isActive
-            };
+            };               
         }
 
         protected User()
@@ -130,15 +130,45 @@ namespace Crnc.Oms.Domain.Aggregates.Users
         #region Behavior
 
         /// <summary>
+        /// Change login
+        /// </summary>
+        /// <param name="login">login</param>
+        public void ChangeLogin(string login)
+        {
+            if (string.IsNullOrWhiteSpace(login))
+                throw new ArgumentNullException("New login is empty");
+
+            Login = login;
+        }
+
+        /// <summary>
         /// Change password (hash of password)
         /// </summary>
         /// <param name="passwordHash">password's hash</param>
         public void ChangePassword(string passwordHash)
         {
             if (string.IsNullOrWhiteSpace(passwordHash))
-                throw new ArgumentNullException("New password is empty ");
+                throw new ArgumentNullException("New password is empty");
 
             PasswordHash = passwordHash;
+        }
+
+        /// <summary>
+        /// Change photo
+        /// </summary>
+        /// <param name="photo">photo</param>
+        public void ChangePhoto(UserPhoto photo)
+        { 
+            if(photo != null)
+            {
+                if (Photo != null)
+                {
+                    Photo.Content = photo.Content;
+                    Photo.MimeType = photo.MimeType;
+                }
+                else
+                    Photo = photo;
+            }               
         }
 
         /// <summary>

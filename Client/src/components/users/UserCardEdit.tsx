@@ -96,24 +96,27 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
         const value = data.type === "checkbox" ? data.checked : data.value;
         const user = {...this.state.user, ...{[name]: value}};
 
-        let validationInfo;
         if (this.state.validationInfo && this.state.validationInfo[name]){
-            validationInfo = {...this.state.validationInfo};
+            let validationInfo = {...this.state.validationInfo};
             delete validationInfo[name];
             if (Object.keys(validationInfo).length === 0){
                 validationInfo = undefined;
             }
+
+            this.setState({
+                validationInfo
+            });
         }
 
         this.setState({
-            user, validationInfo
+            user
         });
     }
 
     private getValidationMessages(): string[]{
         if (this.state.validationInfo){
             let messages: string[] = [];
-            Object.keys(this.state.validationInfo).forEach((key) => {
+            Object.keys(this.state.validationInfo).forEach((key) => {``
                 messages = messages.concat(this.state.validationInfo[key]);
               });
 
@@ -178,6 +181,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                         error={this.hasFieldValidationError("login")}
                                         label="Login"
                                         value={this.state.user.login}
+                                        autoComplete="off"
                                     />
                                     <Form.Input
                                         name="password"
@@ -187,6 +191,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                         label="Password"
                                         type="password"
                                         value={this.state.user.password}
+                                        autoComplete="off"
                                     />
                                 </Form.Group>
                                 <Form.Group widths="equal">
@@ -197,6 +202,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                         error={this.hasFieldValidationError("firstName")}
                                         label="First name"
                                         value={this.state.user.firstName}
+                                        autoComplete="off"
                                     />
                                     <Form.Input
                                         name="lastName"
@@ -205,6 +211,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                         error={this.hasFieldValidationError("lastName")}
                                         label="Last name"
                                         value={this.state.user.lastName}
+                                        autoComplete="off"
                                     />
                                 </Form.Group>
                                 <Form.Group widths="equal">
@@ -216,6 +223,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                         label="Email"
                                         type="email"
                                         value={this.state.user.email}
+                                        autoComplete="off"
                                     />
                                     <Form.Input
                                         name="phone"
@@ -223,6 +231,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                         error={this.hasFieldValidationError("phone")}
                                         label="Phone"
                                         value={this.state.user.phone || ""}
+                                        autoComplete="off"
                                     />
                                 </Form.Group>
                                 <Form.Checkbox
