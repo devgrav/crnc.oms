@@ -123,8 +123,16 @@ export default class UserCards extends React.Component<any, UserCardsState>{
 
         return (
             <div>
-                <UserSearch/>
-                <Segment loading={this.state.isLoading} basic>                    
+                <Segment loading={this.state.isLoading} basic>
+                    <Button
+                         as={Link}
+                         to="/users/search"
+                         floated="right"
+                         icon="search"
+                         title="Search of user"
+                         primary
+                         circular
+                    />
                     <Button
                          as={Link}
                          to="/users/new"

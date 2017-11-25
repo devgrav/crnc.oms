@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Form, Segment, Header, Icon, Button } from "semantic-ui-react";
+import { Button, Form, Icon, Modal, Segment } from "semantic-ui-react";
 
 export default class UserSearch
     extends React.Component<any>{
@@ -10,25 +10,23 @@ export default class UserSearch
 
     public render(){
         return (
-            <Segment basic>
-                <Header attached="top">
-                    <Icon name="search"/>
-                    <Header.Content>
-                        Search
-                    </Header.Content>
-                </Header>
-                <Segment basic attached clearing>
-                    <Form>
-                        <Form.Group>
-                            <Form.Input label="Full name" width={4}/>
-                            <Form.Input label="Login" width={2}/>
-                            <Form.Select label="Role" width={4}/>
-                        </Form.Group>
-                        <Form.Checkbox label="Active"/>
-                        <Form.Button icon="cancel" content="Clear" floated="right" primary/>
-                    </Form>
-                </Segment>
-            </Segment>
+            <Modal open={true} closeIcon>
+                <Modal.Header><Icon name="search"/>Search</Modal.Header>
+                <Modal.Content as={Segment} basic clearing>
+                <Form id="searchForm">
+                    <Form.Group inline>
+                        <Form.Input label="Full name"/>
+                        <Form.Input label="Login" />
+                        <Form.Select label="Role"/>
+                    </Form.Group>
+                    <Form.Checkbox label="Active"/>
+                </Form>
+                </Modal.Content>
+                <Modal.Actions>
+                    <Button basic color="green" type="submit" content="Search" form="searchForm"/>
+                    <Button basic color="red" type="reset" content="Cancel"/>
+                </Modal.Actions>
+        </Modal>
         );
     }
 }
