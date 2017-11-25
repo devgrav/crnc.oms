@@ -5,6 +5,7 @@ import { UserItemDto, UserService } from "../../services/UserService";
 import UserCardEdit from "./UserCardEdit";
 import UserCardView from "./UserCardView";
 import { Link } from "react-router-dom";
+import UserSearch from "./UserSearch";
 
 export default class UserCards extends React.Component<any, UserCardsState>{
 
@@ -122,7 +123,8 @@ export default class UserCards extends React.Component<any, UserCardsState>{
 
         return (
             <div>
-                <Segment loading={this.state.isLoading} basic>
+                <UserSearch/>
+                <Segment loading={this.state.isLoading} basic>                    
                     <Button
                          as={Link}
                          to="/users/new"
