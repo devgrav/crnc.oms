@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button, ButtonProps, Card, Divider, Form, Grid, Image, InputOnChangeData, Modal, ModalProps, Segment, Message } from "semantic-ui-react";
+import { Button, ButtonProps, Card, Divider, Form, Grid, Image, InputOnChangeData, Message, Modal, ModalProps, Segment, FormProps } from "semantic-ui-react";
 import * as noAvatar from "../../assets/images/noavatar.png";
 import { UserItemDto, UserService } from "../../services/UserService";
 
@@ -67,7 +67,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
         }
     }
 
-    private async onSave(event: React.MouseEvent<HTMLButtonElement>, data: ButtonProps): Promise<void>{
+    private async onSave(event: React.FormEvent<HTMLElement>, data: FormProps): Promise<void>{
        try{
            this.showLoader();
            if (this.state.user.id === 0){
@@ -180,7 +180,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                         onChange={this.onChange}
                                         error={this.hasFieldValidationError("login")}
                                         label="Login"
-                                        value={this.state.user.login}
+                                        value={this.state.user.login || ""}
                                         autoComplete="off"
                                     />
                                     <Form.Input
@@ -190,7 +190,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                         error={this.hasFieldValidationError("password")}
                                         label="Password"
                                         type="password"
-                                        value={this.state.user.password}
+                                        value={this.state.user.password || ""}
                                         autoComplete="off"
                                     />
                                 </Form.Group>
@@ -201,7 +201,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                         onChange={this.onChange}
                                         error={this.hasFieldValidationError("firstName")}
                                         label="First name"
-                                        value={this.state.user.firstName}
+                                        value={this.state.user.firstName || ""}
                                         autoComplete="off"
                                     />
                                     <Form.Input
@@ -210,7 +210,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                         onChange={this.onChange}
                                         error={this.hasFieldValidationError("lastName")}
                                         label="Last name"
-                                        value={this.state.user.lastName}
+                                        value={this.state.user.lastName || ""}
                                         autoComplete="off"
                                     />
                                 </Form.Group>
@@ -222,7 +222,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                         error={this.hasFieldValidationError("email")}
                                         label="Email"
                                         type="email"
-                                        value={this.state.user.email}
+                                        value={this.state.user.email || ""}
                                         autoComplete="off"
                                     />
                                     <Form.Input
