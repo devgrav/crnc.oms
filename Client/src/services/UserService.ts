@@ -46,3 +46,10 @@ export interface UserItemDto{
     photoMimeType?: string;
     isActive: boolean;
 }
+
+export interface UserSearchDto{
+    fullName: string;
+    login: string;
+    role: number;
+    isActive: boolean;
+}

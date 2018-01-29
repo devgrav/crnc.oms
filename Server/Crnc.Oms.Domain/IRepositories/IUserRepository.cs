@@ -19,5 +19,11 @@ namespace Crnc.Oms.Domain.IRepositories
         /// <param name="login">login</param>
         /// <returns></returns>
         User FindByLogin(string login);
+
+        /// <summary>
+        /// Get all roles of application
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<Role> GetRoles();
     }
 }

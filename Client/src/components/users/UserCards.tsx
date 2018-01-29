@@ -1,10 +1,10 @@
 import * as React from "react";
 import { Redirect } from "react-router";
-import { Button, Card, Divider, Form, Segment } from "semantic-ui-react";
-import { UserItemDto, UserService } from "../../services/UserService";
+import { Link } from "react-router-dom";
+import { Button, Card, Divider, Form, Popup, Segment } from "semantic-ui-react";
+import { UserItemDto, UserSearchDto, UserService } from "../../services/UserService";
 import UserCardEdit from "./UserCardEdit";
 import UserCardView from "./UserCardView";
-import { Link } from "react-router-dom";
 import UserSearch from "./UserSearch";
 
 export default class UserCards extends React.Component<any, UserCardsState>{
@@ -22,6 +22,16 @@ export default class UserCards extends React.Component<any, UserCardsState>{
         this.hideLoading = this.hideLoading.bind(this);
         this.onCancelEdit = this.onCancelEdit.bind(this);
         this.onSaved = this.onSaved.bind(this);
+        this.onSearch = this.onSearch.bind(this);
+        this.onClearSearch = this.onClearSearch.bind(this);
+    }
+
+    private onSearch(searchDto: UserSearchDto): void{
+
+    }
+
+    private onClearSearch(): void{
+        
     }
 
     private async getUsers(): Promise<UserItemDto[]>{
@@ -124,24 +134,30 @@ export default class UserCards extends React.Component<any, UserCardsState>{
         return (
             <div>
                 <Segment loading={this.state.isLoading} basic>
-                    <Button
-                         as={Link}
-                         to="/users/search"
-                         floated="right"
-                         icon="search"
-                         title="Search of user"
-                         primary
-                         circular
-                    />
-                    <Button
-                         as={Link}
-                         to="/users/new"
-                         floated="right"
-                         icon="plus"
-                         title="Add new user"
-                         primary
-                         circular
-                    />
+                    <Button.Group floated="right" vertical>
+                        <Button
+                            as={Link}
+                            to="/users/new"
+                            icon="plus"
+                            title="Add new user"
+                            primary
+                            attached="left"
+                        />
+
+                        <Popup
+                            trigger={
+                                <Button
+                                    icon="search"
+                                    title="Search of user"
+                                    primary
+                                    attached="left"
+                                />
+                            }
+                            content={<UserSearch onSearch={this.onSearch} onClear={this.onClearSearch}/>}
+                            on="click"
+                            position="bottom right"
+                        />
+                    </Button.Group>
                     <Card.Group>
                         {this.state.users.map((u) => {
                             return <UserCardView key={u.id} userItem={u}/>;
