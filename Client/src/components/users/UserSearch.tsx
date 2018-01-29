@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button, DropdownProps, Form, Icon, InputOnChangeData, Modal, Segment } from "semantic-ui-react";
+import { Button, ButtonProps, DropdownProps, Form, FormProps, Icon, InputOnChangeData, Modal, Segment } from "semantic-ui-react";
 import {RoleService} from "../../services/RoleService";
 import { UserSearchDto } from "../../services/UserService";
 import TextValueDto from "../shared/TextValueDto";
@@ -11,12 +11,6 @@ export default class UserSearch
         super(props);
 
         this.state = {
-            search: {
-                fullName: "",
-                login: "",
-                role: 0,
-                isActive: false
-            },
             roles: [
                 {
                     value: 0,
@@ -26,17 +20,8 @@ export default class UserSearch
             isLoading: false
         };
 
-        this.onChange = this.onChange.bind(this);
-    }
-
-    private onChange(event: React.SyntheticEvent<HTMLElement>, data: any){
-        const name = data.name;
-        const value = data.type === "checkbox" ? data.checked : data.value;
-        const search = {...this.state.search, ...{[name]: value}};
-
-        this.setState({
-            search
-        });
+        this.onSearch = this.onSearch.bind(this);
+        this.onClear = this.onClear.bind(this);
     }
 
     private showLoader(){
@@ -61,36 +46,46 @@ export default class UserSearch
         });
     }
 
+    private onSearch(event: React.FormEvent<HTMLElement>, data: FormProps){
+        this.props.onSearch();
+    }
+
+    private onClear(event: React.MouseEvent<HTMLButtonElement>, data: ButtonProps){
+        this.props.onClear();
+    }
+
     public componentDidMount(){
         this.GetRoles();
     }
 
     public render(){
         return (
-            <Form id="searchForm">
+            <Form id="searchForm" onSubmit={this.onSearch}>
                 <Form.Input
-                    value={this.state.search.fullName}
-                    onChange={this.onChange}
+                    value={this.props.search.fullName}
+                    onChange={this.props.onChange}
                     label="Full name"
                     name="fullName"
+                    autoComplete="off"
                 />
                 <Form.Input
-                    value={this.state.search.login}
-                    onChange={this.onChange}
+                    value={this.props.search.login}
+                    onChange={this.props.onChange}
                     label="Login"
                     name="login"
+                    autoComplete="off"
                 />
                 <Form.Select
-                    value={this.state.search.role}
+                    value={this.props.search.role}
                     options={this.state.roles}
                     loading={this.state.isLoading}
-                    onChange={this.onChange}
+                    onChange={this.props.onChange}
                     label="Role"
                     name="role"
                 />
                 <Form.Checkbox
-                    checked={this.state.search.isActive}
-                    onChange={this.onChange}
+                    checked={this.props.search.isActive}
+                    onChange={this.props.onChange}
                     name="isActive"
                     label="Active"
                 />
@@ -101,6 +96,7 @@ export default class UserSearch
                     type="reset"
                     content="Clear"
                     icon="cancel"
+                    onClick={this.onClear}
                 />
                 <Button
                     floated="right"
@@ -117,12 +113,13 @@ export default class UserSearch
 }
 
 interface UserSearchProps{
-    onSearch(search: UserSearchDto): void;
+    search: UserSearchDto;
+    onSearch(): void;
     onClear(): void;
+    onChange(event: React.SyntheticEvent<HTMLElement>, data: any): void;
 }
 
 interface UserSearchState{
-    search: UserSearchDto;
     roles: TextValueDto[];
     isLoading: boolean;
 }

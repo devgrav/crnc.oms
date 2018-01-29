@@ -37,6 +37,7 @@ namespace CrncOmsWeb.Api
                 Password = u.PasswordHash,
                 Login = u.Login,
                 Phone = u.Phone,
+                RoleId = u.Role.Id,
                 Role = u.Role.Title,
                 PhotoBase64 = u.Photo?.ContentBase64,
                 PhotoMimeType = u.Photo?.MimeType,

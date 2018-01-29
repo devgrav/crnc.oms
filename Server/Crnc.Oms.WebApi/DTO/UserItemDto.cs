@@ -33,6 +33,8 @@ namespace CrncOmsWeb.DTO
         [Phone]
         public string Phone { get; set; }
 
+        public int RoleId { get; set; }
+
         public string Role { get; set; }
 
         public string PhotoBase64 { get; set; }

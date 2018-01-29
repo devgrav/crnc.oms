@@ -15,7 +15,13 @@ export default class UserCards extends React.Component<any, UserCardsState>{
         this.state = {
             users: [],
             isLoading: false,
-            isRequiredRedirectToNotFound: false
+            isRequiredRedirectToNotFound: false,
+            search: {
+                fullName: "",
+                login: "",
+                role: 0,
+                isActive: true
+            }
         };
 
         this.showLoading = this.showLoading.bind(this);
@@ -24,14 +30,54 @@ export default class UserCards extends React.Component<any, UserCardsState>{
         this.onSaved = this.onSaved.bind(this);
         this.onSearch = this.onSearch.bind(this);
         this.onClearSearch = this.onClearSearch.bind(this);
+        this.onSearchChange = this.onSearchChange.bind(this);
     }
 
-    private onSearch(searchDto: UserSearchDto): void{
+    private onSearch(): void{
+        let users = this.state.users.slice();
+        if (this.state.search.fullName) {
+            users = users.filter((u) => u.fullName ?
+                u.fullName.toLowerCase().includes(this.state.search.fullName.toLowerCase())
+                : true);
+        }
+        if (this.state.search.login) {
+            users = users.filter((u) => u.login ?
+                u.login.toLowerCase().includes(this.state.search.login.toLowerCase())
+                : true);
+        }
+        if (this.state.search.role) {
+            users = users.filter((u) =>
+                u.roleId === this.state.search.role);
+        }
 
+        users = users.filter((u) => u.isActive === this.state.search.isActive);
+
+        this.setState({
+            users
+        });
     }
 
-    private onClearSearch(): void{
-        
+    private async onClearSearch(): Promise<void>{
+        const users = await this.getUsers();
+        this.setState({
+            search: {
+                fullName: "",
+                login: "",
+                role: 0,
+                isActive: true
+            },
+            users
+        });
+    }
+
+    private onSearchChange(event: React.SyntheticEvent<HTMLElement>, data: any){
+        const name = data.name;
+        const value = data.type === "checkbox" ? data.checked : data.value;
+        const search = {...this.state.search, ...{[name]: value}};
+
+        this.setState({
+            search
+        });
     }
 
     private async getUsers(): Promise<UserItemDto[]>{
@@ -153,7 +199,13 @@ export default class UserCards extends React.Component<any, UserCardsState>{
                                     attached="left"
                                 />
                             }
-                            content={<UserSearch onSearch={this.onSearch} onClear={this.onClearSearch}/>}
+                            content={
+                                <UserSearch
+                                    onChange={this.onSearchChange}
+                                    onSearch={this.onSearch}
+                                    onClear={this.onClearSearch}
+                                    search={this.state.search}
+                                />}
                             on="click"
                             position="bottom right"
                         />
@@ -177,6 +229,7 @@ export default class UserCards extends React.Component<any, UserCardsState>{
 
 interface UserCardsState{
     users: UserItemDto[];
+    search: UserSearchDto;
     editedUser?: UserItemDto;
     isLoading: boolean;
     isRequiredRedirectToNotFound: boolean;
