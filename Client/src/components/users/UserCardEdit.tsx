@@ -116,7 +116,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
     private getValidationMessages(): string[]{
         if (this.state.validationInfo){
             let messages: string[] = [];
-            Object.keys(this.state.validationInfo).forEach((key) => {``
+            Object.keys(this.state.validationInfo).forEach((key) => {
                 messages = messages.concat(this.state.validationInfo[key]);
               });
 

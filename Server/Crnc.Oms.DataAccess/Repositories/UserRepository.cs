@@ -34,6 +34,11 @@ namespace Crnc.Oms.DataAccess.Repositories
             return user;
         }
 
+        public IEnumerable<Role> GetRoles()
+        {
+            return _dbContext.Roles.ToList();
+        }
+
         #region IRepository 
 
         public void Add(User entity)
@@ -98,7 +103,7 @@ namespace Crnc.Oms.DataAccess.Repositories
                 currentUser.Deactivate();
 
             _dbContext.SaveChanges();
-        } 
+        }
 
         #endregion
     }
