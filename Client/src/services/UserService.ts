@@ -41,6 +41,7 @@ export interface UserItemDto{
     password?: string;
     email?: string;
     phone?: string;
+    roleId?: number;
     role?: string;
     photoBase64?: string;
     photoMimeType?: string;
