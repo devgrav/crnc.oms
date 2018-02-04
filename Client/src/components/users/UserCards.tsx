@@ -6,6 +6,7 @@ import { UserItemDto, UserSearchDto, UserService } from "../../services/UserServ
 import UserCardEdit from "./UserCardEdit";
 import UserCardView from "./UserCardView";
 import UserSearch from "./UserSearch";
+import Paging from "../shared/paging/Paging";
 
 export default class UserCards extends React.Component<any, UserCardsState>{
 
@@ -179,8 +180,10 @@ export default class UserCards extends React.Component<any, UserCardsState>{
 
         return (
             <div>
+
                 <Segment loading={this.state.isLoading} basic>
-                    <Button.Group floated="right" vertical>
+                    <Paging floated="right" vertical totalPages={20}/>
+                    <Button.Group size="big" floated="right" vertical>
                         <Button
                             as={Link}
                             to="/users/new"
@@ -189,7 +192,6 @@ export default class UserCards extends React.Component<any, UserCardsState>{
                             primary
                             attached="left"
                         />
-
                         <Popup
                             trigger={
                                 <Button
