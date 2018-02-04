@@ -32,7 +32,7 @@ export default class UserCardView extends React.Component<UserCardViewProps>{
 
     public render(){
         return (
-            <Card>
+            <Card color="blue">
                 <Card.Content>
                     <Image
                         floated="left"
