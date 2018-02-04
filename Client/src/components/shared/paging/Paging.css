@@ -1,0 +1,12 @@
+.ui.pagination.menu.verticalPaging{
+    flex-direction: column;
+}
+
+.ui.pagination.menu.verticalPaging .item{
+    display: block;
+    text-align: center;
+}
+
+.ui.menu.verticalPaging .item:before{
+    background: unset;
+}
