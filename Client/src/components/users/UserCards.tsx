@@ -10,11 +10,14 @@ import Paging from "../shared/paging/Paging";
 
 export default class UserCards extends React.Component<any, UserCardsState>{
 
+    private readonly itemsPerPage: number = 8;
+
     constructor(props: any){
         super(props);
 
         this.state = {
             users: [],
+            activePage: 1,
             isLoading: false,
             isRequiredRedirectToNotFound: false,
             search: {
@@ -32,6 +35,7 @@ export default class UserCards extends React.Component<any, UserCardsState>{
         this.onSearch = this.onSearch.bind(this);
         this.onClearSearch = this.onClearSearch.bind(this);
         this.onSearchChange = this.onSearchChange.bind(this);
+        this.onPageChange = this.onPageChange.bind(this);
     }
 
     private onSearch(): void{
@@ -173,6 +177,28 @@ export default class UserCards extends React.Component<any, UserCardsState>{
         this.handleEditedUserByRoute(nextProps, this.state.users);
     }
 
+    getUsersPerPage(users: UserItemDto[], pageNumber: number){
+          
+        let pagedArray = users.slice((pageNumber - 1) * this.itemsPerPage, pageNumber * this.itemsPerPage);     
+        
+        return pagedArray;
+    }
+
+    getTotalPages(users: UserItemDto[]){
+        if(users.length <= this.itemsPerPage)
+            return 1;
+            
+        const totalPages =  Math.ceil(users.length / this.itemsPerPage); 
+        
+        return totalPages;
+    }    
+
+    onPageChange(activePage: number){
+        this.setState({
+            activePage
+        });
+    }
+
     public render(){
         if (this.state.isRequiredRedirectToNotFound){
             return <Redirect to="/404"/>;
@@ -182,7 +208,14 @@ export default class UserCards extends React.Component<any, UserCardsState>{
             <div>
 
                 <Segment loading={this.state.isLoading} basic>
-                    <Paging floated="right" vertical totalPages={20}/>
+                    <Paging 
+                        primary 
+                        floated="right" 
+                        vertical 
+                        totalPages={this.getTotalPages(this.state.users)} 
+                        onPageChange={this.onPageChange}
+                        activePage={this.state.activePage}
+                    />
                     <Button.Group size="big" floated="right" vertical>
                         <Button
                             as={Link}
@@ -213,7 +246,7 @@ export default class UserCards extends React.Component<any, UserCardsState>{
                         />
                     </Button.Group>
                     <Card.Group>
-                        {this.state.users.map((u) => {
+                        {this.getUsersPerPage(this.state.users,this.state.activePage).map((u) => {
                             return <UserCardView key={u.id} userItem={u}/>;
                         })}
                     </Card.Group>
@@ -231,6 +264,7 @@ export default class UserCards extends React.Component<any, UserCardsState>{
 
 interface UserCardsState{
     users: UserItemDto[];
+    activePage: number;
     search: UserSearchDto;
     editedUser?: UserItemDto;
     isLoading: boolean;

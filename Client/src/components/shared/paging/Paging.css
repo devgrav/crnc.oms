@@ -5,8 +5,36 @@
 .ui.pagination.menu.verticalPaging .item{
     display: block;
     text-align: center;
+    border-bottom: 1px solid rgba(34,36,38,.15);
+    border-radius: unset;
+    height: 100%;
+    min-height: 46px;
+    width: 100%;
+    min-width: 48px;
+    box-shadow: 1px 0px 1px 0px rgba(34, 36, 38, 0.15) !important;
+}
+
+.ui.pagination.menu.verticalPaging .item:last-child{
+    border-bottom: unset;
 }
 
 .ui.menu.verticalPaging .item:before{
     background: unset;
+}
+
+.ui.menu.pagination.primary{
+    background-color: #2185D0;
+    
+}
+
+.ui.menu.pagination.primary .item{    
+    color: #FFFFFF;    
+}
+
+.ui.menu.pagination.primary .item.active{    
+    background-color: #1a69a4;    
+}
+
+.ui.menu.pagination.primary .item:hover{    
+    background-color: #1678c2;    
 }
