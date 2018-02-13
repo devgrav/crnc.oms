@@ -206,7 +206,6 @@ export default class UserCards extends React.Component<any, UserCardsState>{
 
         return (
             <div>
-
                 <Segment loading={this.state.isLoading} basic>
                     <Paging 
                         primary 
