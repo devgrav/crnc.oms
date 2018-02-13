@@ -92,6 +92,7 @@ namespace Crnc.Oms.DataAccess.Repositories
 
             currentUser.ChangeLogin(modifiedUser.Login);
             currentUser.ChangeEmail(modifiedUser.Email);
+            currentUser.ChangePhone(modifiedUser.Phone);
             currentUser.ChangeFirstName(modifiedUser.FirstName);
             currentUser.ChangeLastName(modifiedUser.LastName);
             currentUser.ChangePassword(modifiedUser.PasswordHash);            
