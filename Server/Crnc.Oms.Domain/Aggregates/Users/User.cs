@@ -213,9 +213,6 @@ namespace Crnc.Oms.Domain.Aggregates.Users
         /// <param name="phone">email</param>
         public void ChangePhone(string phone)
         {
-            if (string.IsNullOrWhiteSpace(phone))
-                throw new ArgumentNullException("Changed phone is empty");
-
             Phone = phone;
         }
 
