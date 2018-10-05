@@ -1,29 +1,14 @@
-{
-  "iisSettings": {
-    "windowsAuthentication": false,
-    "anonymousAuthentication": true,
-    "iisExpress": {
-      "applicationUrl": "http://localhost:64707/",
-      "sslPort": 0
-    }
-  },
+﻿{
+  "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "IIS Express": {
-      "commandName": "IISExpress",
+    "Crnc.Oms.WebApiCore": {
+      "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "api/users",
+      "launchUrl": "api/roles",
+      "applicationUrl": "http://localhost:53001",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
-    },
-    "Crnc.Oms.WebApi": {
-      "commandName": "Project",
-      "launchBrowser": true,
-      "launchUrl": "api/users",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "applicationUrl": "http://localhost:64708/"
     }
   }
 }

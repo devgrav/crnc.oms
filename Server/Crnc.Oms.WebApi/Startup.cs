@@ -46,7 +46,7 @@ namespace Crnc.Oms.WebApi
             });
             services.AddMvc()
                 .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver());
-            services.AddScoped<DataContext>(_ => new DataContext(Configuration.GetConnectionString("oms")));
+            services.AddScoped<FakeDataContext>(_ => new FakeDataContext());
             services.AddScoped<IUserRepository, UserRepository>();
         }
 
