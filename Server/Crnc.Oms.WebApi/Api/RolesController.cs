@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Crnc.Oms.WebApi.Api
 {
     [Produces("application/json")]
-    [Route("api/Roles")]
+    [Route("api/[controller]")]
     public class RolesController : Controller
     {
         private readonly IUserRepository _userRepository;
