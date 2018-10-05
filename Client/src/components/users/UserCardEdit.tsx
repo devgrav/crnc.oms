@@ -21,7 +21,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
         this.onFileSelected = this.onFileSelected.bind(this);
     }
 
-    private fileInput: HTMLInputElement | null;
+    private fileInput: HTMLInputElement | null = null;
 
     private showLoader(){
         this.setState({
@@ -56,7 +56,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
             const fileReader = new FileReader();
             fileReader.onload = (e: any) => {
                 const binaryString = fileReader.result;
-                const base64StringPhoto = btoa(binaryString);
+                const base64StringPhoto = btoa(binaryString as string);
                 const user = {...this.state.user, ...{photoBase64: base64StringPhoto, photoMimeType: file.type}};
                 this.setState({
                     user

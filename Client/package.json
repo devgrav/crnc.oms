@@ -5,7 +5,6 @@
   "repository": {},
   "license": "MIT",
   "devDependencies": {
-    "@types/axios": "^0.14.0",
     "@types/react": "^16.0.34",
     "@types/react-dom": "^16.0.3",
     "@types/react-hot-loader": "^3.0.5",
@@ -27,7 +26,7 @@
     "tslint-eslint-rules": "^4.1.1",
     "tslint-react": "^3.4.0",
     "tslint-react-recommended": "^1.0.15",
-    "typescript": "^2.6.2",
+    "typescript": "^3.1.1",
     "url-loader": "^0.6.2",
     "webpack": "^3.10.0",
     "webpack-dev-server": "^2.11.0",
@@ -37,11 +36,11 @@
     "start": "webpack-dev-server"
   },
   "dependencies": {
-    "axios": "^0.17.1",
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0",
-    "react-router-dom": "^4.2.2",
-    "semantic-ui-css": "^2.2.12",
-    "semantic-ui-react": "^0.77.2"
+    "axios": "^0.18.0",
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2",
+    "react-router-dom": "^4.3.1",
+    "semantic-ui-css": "^2.4.0",
+    "semantic-ui-react": "^0.82.5"
   }
 }
