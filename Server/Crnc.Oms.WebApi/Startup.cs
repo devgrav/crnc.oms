@@ -18,36 +18,32 @@ namespace Crnc.Oms.WebApi
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env)
+        public Startup(IConfiguration configuration)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-                .AddEnvironmentVariables();
-            Configuration = builder.Build();
-
-            
+            Configuration = configuration;           
         }
 
-        public IConfigurationRoot Configuration { get; }
+        public IConfiguration Configuration { get; }
 
         /// <summary>
         /// This method gets called by the runtime. Use this method to add services to the container.
         /// </summary>
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
-        {
+        {            
             services.AddCors(options => {
                 options.AddPolicy("AllOrigins", builder => builder
                     .AllowAnyOrigin()
                     .AllowAnyHeader()
                     .AllowAnyMethod());
             });
+            services.AddOptions();
+            services.Configure<MongoDbSettings>(Configuration.GetSection("ConnectionStrings:omsdb"));
             services.AddMvc()
                 .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver());
             services.AddScoped<FakeDataContext>(_ => new FakeDataContext());
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddSingleton<MongoDataContext>();     
         }
 
         /// <summary>

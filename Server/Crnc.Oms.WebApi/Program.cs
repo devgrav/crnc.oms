@@ -19,6 +19,10 @@ namespace Crnc.Oms.WebApi
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((context, config)=>{
+                    config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);                    
+                    config.AddEnvironmentVariables();                    
+                })
                 .UseStartup<Startup>();
     }
 }

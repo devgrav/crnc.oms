@@ -8,5 +8,9 @@
     <ProjectReference Include="..\Crnc.Oms.Domain\Crnc.Oms.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MongoDB.Driver" Version="2.7.0" />
+  </ItemGroup>
+
 
 </Project>
