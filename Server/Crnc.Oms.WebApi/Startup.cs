@@ -41,8 +41,7 @@ namespace Crnc.Oms.WebApi
             services.Configure<MongoDbSettings>(Configuration.GetSection("ConnectionStrings:omsdb"));
             services.AddMvc()
                 .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver());
-            services.AddScoped<FakeDataContext>(_ => new FakeDataContext());
-            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IUserRepository, MongoDbUserRepository>();
             services.AddSingleton<MongoDataContext>();     
         }
 

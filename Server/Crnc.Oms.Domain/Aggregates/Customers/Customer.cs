@@ -16,20 +16,16 @@ namespace Crnc.Oms.Domain.Aggregates.Customers
         /// <summary>
         /// Full name
         /// </summary>
-        [MaxLength(255)]
-        [Required]
         public string FullName { get; set; }
 
         /// <summary>
         /// Email
         /// </summary>
-        [MaxLength(100)]
         public string Email { get; set; }
 
         /// <summary>
         /// Phone
         /// </summary>
-        [MaxLength(50)]
         public string Phone { get; set; }
     }
 }

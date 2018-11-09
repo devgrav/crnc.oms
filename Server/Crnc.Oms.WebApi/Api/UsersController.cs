@@ -47,7 +47,7 @@ namespace CrncOmsWeb.Api
 
         // GET api/users/5
         [HttpGet("{id}")]
-        public UserItemDto Get(int id)
+        public UserItemDto Get(Guid id)
         {
             var user = _userRepository.FindById(id);
 
@@ -88,7 +88,7 @@ namespace CrncOmsWeb.Api
 
         // PUT api/users/5
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody]UserItemDto user)
+        public IActionResult Put(Guid id, [FromBody]UserItemDto user)
         {
             if (ModelState.IsValid)
             {
@@ -108,7 +108,7 @@ namespace CrncOmsWeb.Api
 
         // DELETE api/users/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public void Delete(Guid id)
         {            
             _userRepository.Delete(id);
         }

@@ -15,8 +15,7 @@ namespace Crnc.Oms.Domain.Aggregates
         /// <summary>
         /// Id of entity
         /// </summary>
-        [Key]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         #region Identity Management
         public static bool operator ==(DomainEntity e1, DomainEntity e2)

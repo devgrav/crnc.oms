@@ -29,6 +29,7 @@ namespace Crnc.Oms.Domain.Aggregates.Users
         {
             return new User()
             {
+                Id = Guid.NewGuid(),
                 Login = login,
                 PasswordHash = passwordHash,
                 FirstName = firstName,
@@ -41,7 +42,7 @@ namespace Crnc.Oms.Domain.Aggregates.Users
             };
         }
 
-        public static User CreateExisted(int id,string login, string passwordHash,
+        public static User CreateExisted(Guid id,string login, string passwordHash,
             string firstName, string lastName, string email, Role role, bool isActive,string phone = null, UserPhoto photo = null)
         {
             return new User()
@@ -70,44 +71,33 @@ namespace Crnc.Oms.Domain.Aggregates.Users
         /// <summary>
         /// User name
         /// </summary>
-        [MaxLength(50)]
-        [Required]
         public string Login { get; private set; }
 
         /// <summary>
         /// Password hash
         /// </summary>
-        [MaxLength(100)]
-        [Required]
         public string PasswordHash { get; private set; }
 
         /// <summary>
         /// Full name
         /// </summary>        
-        [NotMapped]
         public string FullName => $"{FirstName} {LastName}";
 
         /// <summary>
         /// First name
         /// </summary>
-        [MaxLength(200)]
-        [Required]
         public string FirstName { get; private set; }
 
         /// <summary>
         /// Last name
         /// </summary>
-        [MaxLength(200)]
-        [Required]
         public string LastName { get; private set; }
 
         /// <summary>
         /// Email address
         /// </summary>
-        [MaxLength(200)]
         public string Email { get; private set; }
-
-        [MaxLength(200)]
+    
         public string Phone { get; private set; }
 
         /// <summary>
@@ -118,12 +108,12 @@ namespace Crnc.Oms.Domain.Aggregates.Users
         /// <summary>
         /// Photo of user
         /// </summary>
-        public virtual UserPhoto Photo { get; set; }
+        public UserPhoto Photo { get; set; }
 
         /// <summary>
         /// Role
         /// </summary>
-        public virtual Role Role { get; private set; }
+        public Role Role { get; private set; }
 
         #endregion
 

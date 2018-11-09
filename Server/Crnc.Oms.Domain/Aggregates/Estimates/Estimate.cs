@@ -17,8 +17,6 @@ namespace Crnc.Oms.Domain.Aggregates.Estimates
         /// <summary>
         /// Number of estimate, tempalte E-value of id, may be put in manually
         /// </summary>
-        [MaxLength(50)]
-        [Required]
         public string Number { get; set; }
 
         /// <summary>
@@ -39,7 +37,6 @@ namespace Crnc.Oms.Domain.Aggregates.Estimates
         /// <summary>
         /// Comments
         /// </summary>
-        [MaxLength(255)]
         public string JobDescription { get; set; }
 
         /// <summary>

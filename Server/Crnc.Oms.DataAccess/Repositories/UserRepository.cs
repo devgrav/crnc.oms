@@ -50,7 +50,7 @@ namespace Crnc.Oms.DataAccess.Repositories
             _dbContext.SaveChanges();                       
         }
 
-        public void Delete(int entityId)
+        public void Delete(Guid entityId)
         {
             var user = _dbContext.Users.SingleOrDefault(u => u.Id == entityId);
 
@@ -67,7 +67,7 @@ namespace Crnc.Oms.DataAccess.Repositories
             return _dbContext.Users.ToList();
         }
 
-        public User FindById(int id)
+        public User FindById(Guid id)
         {
             var user = _dbContext.Users.SingleOrDefault(u => u.Id == id);
 
