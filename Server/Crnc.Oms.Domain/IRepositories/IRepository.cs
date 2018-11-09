@@ -12,7 +12,7 @@ namespace Crnc.Oms.Domain.IRepositories
     /// Base interface of repository
     /// </summary>
     public interface IRepository<TEntity>
-        where TEntity: DomainEntity,IAggregateRoot
+        where TEntity: IAggregateRoot
     {
         /// <summary>
         /// Find all aggregate root entities
@@ -25,7 +25,7 @@ namespace Crnc.Oms.Domain.IRepositories
         /// </summary>
         /// <param name="id">Id of entity</param>
         /// <returns></returns>
-        TEntity FindById(int id);
+        TEntity FindById(Guid id);
 
         /// <summary>
         /// Add aggregate root entity
@@ -37,7 +37,7 @@ namespace Crnc.Oms.Domain.IRepositories
         /// Delete aggregate root entity
         /// </summary>
         /// <param name="entity">Entity</param>
-        void Delete(int entityId);
+        void Delete(Guid entityId);
 
         /// <summary>
         /// Save changes of entity

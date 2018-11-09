@@ -11,14 +11,11 @@ namespace Crnc.Oms.Domain.Aggregates.Users
     /// <summary>
     /// Photo of user
     /// </summary>
-    [Table("UserPhotos")]
     public class UserPhoto
     {
         /// <summary>
         /// Id of user
         /// </summary>
-        [Key]
-        [ForeignKey("User")]
         public int UserId { get; set; }
 
         /// <summary>

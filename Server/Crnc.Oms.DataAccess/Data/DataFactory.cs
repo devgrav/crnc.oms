@@ -25,11 +25,9 @@ namespace Crnc.Oms.DataAccess.Data
             return roles;
         }
 
-        public static List<User> GetUsers()
+        public static List<User> GetUsers(List<Role> roles)
         {
                 //var photos = GetUserPhotos();
-
-                var roles = GetRoles();
 
                 var users = new List<User>()
                 {

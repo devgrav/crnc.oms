@@ -11,15 +11,12 @@ namespace Crnc.Oms.Domain.Aggregates.Users
     /// <summary>
     /// Role of user
     /// </summary>
-    [Table("Roles")]
     public class Role
         : DomainEntity
     {
         /// <summary>
         /// Title of role
         /// </summary>
-        [MaxLength(50)]
-        [Required]
         public string Title { get; set; }
 
         public Role()
@@ -29,6 +26,7 @@ namespace Crnc.Oms.Domain.Aggregates.Users
 
         public Role(string title)
         {
+            Id = Guid.NewGuid();
             Title = title;
         }
     }

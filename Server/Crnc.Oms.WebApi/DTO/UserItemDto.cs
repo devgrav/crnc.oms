@@ -8,7 +8,7 @@ namespace CrncOmsWeb.DTO
 {
     public class UserItemDto
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         public string FullName { get; set; }
 
@@ -33,7 +33,7 @@ namespace CrncOmsWeb.DTO
         [Phone]
         public string Phone { get; set; }
 
-        public int RoleId { get; set; }
+        public Guid RoleId { get; set; }
 
         public string Role { get; set; }
 

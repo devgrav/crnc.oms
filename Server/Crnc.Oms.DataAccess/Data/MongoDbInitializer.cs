@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Crnc.Oms.Domain.Aggregates.Users;
 using MongoDB.Driver;
 
 namespace Crnc.Oms.DataAccess.Data
@@ -18,18 +20,26 @@ namespace Crnc.Oms.DataAccess.Data
         {
             var isExist = IsDatabaseExistAsync().GetAwaiter().GetResult(); 
             if(isExist)
-                return;            
+                _client.DropDatabase(_dbName);  
+
+            //Порядок имеет значение, иначе будут неверно сгенерированы ссылки
+            var roles = FillRoles();
+            FillUsers(roles);                     
         }
 
-        private void FillUsers()
+        private void FillUsers(List<Role> roles)
         {
-            var user = DataFactory.GetUsers();
-
+            var users = DataFactory.GetUsers(roles);
+            var usersMongo = _client.GetDatabase(_dbName).GetCollection<User>("users");
+            usersMongo.InsertMany(users);
         }
 
-        private void FillRoles()
+        private List<Role> FillRoles()
         {
-            var user = DataFactory.GetRoles();
+            var roles = DataFactory.GetRoles();
+            var rolesMongo = _client.GetDatabase(_dbName).GetCollection<Role>("roles");
+            rolesMongo.InsertMany(roles);
+            return roles;
         }
 
         private async Task<bool> IsDatabaseExistAsync()
