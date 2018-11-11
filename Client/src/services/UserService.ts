@@ -1,5 +1,6 @@
 import axios from "axios";
 import APP_CONFIG from "../config";
+import { Guid } from "guid-typescript";
 
 export class UserService{
 
@@ -24,7 +25,7 @@ export class UserService{
             });
     }
 
-    public static deleteUser(id: number): Promise<void>{
+    public static deleteUser(id: string): Promise<void>{
         return axios.delete(APP_CONFIG.usersUrl, {data: {id}})
             .then((response) => {
                 return;
@@ -33,7 +34,7 @@ export class UserService{
 }
 
 export interface UserItemDto{
-    id: number;
+    id: Guid;
     fullName?: string;
     firstName?: string;
     lastName?: string;

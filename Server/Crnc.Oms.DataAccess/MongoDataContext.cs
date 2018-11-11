@@ -15,13 +15,13 @@ namespace Crnc.Oms.DataAccess
         {
             //Порядок имеет значение, регистрацию конвенций нужно вызывать перед регистрацией маппингов
             //TODO: Чтобы использовать nameof для ключей лучше отключить CamelCase
-            MongoDbConvention.RegisterConventions();
+            //MongoDbConvention.RegisterConventions();
             MongoDbMapping.RegisterAllMappings();
 
             var client = new MongoClient(settings.Value.Server);
             _database = client.GetDatabase(settings.Value.Database);    
 
-            var initializer = new MongoDbInitializer(client, settings.Value.Database);
+            var initializer = new MongoDbInitializer(client, settings.Value.Database);            
             initializer.Initialize();        
         }
 

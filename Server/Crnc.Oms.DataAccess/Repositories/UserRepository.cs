@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Crnc.Oms.Domain.Aggregates.Users;
 using Crnc.Oms.Domain.IRepositories;
 using Crnc.Oms.DataAccess.Exceptions;
+using MongoDB.Driver.Linq;
+using MongoDB.Driver;
 
 namespace Crnc.Oms.DataAccess.Repositories
 {
@@ -16,16 +18,16 @@ namespace Crnc.Oms.DataAccess.Repositories
     public class UserRepository
         : IUserRepository
     {
-        private FakeDataContext _dbContext;
+        private MongoDataContext _dbContext;
 
-        public UserRepository(FakeDataContext dbContext)
+        public UserRepository(MongoDataContext dbContext)
         {
             _dbContext = dbContext;
         }
 
         public User FindByLogin(string login)
         {
-            var user = _dbContext.Users.SingleOrDefault(u => u.Login == login);
+            var user = _dbContext.Users.AsQueryable().SingleOrDefault(u => u.Login == login);
 
             if (user == null)
                 throw new MissingEntityException($"User with such login is not found");
@@ -35,7 +37,7 @@ namespace Crnc.Oms.DataAccess.Repositories
 
         public IEnumerable<Role> GetRoles()
         {
-            return _dbContext.Roles.ToList();
+            return _dbContext.Roles.AsQueryable().ToList();
         }
 
         #region IRepository 
@@ -45,31 +47,27 @@ namespace Crnc.Oms.DataAccess.Repositories
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
            
-            _dbContext.Users.Add(entity);
-
-            _dbContext.SaveChanges();                       
+            _dbContext.Users.InsertOne(entity);                               
         }
 
         public void Delete(Guid entityId)
         {
-            var user = _dbContext.Users.SingleOrDefault(u => u.Id == entityId);
+            var user = _dbContext.Users.AsQueryable().SingleOrDefault(x => x.Id == entityId);
 
             if (user == null)
-                throw new MissingEntityException($"User with Id={entityId} is not found");
+                throw new MissingEntityException($"User with such entityId is not found");
 
-            user.Deactivate();
-
-            _dbContext.SaveChanges();
+            _dbContext.Users.DeleteOne(x => x.Id == entityId);            
         }
 
         public IEnumerable<User> FindAll()
         {
-            return _dbContext.Users.ToList();
+            return _dbContext.Users.AsQueryable().ToList();
         }
 
         public User FindById(Guid id)
         {
-            var user = _dbContext.Users.SingleOrDefault(u => u.Id == id);
+            var user = _dbContext.Users.AsQueryable().SingleOrDefault(u => u.Id == id);
 
             if (user == null)
                 throw new MissingEntityException($"User with Id={id} is not found");
@@ -84,7 +82,7 @@ namespace Crnc.Oms.DataAccess.Repositories
 
             var modifiedUser = entity;
 
-            var currentUser = _dbContext.Users.SingleOrDefault(u => u.Id == modifiedUser.Id);
+            var currentUser = _dbContext.Users.AsQueryable().SingleOrDefault(u => u.Id == modifiedUser.Id);
 
             if (currentUser == null)
                 throw new MissingEntityException($"User with Id={entity.Id} is not found");
@@ -102,7 +100,7 @@ namespace Crnc.Oms.DataAccess.Repositories
             else
                 currentUser.Deactivate();
 
-            _dbContext.SaveChanges();
+            _dbContext.Users.ReplaceOne(x => x.Id == entity.Id, currentUser, new UpdateOptions(){IsUpsert = true});
         }
 
         #endregion
