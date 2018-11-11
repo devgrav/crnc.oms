@@ -2,8 +2,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Crnc.Oms.Domain.Aggregates.Users;
 using MongoDB.Driver;
+using Crnc.Oms.DataAccess.Data;
 
-namespace Crnc.Oms.DataAccess.Data
+namespace Crnc.Oms.DataAccess
 {
     public class MongoDbInitializer
     {

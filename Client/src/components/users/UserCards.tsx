@@ -7,6 +7,7 @@ import UserCardEdit from "./UserCardEdit";
 import UserCardView from "./UserCardView";
 import UserSearch from "./UserSearch";
 import Paging from "../shared/paging/Paging";
+import { Guid } from "guid-typescript";
 
 export default class UserCards extends React.Component<any, UserCardsState>{
 
@@ -101,19 +102,16 @@ export default class UserCards extends React.Component<any, UserCardsState>{
     private getEditedUserByRouteId(users: UserItemDto[], idString: string): UserItemDto | undefined{
         if (idString === "new"){
             return {
-                id: 0,
+                id: Guid.createEmpty(),
                 isActive: true
             };
         }
 
-        const id = Number(idString);
-        if (id && !isNaN(id)){
+        if (Guid.isGuid(idString)){
+            const id = Guid.parse(idString);
             return users.find((u) => u.id === id);
         }
-        if (isNaN(id)){
-            return undefined;
-        }
-
+       
         return undefined;
     }
 
@@ -246,7 +244,7 @@ export default class UserCards extends React.Component<any, UserCardsState>{
                     </Button.Group>
                     <Card.Group>
                         {this.getUsersPerPage(this.state.users,this.state.activePage).map((u) => {
-                            return <UserCardView key={u.id} userItem={u}/>;
+                            return <UserCardView key={u.id.toString()} userItem={u}/>;
                         })}
                     </Card.Group>
                     {this.state.editedUser &&

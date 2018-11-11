@@ -2,6 +2,7 @@ import * as React from "react";
 import { Button, ButtonProps, Card, Divider, Form, Grid, Image, InputOnChangeData, Message, Modal, ModalProps, Segment, FormProps } from "semantic-ui-react";
 import * as noAvatar from "../../assets/images/noavatar.png";
 import { UserItemDto, UserService } from "../../services/UserService";
+import { Guid } from "guid-typescript";
 
 export default class UserCardEdit extends React.Component<UserCardEditProps, UserCardEditState>{
 
@@ -70,7 +71,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
     private async onSave(event: React.FormEvent<HTMLElement>, data: FormProps): Promise<void>{
        try{
            this.showLoader();
-           if (this.state.user.id === 0){
+           if (this.state.user.id === Guid.createEmpty()){
                 await UserService.postUser(this.state.user);
            }
            else{
@@ -137,7 +138,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
     public render(){
         return (
             <Modal open={true} closeIcon onClose={this.onClose}>
-                <Modal.Header>{this.props.user.id === 0 ? "Add new user" : "Edit user"}</Modal.Header>
+                <Modal.Header>{this.props.user.id === Guid.createEmpty() ? "Add new user" : "Edit user"}</Modal.Header>
                 <Modal.Content as={Segment} basic clearing loading={this.state.isLoading}>
                     {this.state.validationInfo && <Message
                         error
@@ -239,7 +240,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                     onChange={this.onChange}
                                     label="Active"
                                     checked={this.state.user.isActive}
-                                    disabled={this.props.user.id === 0}
+                                    disabled={this.props.user.id === Guid.createEmpty()}
                                 />
                             </Grid.Column>
                             </Grid.Row>
