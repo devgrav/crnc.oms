@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Redirect } from "react-router";
 import { Link } from "react-router-dom";
-import { Button, Card, Divider, Form, Popup, Segment } from "semantic-ui-react";
+import { Button, Card, Divider, Form, Popup, Segment, Confirm } from "semantic-ui-react";
 import { UserItemDto, UserSearchDto, UserService } from "../../services/UserService";
 import UserCardEdit from "./UserCardEdit";
 import UserCardView from "./UserCardView";
@@ -21,6 +21,7 @@ export default class UserCards extends React.Component<any, UserCardsState>{
             activePage: 1,
             isLoading: false,
             isRequiredRedirectToNotFound: false,
+            isDeleteConfirmOpen: false,
             search: {
                 fullName: "",
                 login: "",
@@ -32,14 +33,17 @@ export default class UserCards extends React.Component<any, UserCardsState>{
         this.showLoading = this.showLoading.bind(this);
         this.hideLoading = this.hideLoading.bind(this);
         this.onCancelEdit = this.onCancelEdit.bind(this);
-        this.onSaved = this.onSaved.bind(this);
-        this.onSearch = this.onSearch.bind(this);
-        this.onClearSearch = this.onClearSearch.bind(this);
-        this.onSearchChange = this.onSearchChange.bind(this);
-        this.onPageChange = this.onPageChange.bind(this);
+        this.handleSave = this.handleSave.bind(this);
+        this.handleOpenDeleteConfirm = this.handleOpenDeleteConfirm.bind(this);
+        this.handleCloseDeleteConfirm = this.handleCloseDeleteConfirm.bind(this);
+        this.handleDeleteConfirmed = this.handleDeleteConfirmed.bind(this);
+        this.handleSearch = this.handleSearch.bind(this);
+        this.handleClearSearch = this.handleClearSearch.bind(this);
+        this.handleSearchChange = this.handleSearchChange.bind(this);
+        this.handlePageChange = this.handlePageChange.bind(this);
     }
 
-    private onSearch(): void{
+    private handleSearch(): void{
         let users = this.state.users.slice();
         if (this.state.search.fullName) {
             users = users.filter((u) => u.fullName ?
@@ -63,7 +67,7 @@ export default class UserCards extends React.Component<any, UserCardsState>{
         });
     }
 
-    private async onClearSearch(): Promise<void>{
+    private async handleClearSearch(): Promise<void>{
         const users = await this.getUsers();
         this.setState({
             search: {
@@ -76,7 +80,7 @@ export default class UserCards extends React.Component<any, UserCardsState>{
         });
     }
 
-    private onSearchChange(event: React.SyntheticEvent<HTMLElement>, data: any){
+    private handleSearchChange(event: React.SyntheticEvent<HTMLElement>, data: any){
         const name = data.name;
         const value = data.type === "checkbox" ? data.checked : data.value;
         const search = {...this.state.search, ...{[name]: value}};
@@ -89,9 +93,8 @@ export default class UserCards extends React.Component<any, UserCardsState>{
     private async getUsers(): Promise<UserItemDto[]>{
         try{
             this.showLoading();
-            const users = await UserService.getUsersGrid();
+            const users = await UserService.getUsersGrid();            
             this.hideLoading();
-
             return users;
         }catch (error) {
             this.hideLoading();
@@ -102,14 +105,14 @@ export default class UserCards extends React.Component<any, UserCardsState>{
     private getEditedUserByRouteId(users: UserItemDto[], idString: string): UserItemDto | undefined{
         if (idString === "new"){
             return {
-                id: Guid.createEmpty(),
+                id: Guid.EMPTY,
                 isActive: true
             };
         }
 
         if (Guid.isGuid(idString)){
             const id = Guid.parse(idString);
-            return users.find((u) => u.id === id);
+            return users.find((u) => u.id === id.toString());
         }
        
         return undefined;
@@ -156,7 +159,11 @@ export default class UserCards extends React.Component<any, UserCardsState>{
         this.props.history.push("/users");
     }
 
-    private async onSaved(): Promise<void> {
+    private async DeleteUser(id: string): Promise<void>{
+        await UserService.deleteUser(id);            
+    }
+
+    private async handleSave(): Promise<void> {
         const users = await this.getUsers();
         this.setState({
             users
@@ -175,14 +182,14 @@ export default class UserCards extends React.Component<any, UserCardsState>{
         this.handleEditedUserByRoute(nextProps, this.state.users);
     }
 
-    getUsersPerPage(users: UserItemDto[], pageNumber: number){
+    private getUsersPerPage(users: UserItemDto[], pageNumber: number){
           
         let pagedArray = users.slice((pageNumber - 1) * this.itemsPerPage, pageNumber * this.itemsPerPage);     
         
         return pagedArray;
     }
 
-    getTotalPages(users: UserItemDto[]){
+    private getTotalPages(users: UserItemDto[]){
         if(users.length <= this.itemsPerPage)
             return 1;
             
@@ -191,10 +198,45 @@ export default class UserCards extends React.Component<any, UserCardsState>{
         return totalPages;
     }    
 
-    onPageChange(activePage: number){
+    private handlePageChange(activePage: number){
         this.setState({
             activePage
         });
+    }
+
+    private handleOpenDeleteConfirm(deletedUser: UserItemDto){
+        this.setState({
+            isDeleteConfirmOpen: true,
+            deletedUser
+        })
+    }
+
+    private handleCloseDeleteConfirm(){
+        this.setState({
+            isDeleteConfirmOpen: false,
+            deletedUser: undefined
+        })
+    }
+
+    private async handleDeleteConfirmed(): Promise<void>{
+        this.setState({
+            isDeleteConfirmOpen: false
+        })
+
+        const {deletedUser} = this.state;
+        
+        if(deletedUser){
+            await this.DeleteUser(deletedUser.id)
+            const users = await this.getUsers();
+    
+            this.setState({
+                users
+            })
+
+            this.setState({
+                deletedUser: undefined
+            })
+        }
     }
 
     public render(){
@@ -202,15 +244,23 @@ export default class UserCards extends React.Component<any, UserCardsState>{
             return <Redirect to="/404"/>;
         }
 
+        const deletedUser = this.state.deletedUser ? this.state.deletedUser.fullName : "";
+
         return (
             <div>
                 <Segment loading={this.state.isLoading} basic>
+                    <Confirm 
+                        open={this.state.isDeleteConfirmOpen} 
+                        onCancel={this.handleCloseDeleteConfirm} 
+                        onConfirm={this.handleDeleteConfirmed}
+                        header={`Delete of user ${deletedUser}`} 
+                    />
                     <Paging 
                         primary 
                         floated="right" 
                         vertical 
                         totalPages={this.getTotalPages(this.state.users)} 
-                        onPageChange={this.onPageChange}
+                        onPageChange={this.handlePageChange}
                         activePage={this.state.activePage}
                     />
                     <Button.Group size="big" floated="right" vertical>
@@ -233,9 +283,9 @@ export default class UserCards extends React.Component<any, UserCardsState>{
                             }
                             content={
                                 <UserSearch
-                                    onChange={this.onSearchChange}
-                                    onSearch={this.onSearch}
-                                    onClear={this.onClearSearch}
+                                    onChange={this.handleSearchChange}
+                                    onSearch={this.handleSearch}
+                                    onClear={this.handleClearSearch}
                                     search={this.state.search}
                                 />}
                             on="click"
@@ -244,14 +294,14 @@ export default class UserCards extends React.Component<any, UserCardsState>{
                     </Button.Group>
                     <Card.Group>
                         {this.getUsersPerPage(this.state.users,this.state.activePage).map((u) => {
-                            return <UserCardView key={u.id.toString()} userItem={u}/>;
+                            return <UserCardView key={u.id.toString()} userItem={u} onUserDelete={this.handleOpenDeleteConfirm}/>;
                         })}
                     </Card.Group>
                     {this.state.editedUser &&
                         <UserCardEdit
                             user={this.state.editedUser}
                             onCancelEdit={this.onCancelEdit}
-                            onSaved={this.onSaved}
+                            onSaved={this.handleSave}
                         />}
                 </Segment>
             </div>
@@ -264,6 +314,8 @@ interface UserCardsState{
     activePage: number;
     search: UserSearchDto;
     editedUser?: UserItemDto;
+    deletedUser?: UserItemDto;
     isLoading: boolean;
+    isDeleteConfirmOpen: boolean;
     isRequiredRedirectToNotFound: boolean;
 }

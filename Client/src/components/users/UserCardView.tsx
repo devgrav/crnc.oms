@@ -2,12 +2,14 @@ import * as React from "react";
 import { Link } from "react-router-dom";
 import { Button, ButtonProps, Card, Divider, Form, Icon, Image } from "semantic-ui-react";
 import * as noAvatar from "../../assets/images/noavatar.png";
-import { UserItemDto } from "../../services/UserService";
+import { UserItemDto, UserService } from "../../services/UserService";
 
 export default class UserCardView extends React.Component<UserCardViewProps>{
 
     constructor(props: UserCardViewProps){
         super(props);
+
+        this.onDeleteClick = this.onDeleteClick.bind(this);
     }
 
     private renderCardInfo(){
@@ -30,6 +32,10 @@ export default class UserCardView extends React.Component<UserCardViewProps>{
         );
     }
 
+    private onDeleteClick(event: React.MouseEvent<HTMLButtonElement>, data: ButtonProps):void{
+        this.props.onUserDelete(this.props.userItem);
+    }
+
     public render(){
         return (
             <Card color="blue">
@@ -42,16 +48,17 @@ export default class UserCardView extends React.Component<UserCardViewProps>{
                             : `data:${this.props.userItem.photoMimeType};base64,
                             ${this.props.userItem.photoBase64}`}
                     />
-                    <div className="ui right floated ">
+                    <Button.Group floated="right" size="mini" basic>
                         <Button
                             as={Link}
-                            to={`/users/${this.props.userItem.id}`}
-                            basic
+                            to={`/users/${this.props.userItem.id}`}                   
                             icon="pencil"
-                            content="Edit"
-                            size="mini"
-                        />
-                    </div>
+                        />             
+                        <Button                                                       
+                            icon={{name: "cancel", color: "red"}}
+                            onClick={this.onDeleteClick}
+                        />          
+                    </Button.Group>
                     <Card.Header>
                         {this.props.userItem.fullName}
                     </Card.Header>
@@ -69,4 +76,5 @@ export default class UserCardView extends React.Component<UserCardViewProps>{
 
 interface UserCardViewProps{
     userItem: UserItemDto;
+    onUserDelete(userItem: UserItemDto) :void;
 }

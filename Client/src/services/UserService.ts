@@ -26,7 +26,7 @@ export class UserService{
     }
 
     public static deleteUser(id: string): Promise<void>{
-        return axios.delete(APP_CONFIG.usersUrl, {data: {id}})
+        return axios.delete(`${APP_CONFIG.usersUrl}/${id}`)
             .then((response) => {
                 return;
             });
@@ -34,7 +34,7 @@ export class UserService{
 }
 
 export interface UserItemDto{
-    id: Guid;
+    id: string;
     fullName?: string;
     firstName?: string;
     lastName?: string;
