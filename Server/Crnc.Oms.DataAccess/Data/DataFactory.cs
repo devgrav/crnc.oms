@@ -27,14 +27,14 @@ namespace Crnc.Oms.DataAccess.Data
 
         public static List<User> GetUsers(List<Role> roles)
         {
-                //var photos = GetUserPhotos();
+                var photos = GetUserPhotos();
 
                 var users = new List<User>()
                 {
-                    User.CreateNew("jack_richer","111111","Jack","Richer","jack_richer@crnc.com",null, roles.First(r=> r.Title.Equals("Admin")),null),
-                    User.CreateNew("shon_bean","111111","Shon","Bean","shon_bean@crnc.com",null,roles.First(r=> r.Title.Equals("Main manager")),null),
-                    User.CreateNew("helen_smith","111111","Helen","Smith","helen_smith@crnc.com",null,roles.First(r=> r.Title.Equals("Manager")),null),
-                    User.CreateNew("agness_stuart","111111","Agness","Stuart","agness_stuart@crnc.com",null,roles.First(r=> r.Title.Equals("Manager")),null),
+                    User.CreateNew("jack_richer","111111","Jack","Richer","jack_richer@crnc.com",null, roles.First(r=> r.Title.Equals("Admin")),photos[0]),
+                    User.CreateNew("shon_bean","111111","Shon","Bean","shon_bean@crnc.com",null,roles.First(r=> r.Title.Equals("Main manager")),photos[1]),
+                    User.CreateNew("helen_smith","111111","Helen","Smith","helen_smith@crnc.com",null,roles.First(r=> r.Title.Equals("Manager")),photos[2]),
+                    User.CreateNew("agness_stuart","111111","Agness","Stuart","agness_stuart@crnc.com",null,roles.First(r=> r.Title.Equals("Manager")),photos[3]),
                     User.CreateNew("darius_larson","111111","Darius","Larson","darius_larson@crnc.com",null,roles.First(r=> r.Title.Equals("Manager")),null),
                     User.CreateNew("gillian_labadie","111111","Gillian","Labadie","darius_larson@crnc.com",null,roles.First(r=> r.Title.Equals("Manager")),null),
                     User.CreateNew("jonas_nolan","111111","Jonas","Nolan","jonas_nolan@crnc.com",null,roles.First(r=> r.Title.Equals("Manager")),null),
@@ -48,7 +48,7 @@ namespace Crnc.Oms.DataAccess.Data
             return users;
         }
 
-        private List<UserPhoto> GetUserPhotos()
+        private static List<UserPhoto> GetUserPhotos()
         {
             var resourceName = Assembly.GetExecutingAssembly().GetManifestResourceNames().FirstOrDefault(r => r.Contains("UserPhotos"));
 
