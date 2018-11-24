@@ -14,11 +14,6 @@ namespace Crnc.Oms.Domain.Aggregates.Users
     public class UserPhoto
     {
         /// <summary>
-        /// Id of user
-        /// </summary>
-        public int UserId { get; set; }
-
-        /// <summary>
         /// Photo content
         /// </summary>
         public byte[] Content { get; set; }
@@ -41,17 +36,12 @@ namespace Crnc.Oms.Domain.Aggregates.Users
         /// </summary>
         public string MimeType { get; set; }
 
-        /// <summary>
-        /// User
-        /// </summary>
-        public virtual User User { get; set; }
-
         public UserPhoto()
         {
 
         }
 
-        public UserPhoto(string base64Content, string mimeType, User user=null)
+        public UserPhoto(string base64Content, string mimeType)
         {
             if (string.IsNullOrWhiteSpace(base64Content))
                 throw new ArgumentNullException("Photo content is empty");
@@ -60,7 +50,6 @@ namespace Crnc.Oms.Domain.Aggregates.Users
 
             this.Content = Convert.FromBase64String(base64Content);
             this.MimeType = mimeType;
-            this.User = user;
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Crnc.Oms.Domain.Aggregates.Users;
 using MongoDB.Driver;
 using Crnc.Oms.DataAccess.Data;
+using System;
 
 namespace Crnc.Oms.DataAccess
 {
@@ -19,13 +20,25 @@ namespace Crnc.Oms.DataAccess
 
         public void Initialize()
         {
-            var isExist = IsDatabaseExistAsync().GetAwaiter().GetResult(); 
-            if(isExist)
-                _client.DropDatabase(_dbName);  
+            try
+            {
+                var isExist = IsDatabaseExistAsync().GetAwaiter().GetResult(); 
+                if(isExist)
+                    _client.DropDatabase(_dbName);  
 
-            //Порядок имеет значение, иначе будут неверно сгенерированы ссылки
-            var roles = FillRoles();
-            FillUsers(roles);                     
+                //Порядок имеет значение, иначе будут неверно сгенерированы ссылки
+                var roles = FillRoles();
+                FillUsers(roles);                      
+            }
+            catch(TimeoutException e)
+            {
+                throw new DataAccessException($"Not connected to database {_dbName} by timeout, may be database not avaliable", e);
+            }
+            catch (Exception e)
+            {
+                
+                throw new DataAccessException($"Not connected to database {_dbName}, unexpected error caused, may be database not avaliable", e);
+            }               
         }
 
         private void FillUsers(List<Role> roles)
