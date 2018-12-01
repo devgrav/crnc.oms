@@ -1,12 +1,11 @@
 import * as React from "react";
 import { Route, Switch } from "react-router";
-import {BrowserRouter as Router} from "react-router-dom";
 import EstimatesGrid from "./components/estimates/EstimatesGrid";
 import JobsGrid from "./components/jobs/JobsGrid";
-import NotFound from "./components/notFound/NotFound";
-import UserCardEdit from "./components/users/UserCardEdit";
+import NotFound from "./components/notFound/NotFound";;
 import UserCards from "./components/users/UserCards";
 import EstimateEdit from "./components/estimates/EstimateEdit";
+import Login from "./components/auth/Login";
 
 const Routes: React.StatelessComponent = () => {
     return (
@@ -17,6 +16,7 @@ const Routes: React.StatelessComponent = () => {
             <Route path="/estimates/:id" component={EstimateEdit}/>
             <Route path="/estimates" component={EstimatesGrid}/>
             <Route path="/jobs" component={JobsGrid}/>
+            <Route path="/login" component={Login}/>
             <Route component={NotFound}/>
         </Switch>
     );
