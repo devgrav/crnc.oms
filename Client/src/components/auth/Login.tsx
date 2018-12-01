@@ -41,6 +41,10 @@ export default class Login extends React.Component<any, LoginState> {
         })
     }
 
+    isSignInDisabled():boolean{
+        return !this.state.login || !this.state.password; 
+    }
+
     public render() {
         let {login, password, redirectToReferrer} = this.state;            
         let { from } = this.props.location.state || { from: { pathname: "/" } };
@@ -55,7 +59,7 @@ export default class Login extends React.Component<any, LoginState> {
                         <Form onSubmit={this.onSignIn}>
                             <Form.Input label="Login" value={login} onChange={this.onLoginChange}/>
                             <Form.Input label="Password" value={password} onChange={this.onPasswordChange} type="password"/>
-                            <Button primary type="submit" content="Sign In"/>
+                            <Button primary type="submit" content="Sign In" disabled={this.isSignInDisabled()}/>
                         </Form>
                     </Segment>
                 </Grid.Column>
