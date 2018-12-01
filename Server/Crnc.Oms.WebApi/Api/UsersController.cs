@@ -13,7 +13,7 @@ namespace CrncOmsWeb.Api
 {
     [Route("api/[controller]")]
     public class UsersController 
-        : Controller
+        : ControllerBase
     {
         private readonly IUserRepository _userRepository;
 

@@ -11,7 +11,7 @@ namespace Crnc.Oms.WebApi.Api
 {
     [Produces("application/json")]
     [Route("api/[controller]")]
-    public class RolesController : Controller
+    public class RolesController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
 
