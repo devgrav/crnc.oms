@@ -5,14 +5,13 @@ import {Container, Header} from "semantic-ui-react";
 import Layout from "./components/layout/Layout";
 import Routes from "./routes";
 
-export default class App extends React.Component {
-    public render() {
+export default class App extends React.Component<any, any> {
+    
+    public render() {        
         return (
             <Router>
                 <Container fluid>
-                    <Layout>
-                        <Routes/>
-                    </Layout>
+                    <Routes/>
                 </Container>
             </Router>
         );
