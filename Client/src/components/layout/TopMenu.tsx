@@ -1,11 +1,11 @@
 import * as React from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, withRouter } from "react-router-dom";
 import { Menu, MenuItemProps } from "semantic-ui-react";
 import * as Logo from "../../assets/images/logo.png";
 import UserInfo from "./UserInfo";
 
 export default class TopMenu
-    extends React.Component<{}> {
+    extends React.Component<any,{}> {
 
     constructor(props: any) {
         super(props);
@@ -36,9 +36,6 @@ export default class TopMenu
                 </Menu.Item>
                 <Menu.Item as={NavLink} to="/jobs" name="jobs" link>
                     Jobs
-                </Menu.Item>
-                <Menu.Item as={NavLink} to="/login" name="login" link>
-                    Login
                 </Menu.Item>
                 <Menu.Menu position="right">
                     <Menu.Item>
