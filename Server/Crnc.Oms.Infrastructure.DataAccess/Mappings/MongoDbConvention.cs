@@ -1,6 +1,6 @@
 using MongoDB.Bson.Serialization.Conventions;
 
-namespace Crnc.Oms.DataAccess.Mappings
+namespace Crnc.Oms.Infrastructure.DataAccess.Mappings
 {
     public static class MongoDbConvention
     {

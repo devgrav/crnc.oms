@@ -7,7 +7,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.WebApi", "Crnc.Oms
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Domain", "Crnc.Oms.Domain\Crnc.Oms.Domain.csproj", "{B9F66CEF-403C-4A13-BEB9-40CA1DB91909}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.DataAccess", "Crnc.Oms.DataAccess\Crnc.Oms.DataAccess.csproj", "{FA50AB09-6DC5-4BF9-9CB1-86385B9FC379}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Infrastructure.DataAccess", "Crnc.Oms.Infrastructure.DataAccess\Crnc.Oms.Infrastructure.DataAccess.csproj", "{FA50AB09-6DC5-4BF9-9CB1-86385B9FC379}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Infrastructure.CrossCutting", "Crnc.Oms.Infrastructure.CrossCutting\Crnc.Oms.Infrastructure.CrossCutting.csproj", "{FA50AB09-6DC5-4BF9-9CB1-86385B9FC379}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

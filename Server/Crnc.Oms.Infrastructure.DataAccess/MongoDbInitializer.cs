@@ -2,10 +2,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Crnc.Oms.Domain.Aggregates.Users;
 using MongoDB.Driver;
-using Crnc.Oms.DataAccess.Data;
+using Crnc.Oms.Infrastructure.DataAccess.Data;
 using System;
 
-namespace Crnc.Oms.DataAccess
+namespace Crnc.Oms.Infrastructure.DataAccess
 {
     public class MongoDbInitializer
     {
@@ -37,7 +37,7 @@ namespace Crnc.Oms.DataAccess
             catch (Exception e)
             {
                 
-                throw new DataAccessException($"Not connected to database {_dbName}, unexpected error caused, may be database not avaliable", e);
+                throw new DataAccessException($"Not connected to database {_dbName}, unexpected error caused", e);
             }               
         }
 

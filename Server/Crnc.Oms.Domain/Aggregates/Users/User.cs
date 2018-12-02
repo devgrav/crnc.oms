@@ -21,10 +21,11 @@ namespace Crnc.Oms.Domain.Aggregates.Users
         /// </summary>
         /// <param name="login">Username/login</param>
         /// <param name="passwordHash">Hash of password</param>
+        /// <param name="passwordSalt">Salt of password</param>
         /// <param name="firstName">FirstName</param>
         /// <param name="lastName">LastName</param>
         /// <returns></returns>
-        public static User CreateNew(string login, string passwordHash, 
+        public static User CreateNew(string login, string passwordHash, string passwordSalt,
             string firstName, string lastName, string email, string phone=null, Role role=null, UserPhoto photo = null)
         {
             return new User()
@@ -32,6 +33,7 @@ namespace Crnc.Oms.Domain.Aggregates.Users
                 Id = Guid.NewGuid(),
                 Login = login,
                 PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt,
                 FirstName = firstName,
                 LastName = lastName,
                 Email = email,
@@ -42,7 +44,7 @@ namespace Crnc.Oms.Domain.Aggregates.Users
             };
         }
 
-        public static User CreateExisted(Guid id,string login, string passwordHash,
+        public static User CreateExisted(Guid id,string login, string passwordHash, string passwordSalt,
             string firstName, string lastName, string email, Role role, bool isActive,string phone = null, UserPhoto photo = null)
         {
             return new User()
@@ -50,6 +52,7 @@ namespace Crnc.Oms.Domain.Aggregates.Users
                 Id = id,
                 Login = login,
                 PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt,
                 FirstName = firstName,
                 LastName = lastName,
                 Email = email,
@@ -77,6 +80,12 @@ namespace Crnc.Oms.Domain.Aggregates.Users
         /// Password hash
         /// </summary>
         public string PasswordHash { get; private set; }
+
+
+        /// <summary>
+        /// Password hash
+        /// </summary>
+        public string PasswordSalt { get; private set; }
 
         /// <summary>
         /// Full name
@@ -135,12 +144,13 @@ namespace Crnc.Oms.Domain.Aggregates.Users
         /// Change password (hash of password)
         /// </summary>
         /// <param name="passwordHash">password's hash</param>
-        public void ChangePassword(string passwordHash)
+        public void ChangePassword(string passwordHash, string passwordSalt)
         {
-            if (string.IsNullOrWhiteSpace(passwordHash))
+            if (string.IsNullOrWhiteSpace(passwordHash) || string.IsNullOrWhiteSpace(passwordSalt))
                 throw new ArgumentNullException("New password is empty");
 
             PasswordHash = passwordHash;
+            PasswordSalt = passwordSalt;
         }
 
         /// <summary>

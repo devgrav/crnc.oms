@@ -1,4 +1,4 @@
-namespace Crnc.Oms.DataAccess
+namespace Crnc.Oms.Infrastructure.DataAccess
 {
     public class MongoDbSettings
     {
