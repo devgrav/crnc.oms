@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Form, Button, InputOnChangeData, Segment, Grid, Image } from 'semantic-ui-react';
+import { Form, Button, InputOnChangeData, Segment, Grid, Image, Message } from 'semantic-ui-react';
 import AuthService from '../../services/AuthService';
 import * as Logo from "../../assets/images/logo.png";
 import { string } from 'prop-types';
@@ -21,24 +21,49 @@ export default class Login extends React.Component<any, LoginState> {
         this.onSignIn = this.onSignIn.bind(this);
     }
 
+    showError(error: string){
+        this.setState({
+            errorMessage: error
+        })
+    }
+
+    hideError(){
+        this.setState({
+            errorMessage: ""
+        })
+    }
+
     onLoginChange(event: React.SyntheticEvent<HTMLInputElement>, data: InputOnChangeData){
         this.setState({
             login: data.value
         })
-    }
 
+        this.hideError();
+    }
+    
     onPasswordChange(event: React.SyntheticEvent<HTMLInputElement>, data: InputOnChangeData){
         this.setState({
             password: data.value
         })
+
+        this.hideError();
     }
 
-    onSignIn(){
+    async onSignIn(){
         const {login, password} = this.state;
-        AuthService.signIn(login, password);
-        this.setState({
-            redirectToReferrer: true
-        })
+
+        try {
+            await AuthService.signIn(login, password)   
+            
+            if(CurrentUserContext.isAuthentificated)
+                this.setState({
+                    redirectToReferrer: true
+                })                
+        } catch (error) {
+            if(error.response){
+                this.showError(error.response.data);
+            }            
+        }    
     }
 
     isSignInDisabled():boolean{
@@ -46,7 +71,7 @@ export default class Login extends React.Component<any, LoginState> {
     }
 
     public render() {
-        let {login, password, redirectToReferrer} = this.state;            
+        let {login, password, redirectToReferrer, errorMessage} = this.state;            
         let { from } = this.props.location.state || { from: { pathname: "/" } };
     
         if (redirectToReferrer) return <Redirect to={from} />;
@@ -56,6 +81,7 @@ export default class Login extends React.Component<any, LoginState> {
                 <Grid.Column>
                     <Segment attached="top"><Image centered src={Logo} size="tiny"/></Segment>
                     <Segment attached >
+                        {errorMessage && <Message error content={errorMessage}/>}
                         <Form onSubmit={this.onSignIn}>
                             <Form.Input label="Login" value={login} onChange={this.onLoginChange}/>
                             <Form.Input label="Password" value={password} onChange={this.onPasswordChange} type="password"/>
@@ -74,4 +100,5 @@ interface LoginState{
     login: string;
     password: string;
     redirectToReferrer: boolean;
+    errorMessage?: string;
 }
