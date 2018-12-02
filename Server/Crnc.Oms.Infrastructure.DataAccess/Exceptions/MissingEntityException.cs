@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Crnc.Oms.DataAccess.Exceptions
+namespace Crnc.Oms.Infrastructure.DataAccess.Exceptions
 {
     /// <summary>
     /// Exception for missing entities

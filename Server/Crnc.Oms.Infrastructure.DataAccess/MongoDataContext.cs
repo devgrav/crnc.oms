@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using Crnc.Oms.DataAccess.Data;
-using Crnc.Oms.DataAccess.Mappings;
+using Crnc.Oms.Infrastructure.DataAccess.Data;
+using Crnc.Oms.Infrastructure.DataAccess.Mappings;
 using Crnc.Oms.Domain.Aggregates.Users;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
-namespace Crnc.Oms.DataAccess
+namespace Crnc.Oms.Infrastructure.DataAccess
 {
     public class MongoDataContext
     {

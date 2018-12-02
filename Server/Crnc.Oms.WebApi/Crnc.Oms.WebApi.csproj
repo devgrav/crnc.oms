@@ -9,7 +9,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Crnc.Oms.DataAccess\Crnc.Oms.DataAccess.csproj" />
+    <ProjectReference Include="..\Crnc.Oms.Infrastructure.DataAccess\Crnc.Oms.Infrastructure.DataAccess.csproj" />
+     <ProjectReference Include="..\Crnc.Oms.Infrastructure.CrossCutting\Crnc.Oms.Infrastructure.CrossCutting.csproj" />
     <ProjectReference Include="..\Crnc.Oms.Domain\Crnc.Oms.Domain.csproj" />
   </ItemGroup>
 

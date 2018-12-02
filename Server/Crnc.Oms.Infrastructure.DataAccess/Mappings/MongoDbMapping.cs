@@ -2,7 +2,7 @@ using Crnc.Oms.Domain.Aggregates;
 using Crnc.Oms.Domain.Aggregates.Users;
 using MongoDB.Bson.Serialization;
 
-namespace Crnc.Oms.DataAccess.Mappings
+namespace Crnc.Oms.Infrastructure.DataAccess.Mappings
 {
     public static class MongoDbMapping
     {

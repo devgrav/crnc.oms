@@ -8,9 +8,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Crnc.Oms.DataAccess;
+using Crnc.Oms.Infrastructure.DataAccess;
 using Crnc.Oms.Domain.IRepositories;
-using Crnc.Oms.DataAccess.Repositories;
+using Crnc.Oms.Infrastructure.DataAccess.Repositories;
 using System.Globalization;
 using Newtonsoft.Json.Serialization;
 

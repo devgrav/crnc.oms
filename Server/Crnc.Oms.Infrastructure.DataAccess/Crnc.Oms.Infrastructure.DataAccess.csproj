@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Crnc.Oms.Domain\Crnc.Oms.Domain.csproj" />
+    <ProjectReference Include="..\Crnc.Oms.Infrastructure.CrossCutting\Crnc.Oms.Infrastructure.CrossCutting.csproj" />
   </ItemGroup>
 
   <ItemGroup>

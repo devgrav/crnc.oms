@@ -4,12 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Crnc.Oms.Domain.IRepositories;
-using CrncOmsWeb.DTO;
 using Crnc.Oms.Domain.Aggregates.Users;
 using UserEntity = Crnc.Oms.Domain.Aggregates.Users.User;
 using System.ComponentModel.DataAnnotations;
+using Crnc.Oms.Infrastructure.CrossCutting;
+using Crnc.Oms.WebApi.DTO;
 
-namespace CrncOmsWeb.Api
+namespace Crnc.Oms.WebApi.Api
 {
     [Route("api/[controller]")]
     public class UsersController 
@@ -74,7 +75,9 @@ namespace CrncOmsWeb.Api
         {
             if (ModelState.IsValid)
             {
-                var entity = UserEntity.CreateNew(user.Login, user.Password,
+                var password = PasswordHelper.GetHash(user.Password);
+
+                var entity = UserEntity.CreateNew(user.Login, password.Hash, password.Salt,
                     user.FirstName, user.LastName, user.Email, user.Phone, null, !string.IsNullOrWhiteSpace(user.PhotoBase64)
                         && !string.IsNullOrWhiteSpace(user.PhotoMimeType)
                     ? new UserPhoto(user.PhotoBase64, user.PhotoMimeType) : null);
@@ -92,7 +95,10 @@ namespace CrncOmsWeb.Api
         {
             if (ModelState.IsValid)
             {
-                var entity = UserEntity.CreateExisted(id, user.Login, user.Password,
+
+                var password = PasswordHelper.GetHash(user.Password);
+
+                var entity = UserEntity.CreateExisted(id, user.Login, password.Hash, password.Salt,
                     user.FirstName, user.LastName, user.Email, new Role(user.Role), 
                     user.IsActive, user.Phone, !string.IsNullOrWhiteSpace(user.PhotoBase64) 
                         && !string.IsNullOrWhiteSpace(user.PhotoMimeType)

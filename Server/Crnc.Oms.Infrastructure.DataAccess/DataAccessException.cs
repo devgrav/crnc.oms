@@ -1,6 +1,6 @@
 using System;
 
-namespace Crnc.Oms.DataAccess
+namespace Crnc.Oms.Infrastructure.DataAccess
 {
     public class DataAccessException
         : ApplicationException

@@ -6,11 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Crnc.Oms.Domain.Aggregates.Users;
 using Crnc.Oms.Domain.IRepositories;
-using Crnc.Oms.DataAccess.Exceptions;
+using Crnc.Oms.Infrastructure.DataAccess.Exceptions;
 using MongoDB.Driver.Linq;
 using MongoDB.Driver;
 
-namespace Crnc.Oms.DataAccess.Repositories
+namespace Crnc.Oms.Infrastructure.DataAccess.Repositories
 {
     /// <summary>
     /// Repository for users
@@ -92,7 +92,7 @@ namespace Crnc.Oms.DataAccess.Repositories
             currentUser.ChangePhone(modifiedUser.Phone);
             currentUser.ChangeFirstName(modifiedUser.FirstName);
             currentUser.ChangeLastName(modifiedUser.LastName);
-            currentUser.ChangePassword(modifiedUser.PasswordHash);            
+            currentUser.ChangePassword(modifiedUser.PasswordHash, modifiedUser.PasswordSalt);            
             currentUser.ChangePhoto(modifiedUser.Photo);
 
             if (modifiedUser.IsActive)
