@@ -13,6 +13,10 @@ using Crnc.Oms.Domain.IRepositories;
 using Crnc.Oms.Infrastructure.DataAccess.Repositories;
 using System.Globalization;
 using Newtonsoft.Json.Serialization;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Text;
+using Crnc.Oms.WebApi.auth;
 
 namespace Crnc.Oms.WebApi
 {
@@ -38,7 +42,26 @@ namespace Crnc.Oms.WebApi
                     .AllowAnyMethod());
             });
             services.AddOptions();
-            services.Configure<MongoDbSettings>(Configuration.GetSection("ConnectionStrings:omsdb"));
+            services.Configure<MongoDbSettings>(Configuration.GetSection("ConnectionStrings:Omsdb"));
+            services.Configure<AuthSettings>(Configuration.GetSection("Auth"));
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                var securityKey = Configuration.GetSection("Auth").GetValue<string>("JwtBase64SymmetricKey");
+
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,                    
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = AuthSettings.ISSUER,
+                    ValidAudience = AuthSettings.AUDIENCE,
+                    IssuerSigningKey = AuthSettings.GetSymmetricSecurityKey(securityKey)
+                };
+            });
+
             services.AddMvc()
                 .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver());
             services.AddScoped<IUserRepository, MongoDbUserRepository>();

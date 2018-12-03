@@ -9,10 +9,12 @@ using UserEntity = Crnc.Oms.Domain.Aggregates.Users.User;
 using System.ComponentModel.DataAnnotations;
 using Crnc.Oms.Infrastructure.CrossCutting;
 using Crnc.Oms.WebApi.DTO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Crnc.Oms.WebApi.Api
 {
     [Route("api/[controller]")]
+    [Authorize]
     public class UsersController 
         : ControllerBase
     {
