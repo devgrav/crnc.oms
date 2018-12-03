@@ -13,7 +13,8 @@ export default class Login extends React.Component<any, LoginState> {
         this.state = {
             login: "",
             password: "",
-            redirectToReferrer: false
+            redirectToReferrer: false,
+            isLoading: false
         }
 
         this.onLoginChange = this.onLoginChange.bind(this);
@@ -30,6 +31,18 @@ export default class Login extends React.Component<any, LoginState> {
     hideError(){
         this.setState({
             errorMessage: ""
+        })
+    }
+
+    showLoading(){
+        this.setState({
+            isLoading: true
+        })
+    }
+
+    hideLoading(){
+        this.setState({
+            isLoading: false
         })
     }
 
@@ -53,6 +66,7 @@ export default class Login extends React.Component<any, LoginState> {
         const {login, password} = this.state;
 
         try {
+            this.showLoading();
             await AuthService.signIn(login, password)   
             
             if(CurrentUserContext.isAuthentificated)
@@ -63,6 +77,9 @@ export default class Login extends React.Component<any, LoginState> {
             if(error.response){
                 this.showError(error.response.data);
             }            
+        }
+        finally{
+            this.hideLoading();
         }    
     }
 
@@ -71,7 +88,7 @@ export default class Login extends React.Component<any, LoginState> {
     }
 
     public render() {
-        let {login, password, redirectToReferrer, errorMessage} = this.state;            
+        let {login, password, redirectToReferrer, errorMessage, isLoading} = this.state;            
         let { from } = this.props.location.state || { from: { pathname: "/" } };
     
         if (redirectToReferrer) return <Redirect to={from} />;
@@ -82,7 +99,7 @@ export default class Login extends React.Component<any, LoginState> {
                     <Segment attached="top"><Image centered src={Logo} size="tiny"/></Segment>
                     <Segment attached >
                         {errorMessage && <Message error content={errorMessage}/>}
-                        <Form onSubmit={this.onSignIn}>
+                        <Form loading={isLoading} onSubmit={this.onSignIn}>
                             <Form.Input label="Login" value={login} onChange={this.onLoginChange}/>
                             <Form.Input label="Password" value={password} onChange={this.onPasswordChange} type="password"/>
                             <Button primary type="submit" content="Sign In" disabled={this.isSignInDisabled()}/>
@@ -99,6 +116,7 @@ withRouter(Login)
 interface LoginState{
     login: string;
     password: string;
+    isLoading: boolean;
     redirectToReferrer: boolean;
     errorMessage?: string;
 }
