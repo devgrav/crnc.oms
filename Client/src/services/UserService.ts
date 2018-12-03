@@ -1,32 +1,33 @@
 import axios from "axios";
 import APP_CONFIG from "../config";
 import { Guid } from "guid-typescript";
+import AxiosProxy from "./AxiosProxy";
 
 export class UserService{
 
     public static getUsersGrid(): Promise<UserItemDto[]>{
-        return axios.get(APP_CONFIG.usersUrl)
+        return AxiosProxy.instance.get(APP_CONFIG.usersUrl)
             .then((response) => {
                 return response.data;
             });
     }
 
     public static postUser(user: UserItemDto): Promise<void>{
-        return axios.post(APP_CONFIG.usersUrl, user)
+        return AxiosProxy.instance.post(APP_CONFIG.usersUrl, user)
             .then((response) => {
                 return;
             });
     }
 
     public static putUser(user: UserItemDto): Promise<void>{
-        return axios.put(`${APP_CONFIG.usersUrl}/${user.id}`, user)
+        return AxiosProxy.instance.put(`${APP_CONFIG.usersUrl}/${user.id}`, user)
             .then((response) => {
                 return;
             });
     }
 
     public static deleteUser(id: string): Promise<void>{
-        return axios.delete(`${APP_CONFIG.usersUrl}/${id}`)
+        return AxiosProxy.instance.delete(`${APP_CONFIG.usersUrl}/${id}`)
             .then((response) => {
                 return;
             });

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Crnc.Oms.Domain.IRepositories;
 using Crnc.Oms.WebApi.DTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,6 +12,7 @@ namespace Crnc.Oms.WebApi.Api
 {
     [Produces("application/json")]
     [Route("api/[controller]")]
+    [Authorize]
     public class RolesController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
