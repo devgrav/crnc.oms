@@ -2,8 +2,10 @@ namespace Crnc.Oms.WebApi.Authorization
 {
     public class Roles
     {
-        public const string Admin = "admin";
+        public const string Admin = "Admin";
 
-        public const string Manager = "manager";
+        public const string MainManager = "Main manager";
+
+        public const string Manager = "Manager";
     }
 }

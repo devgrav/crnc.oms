@@ -5,18 +5,21 @@ import axios from "axios";
 
 export default class AuthService {
 
-    static signIn(login: string, password: string): Promise<void>{               
+    static signIn(login: string, password: string): Promise<void>{              
         return axios.post(`${APP_CONFIG.accountsUrl}/auth`, {
             login: login,
             password: password
         })
         .then((response) => {
-            CurrentUserContext.init(response.data);
+            const user = response.data as CurrentUser;
+            sessionStorage.setItem("crnc.oms.currentUser", JSON.stringify(user))
+            CurrentUserContext.init(user);
             return;
         })
     }
 
     static signOut(){
+        sessionStorage.removeItem("crnc.oms.currentUser");
         CurrentUserContext.clear();
     }
 }
