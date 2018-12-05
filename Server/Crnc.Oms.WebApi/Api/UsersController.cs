@@ -11,12 +11,13 @@ using Crnc.Oms.Infrastructure.CrossCutting;
 using Crnc.Oms.WebApi.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Swashbuckle.AspNetCore.Annotations;
+using Crnc.Oms.WebApi.Authorization;
 
 namespace Crnc.Oms.WebApi.Api
 {
     [Produces("application/json")]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Roles = Roles.Admin)]
     public class UsersController 
         : ControllerBase
     {

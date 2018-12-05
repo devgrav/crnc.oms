@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Crnc.Oms.Domain.IRepositories;
+using Crnc.Oms.WebApi.Authorization;
 using Crnc.Oms.WebApi.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -13,7 +14,7 @@ namespace Crnc.Oms.WebApi.Api
 {
     [Produces("application/json")]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Roles = Roles.Admin)]
     public class RolesController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
@@ -27,7 +28,8 @@ namespace Crnc.Oms.WebApi.Api
         [SwaggerOperation(
             Summary = "Get all user roles",
             Description = "Requires admin role",
-            OperationId = "Get roles")]
+            OperationId = "Get roles",
+            Tags = new[] { "Roles" })]
         public IEnumerable<TextValueDto> Get()
         {
             return _userRepository.GetRoles().Select(r => new TextValueDto

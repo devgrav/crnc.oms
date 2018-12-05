@@ -58,7 +58,8 @@ namespace Crnc.Oms.WebApi.Api
             if(!user.IsActive)
                 return BadRequest("User is not active");
 
-            var jwt = GetToken();
+            var identity = GetIdentity(user);
+            var jwt = GetToken(identity);
 
             return Ok(new CurrentUserDto(){
                 Login = user.Login,
@@ -68,7 +69,21 @@ namespace Crnc.Oms.WebApi.Api
             });    
         }   
 
-        private string GetToken()
+        private ClaimsIdentity GetIdentity(User user)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimsIdentity.DefaultNameClaimType, user.Login),
+                new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role.Title)
+            };
+            ClaimsIdentity claimsIdentity =
+            new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,
+                ClaimsIdentity.DefaultRoleClaimType);
+                
+            return claimsIdentity;
+        }
+
+        private string GetToken(ClaimsIdentity identity)
         {
             var secretKey = AuthSettings.GetSymmetricSecurityKey(_authSettings.JwtBase64SymmetricKey);
             var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
@@ -77,7 +92,7 @@ namespace Crnc.Oms.WebApi.Api
             var tokenOptions = new JwtSecurityToken(
                 issuer: AuthSettings.ISSUER,
                 audience: AuthSettings.AUDIENCE,
-                claims: new List<Claim>(),
+                claims: identity.Claims,
                 expires: now.AddSeconds(_authSettings.JwtLifetimeSeconds),
                 signingCredentials: signinCredentials
             );
