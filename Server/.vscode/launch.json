@@ -27,7 +27,7 @@
                 },
                 "linux": {
                     "command": "xdg-open",
-                    "args": "${auto-detect-url}/api/users"
+                    "args": "${auto-detect-url}/api-docs"
                 }
             },
             "env": {

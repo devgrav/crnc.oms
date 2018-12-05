@@ -10,6 +10,7 @@ using System.ComponentModel.DataAnnotations;
 using Crnc.Oms.Infrastructure.CrossCutting;
 using Crnc.Oms.WebApi.DTO;
 using Microsoft.AspNetCore.Authorization;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Crnc.Oms.WebApi.Api
 {
@@ -28,6 +29,10 @@ namespace Crnc.Oms.WebApi.Api
 
         // GET: api/users
         [HttpGet]
+        [SwaggerOperation(
+            Summary = "Get all users",
+            Description = "Requires admin role",
+            OperationId = "Get users")]
         public IEnumerable<UserItemDto> Get()
         {
             var users = _userRepository.FindAll();
@@ -51,6 +56,10 @@ namespace Crnc.Oms.WebApi.Api
 
         // GET api/users/5
         [HttpGet("{id}")]
+        [SwaggerOperation(
+            Summary = "Get users by Id",
+            Description = "Requires admin role",
+            OperationId = "Get user")]
         public UserItemDto Get(Guid id)
         {
             var user = _userRepository.FindById(id);
@@ -74,6 +83,10 @@ namespace Crnc.Oms.WebApi.Api
 
         // POST api/users
         [HttpPost]
+        [SwaggerOperation(
+            Summary = "Create new user",
+            Description = "Requires admin role",
+            OperationId = "Create user")]
         public IActionResult Post([FromBody]UserItemDto user)
         {
             if (ModelState.IsValid)
@@ -94,6 +107,10 @@ namespace Crnc.Oms.WebApi.Api
 
         // PUT api/users/5
         [HttpPut("{id}")]
+        [SwaggerOperation(
+            Summary = "Update user by id",
+            Description = "Requires admin role",
+            OperationId = "Update user")]        
         public IActionResult Put(Guid id, [FromBody]UserItemDto user)
         {
             if (ModelState.IsValid)
@@ -117,6 +134,10 @@ namespace Crnc.Oms.WebApi.Api
 
         // DELETE api/users/5
         [HttpDelete("{id}")]
+        [SwaggerOperation(
+            Summary = "Delete user by id",
+            Description = "Requires admin role",
+            OperationId = "Delete user")]  
         public void Delete(Guid id)
         {            
             _userRepository.Delete(id);

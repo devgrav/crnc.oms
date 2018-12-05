@@ -6,12 +6,13 @@ using Crnc.Oms.Domain.Aggregates.Users;
 using Crnc.Oms.Domain.IRepositories;
 using Crnc.Oms.Infrastructure.CrossCutting;
 using Crnc.Oms.Infrastructure.DataAccess.Exceptions;
-using Crnc.Oms.WebApi.Authentication;
+using Crnc.Oms.WebApi.Authorization;
 using Crnc.Oms.WebApi.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Crnc.Oms.WebApi.Api
 {
@@ -31,6 +32,10 @@ namespace Crnc.Oms.WebApi.Api
 
 
         [HttpPost("auth")]
+        [SwaggerOperation(
+            Summary = "Authenticate user",
+            Description = "Returns user info with token in JWT format",
+            OperationId = "Authenticate token")]                
         public IActionResult Authenticate([FromBody]AccountDto account)
         {
             if(!ModelState.IsValid)
