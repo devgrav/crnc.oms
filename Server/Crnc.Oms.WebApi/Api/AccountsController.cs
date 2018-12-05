@@ -6,7 +6,7 @@ using Crnc.Oms.Domain.Aggregates.Users;
 using Crnc.Oms.Domain.IRepositories;
 using Crnc.Oms.Infrastructure.CrossCutting;
 using Crnc.Oms.Infrastructure.DataAccess.Exceptions;
-using Crnc.Oms.WebApi.auth;
+using Crnc.Oms.WebApi.Authentication;
 using Crnc.Oms.WebApi.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

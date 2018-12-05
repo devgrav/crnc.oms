@@ -16,7 +16,7 @@ using Newtonsoft.Json.Serialization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
-using Crnc.Oms.WebApi.auth;
+using Crnc.Oms.WebApi.Authentication;
 
 namespace Crnc.Oms.WebApi
 {
@@ -86,6 +86,7 @@ namespace Crnc.Oms.WebApi
             CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
             app.UseCors("AllOrigins");
+            app.UseAuthentication();
             app.UseMvc();
         }
     }

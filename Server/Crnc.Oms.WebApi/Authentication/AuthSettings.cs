@@ -1,7 +1,7 @@
 using System;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Crnc.Oms.WebApi.auth
+namespace Crnc.Oms.WebApi.Authentication
 {
     public class AuthSettings
     {

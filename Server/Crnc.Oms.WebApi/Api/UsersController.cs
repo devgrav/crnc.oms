@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Crnc.Oms.WebApi.Api
 {
+    [Produces("application/json")]
     [Route("api/[controller]")]
     [Authorize]
     public class UsersController 
