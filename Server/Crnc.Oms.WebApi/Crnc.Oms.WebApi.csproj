@@ -6,6 +6,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="swashbuckle.aspnetcore" Version="4.0.1" />
+    <PackageReference Include="swashbuckle.aspnetcore.annotations" Version="4.0.1" />
   </ItemGroup>
 
   <ItemGroup>
