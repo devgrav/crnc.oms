@@ -2,6 +2,7 @@ import CurrentUser from "../auth/CurrentUser";
 import CurrentUserContext from "../auth/CurrentUserContext";
 import APP_CONFIG from "../config";
 import axios from "axios";
+import AxiosProxy from "./AxiosProxy";
 
 export default class AuthService {
 
@@ -20,6 +21,7 @@ export default class AuthService {
 
     static signOut(){
         sessionStorage.removeItem("crnc.oms.currentUser");
+        AxiosProxy.clear();
         CurrentUserContext.clear();
     }
 }

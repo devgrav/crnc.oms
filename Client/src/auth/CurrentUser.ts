@@ -1,4 +1,4 @@
-import CurrentUserRole from "./CurrentUserRole";
+import {CurrentUserRole} from "./CurrentUserRole";
 
 export default interface CurrentUser{
     login: string;
