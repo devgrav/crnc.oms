@@ -1,4 +1,15 @@
-type CurrentUserRole = "admin" | "manager"
+export type CurrentUserRole = "Admin" | "Manager" | "Main manager";
 
-export default CurrentUserRole
+export const Roles: IRoles = {
+    Admin: "Admin",
+    MainManager: "Main manager",
+    Manager: "Manager"
+} 
+
+interface IRoles{
+    Admin: CurrentUserRole;
+    Manager: CurrentUserRole;
+    MainManager: CurrentUserRole;
+}
+
 

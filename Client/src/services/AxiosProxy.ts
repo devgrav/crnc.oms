@@ -4,7 +4,7 @@ import CurrentUserContext from "../auth/CurrentUserContext";
 
 export default class AxiosProxy{
 
-    private static _instance: AxiosInstance
+    private static _instance: AxiosInstance | null
 
     static get instance(){
         if(!AxiosProxy._instance){
@@ -14,6 +14,10 @@ export default class AxiosProxy{
         }            
 
         return AxiosProxy._instance;        
+    }
+
+    static clear(){
+        AxiosProxy._instance = null;
     }
 
 }
