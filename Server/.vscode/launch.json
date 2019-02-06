@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/Crnc.Oms.WebApi/bin/Debug/netcoreapp2.1/Crnc.Oms.WebApi.dll",
+            "program": "${workspaceFolder}/Crnc.Oms.WebApi/bin/Debug/netcoreapp2.2/Crnc.Oms.WebApi.dll",
             "args": [],
             "cwd": "${workspaceFolder}/Crnc.Oms.WebApi",
             "stopAtEntry": false,
