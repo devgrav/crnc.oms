@@ -33,6 +33,7 @@ namespace Crnc.Oms.Infrastructure.DataAccess.Data
 
                 var users = new List<User>()
                 {
+                    User.CreateNew("admin",password.Hash, password.Salt,"John","Admin","admin@crnc.com",null, roles.First(r=> r.Title.Equals("Admin")),null),
                     User.CreateNew("jack_richer",password.Hash, password.Salt,"Jack","Richer","jack_richer@crnc.com",null, roles.First(r=> r.Title.Equals("Admin")),photos[0]),
                     User.CreateNew("shon_bean",password.Hash, password.Salt,"Shon","Bean","shon_bean@crnc.com",null,roles.First(r=> r.Title.Equals("Main manager")),photos[1]),
                     User.CreateNew("helen_smith",password.Hash, password.Salt,"Helen","Smith","helen_smith@crnc.com",null,roles.First(r=> r.Title.Equals("Manager")),photos[2]),
