@@ -1,12 +1,8 @@
-﻿using Crnc.Oms.Domain.Aggregates.Customers;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using Crnc.Oms.Domain.SeedWork;
+using Crnc.Oms.Sales.Domain.Aggregates.Customers;
 
-namespace Crnc.Oms.Domain.Aggregates.Estimates
+namespace Crnc.Oms.Sales.Domain.Aggregates.Estimates
 {
     /// <summary>
     /// Estimate for job

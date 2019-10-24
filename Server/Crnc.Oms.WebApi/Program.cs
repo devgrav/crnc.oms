@@ -23,6 +23,7 @@ namespace Crnc.Oms.WebApi
                     config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);                    
                     config.AddEnvironmentVariables();                    
                 })
+                .ConfigureKestrel(options => {})
                 .UseStartup<Startup>();
     }
 }

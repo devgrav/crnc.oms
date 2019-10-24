@@ -1,5 +1,6 @@
 using Crnc.Oms.Domain.Aggregates;
 using Crnc.Oms.Domain.Aggregates.Users;
+using Crnc.Oms.Domain.SeedWork;
 using MongoDB.Bson.Serialization;
 
 namespace Crnc.Oms.Infrastructure.DataAccess.Mappings
