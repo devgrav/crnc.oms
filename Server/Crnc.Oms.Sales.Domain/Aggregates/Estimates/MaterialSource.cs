@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Crnc.Oms.Domain.Aggregates.Estimates
+﻿namespace Crnc.Oms.Sales.Domain.Aggregates.Estimates
 {
     /// <summary>
     /// Source of material

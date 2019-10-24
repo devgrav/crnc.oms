@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Crnc.Oms.Domain.SeedWork\Crnc.Oms.Domain.SeedWork.csproj" />
+      <ProjectReference Include="..\Crnc.Oms.Sales.Dto\Crnc.Oms.Sales.Dto.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Aggregates" />
+    </ItemGroup>
+
+</Project>

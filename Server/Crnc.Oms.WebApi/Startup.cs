@@ -17,6 +17,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using Crnc.Oms.WebApi.Authorization;
+using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -67,24 +69,35 @@ namespace Crnc.Oms.WebApi
             services.AddSwaggerGen(c =>
             {
                 c.EnableAnnotations();
-                c.SwaggerDoc("v1.0", new Info { Title = "Crnc Oms API", Version = "v1.0" });
+                c.SwaggerDoc("v1.0", new OpenApiInfo(){ Title = "Crnc Oms API", Version = "v1.0" });
                 var security = new Dictionary<string, IEnumerable<string>>
                 {
                     {"Bearer", new string[] { }},
                 };
  
-                c.AddSecurityDefinition("Bearer", new ApiKeyScheme
+                services.AddSwaggerGen(c =>
                 {
-                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
-                    Name = "Authorization",
-                    In = "header",
-                    Type = "apiKey"
+                    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+                    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+                        { In = ParameterLocation.Header, Description = "Please insert JWT with Bearer into field", Name = "Authorization", Type = SecuritySchemeType.ApiKey });
+                    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                    {
+                        {
+                            new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme, 
+                                    Id = "Bearer"
+                                }
+                            }, new string[] { }
+                        }
+                    });
                 });
-                c.AddSecurityRequirement(security);
             });
 
-            services.AddMvc()
-                .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver());
+            services.AddControllers()
+                .AddJsonOptions(options => options.JsonSerializerOptions.PropertyNameCaseInsensitive = true);
             services.AddScoped<IUserRepository, MongoDbUserRepository>();
             services.AddSingleton<MongoDataContext>();     
         }
@@ -95,9 +108,8 @@ namespace Crnc.Oms.WebApi
         /// <param name="app"></param>
         /// <param name="env"></param>
         /// <param name="loggerFactory"></param>
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddDebug();
 
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
@@ -106,9 +118,12 @@ namespace Crnc.Oms.WebApi
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
             CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
+            app.UseRouting();
             app.UseCors("AllOrigins");
             app.UseAuthentication();
-            app.UseMvc();
+            app.UseAuthorization();
+            app.UseEndpoints(e => 
+                e.MapControllers());
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
