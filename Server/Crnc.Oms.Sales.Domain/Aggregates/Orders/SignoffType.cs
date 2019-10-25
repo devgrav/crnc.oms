@@ -1,14 +1,16 @@
-﻿namespace Crnc.Oms.Sales.Domain.Aggregates.Orders
+﻿using System.ComponentModel;
+
+namespace Crnc.Oms.Sales.Domain.Aggregates.Orders
 {
     /// <summary>
     /// Type of signoff for estimate
     /// </summary>
     public enum SignoffType
     {
-        PO =1,
-
-        Email=2,
-
-        Verbal=3
+        [Description("Email")]
+        Email=1,
+        
+        [Description("Verbal")]
+        Verbal=2
     }
 }

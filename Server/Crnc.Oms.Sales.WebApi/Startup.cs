@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Crnc.Oms.Sales.Application;
+using Crnc.Oms.Sales.Application.Features.Orders.Dto;
+using Crnc.Oms.Sales.Application.Features.Orders.Queries;
 using Crnc.Oms.Sales.DataAccess;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -32,6 +35,7 @@ namespace Crnc.Oms.Sales.WebApi
             {
                 options.UseNpgsql(Configuration.GetConnectionString("OmsSalesDb"));
             });
+            services.AddScoped<IUseCaseQueryHandler<OrdersForTableRequestDto, OrdersForTableResponseDto>,GetOrdersForTable>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
