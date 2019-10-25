@@ -1,9 +1,9 @@
 import axios from "axios";
 import APP_CONFIG from "../config";
 
-export class EstimateService{
+export class OrderService{
 }
 
-export interface EstimateItemDto{
+export interface OrderItemDto{
     id: number;
 }

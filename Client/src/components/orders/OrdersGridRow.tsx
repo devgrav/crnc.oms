@@ -1,10 +1,10 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
 import { Checkbox, Icon, Label, Table } from "semantic-ui-react";
-import { EstimateItemDto } from "../../services/EstimateService";
+import { OrderItemDto } from "../../services/OrderService";
 import {UserItemDto, UserService} from "../../services/UserService";
 
-const EstimatesGridRow: React.StatelessComponent<EstimatesGridRowProps> = (props) => {
+const OrdersGridRow: React.StatelessComponent<OrdersGridRowProps> = (props) => {
         return (
                 <Table.Row>
                     <Table.Cell>
@@ -38,8 +38,8 @@ const EstimatesGridRow: React.StatelessComponent<EstimatesGridRowProps> = (props
         );
 };
 
-export default EstimatesGridRow;
+export default OrdersGridRow;
 
-interface EstimatesGridRowProps{
-    estimateItem: EstimateItemDto;
+interface OrdersGridRowProps{
+    estimateItem: OrderItemDto;
 }

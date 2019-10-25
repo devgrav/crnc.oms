@@ -1,6 +1,6 @@
 import * as React from "react";
 
-export default class EstimateEdit extends React.Component<any>{
+export default class OrderEdit extends React.Component<any>{
 
     constructor(props: any){
         super(props);
