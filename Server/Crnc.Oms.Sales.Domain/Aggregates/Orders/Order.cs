@@ -2,12 +2,12 @@
 using Crnc.Oms.Domain.SeedWork;
 using Crnc.Oms.Sales.Domain.Aggregates.Customers;
 
-namespace Crnc.Oms.Sales.Domain.Aggregates.Estimates
+namespace Crnc.Oms.Sales.Domain.Aggregates.Orders
 {
     /// <summary>
-    /// Estimate for job
+    /// Order for job
     /// </summary>
-    public class Estimate
+    public class Order
         : DomainEntity, IAggregateRoot
     {
         /// <summary>
@@ -38,7 +38,7 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Estimates
         /// <summary>
         /// Current status of estimate
         /// </summary>
-        public EstimateStatus Status { get; set; }
+        public OrderStatus Status { get; set; }
 
         /// <summary>
         /// Source of material

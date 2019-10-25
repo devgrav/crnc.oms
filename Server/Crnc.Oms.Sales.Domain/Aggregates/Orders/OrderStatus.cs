@@ -1,9 +1,9 @@
-﻿namespace Crnc.Oms.Sales.Domain.Aggregates.Estimates
+﻿namespace Crnc.Oms.Sales.Domain.Aggregates.Orders
 {
     /// <summary>
-    /// Status of estimate
+    /// Status of order
     /// </summary>
-    public enum EstimateStatus
+    public enum OrderStatus
     {
         NotSent=1,
 
