@@ -11,7 +11,7 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Orders
         : DomainEntity, IAggregateRoot
     {
         /// <summary>
-        /// Number of estimate, tempalte E-value of id, may be put in manually
+        /// Number of order, tempalte E-value of id, may be put in manually
         /// </summary>
         public string Number { get; set; }
 
@@ -36,7 +36,7 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Orders
         public string JobDescription { get; set; }
 
         /// <summary>
-        /// Current status of estimate
+        /// Current status of order
         /// </summary>
         public OrderStatus Status { get; set; }
 
@@ -48,10 +48,15 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Orders
         /// <summary>
         /// Type of signoff
         /// </summary>
-        public SignoffType SignoffType { get; set; }
-
+        public SignoffType SignOffType { get; set; }
+        
         /// <summary>
-        /// Customer of estimate
+        /// Customer Id
+        /// </summary>
+        public Guid CustomerId { get; set; }
+        
+        /// <summary>
+        /// Customer of order
         /// </summary>
         public Customer Customer { get; set; }
     }

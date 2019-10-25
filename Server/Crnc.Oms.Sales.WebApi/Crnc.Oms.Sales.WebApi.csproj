@@ -5,12 +5,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Controllers" />
+      <ProjectReference Include="..\Crnc.Oms.Sales.Application\Crnc.Oms.Sales.Application.csproj" />
+      <ProjectReference Include="..\Crnc.Oms.Sales.DataAccess\Crnc.Oms.Sales.DataAccess.csproj" />
+      <ProjectReference Include="..\Crnc.Oms.Sales.Dto\Crnc.Oms.Sales.Dto.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Crnc.Oms.Sales.Application\Crnc.Oms.Sales.Application.csproj" />
-      <ProjectReference Include="..\Crnc.Oms.Sales.Dto\Crnc.Oms.Sales.Dto.csproj" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.0.0" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.0.1" />
     </ItemGroup>
 
 </Project>
