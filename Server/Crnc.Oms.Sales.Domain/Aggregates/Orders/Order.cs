@@ -58,6 +58,6 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Orders
         /// <summary>
         /// Customer of order
         /// </summary>
-        public Customer Customer { get; set; }
+        public virtual Customer Customer { get; set; }
     }
 }
