@@ -31,8 +31,8 @@ export default class TopMenu
                 <Menu.Item as={NavLink} isActive={this.isActiveForDefault} to="/users" name="users" link>
                     Users
                 </Menu.Item>
-                <Menu.Item as={NavLink} to="/estimates" name="estimates" link>
-                    Estimates
+                <Menu.Item as={NavLink} to="/orders" name="orders" link>
+                    Orders
                 </Menu.Item>
                 <Menu.Item as={NavLink} to="/jobs" name="jobs" link>
                     Jobs

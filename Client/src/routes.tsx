@@ -1,10 +1,10 @@
 import * as React from "react";
 import { Route, Switch, RouteProps, Redirect } from "react-router";
-import EstimatesGrid from "./components/estimates/EstimatesGrid";
+import OrdersGrid from "./components/orders/OrdersGrid";
 import JobsGrid from "./components/jobs/JobsGrid";
 import NotFound from "./components/notFound/NotFound";;
 import UserCards from "./components/users/UserCards";
-import EstimateEdit from "./components/estimates/EstimateEdit";
+import OrderEdit from "./components/orders/OrderEdit";
 import Login from "./components/auth/Login";
 import CurrentUserContext from "./auth/CurrentUserContext";
 import Layout from "./components/layout/Layout";
@@ -17,8 +17,8 @@ const Routes: React.StatelessComponent = () => {
             <PrivateRoute roles={[Roles.Admin]} exact path="/" component={UserCards}/>
             <PrivateRoute roles={[Roles.Admin]} path="/users/:id" component={UserCards}/>
             <PrivateRoute roles={[Roles.Admin]} path="/users" component={UserCards}/>
-            <PrivateRoute roles={[Roles.MainManager, Roles.Manager]} path="/estimates/:id" component={EstimateEdit}/>
-            <PrivateRoute roles={[Roles.MainManager, Roles.Manager]} path="/estimates" component={EstimatesGrid}/>
+            <PrivateRoute roles={[Roles.MainManager, Roles.Manager]} path="/orders/:id" component={OrderEdit}/>
+            <PrivateRoute roles={[Roles.MainManager, Roles.Manager]} path="/orders" component={OrdersGrid}/>
             <PrivateRoute roles={[Roles.MainManager, Roles.Manager]} path="/jobs" component={JobsGrid}/>            
             <Route path="/login" component={Login}/>
             <Route component={NotFound}/>

@@ -1,15 +1,15 @@
 import * as React from "react";
 import { Button, Dimmer, Header, Icon, Loader, Menu, Segment, Table } from "semantic-ui-react";
-import { EstimateItemDto } from "../../services/EstimateService";
+import { OrderItemDto } from "../../services/OrderService";
 import {UserItemDto, UserService} from "../../services/UserService";
-import EstimatesGridRow from "./EstimatesGridRow";
+import OrdersGridRow from "./OrdersGridRow";
 
-export default class EstimatesGrid extends React.Component<{}, EstimatesGridState> {
+export default class OrdersGrid extends React.Component<{}, OrdersGridState> {
     constructor(props: any){
         super(props);
 
         this.state = {
-            estimates: [],
+            orders: [],
             isLoading: false
         };
     }
@@ -47,7 +47,7 @@ export default class EstimatesGrid extends React.Component<{}, EstimatesGridStat
                         <Table.Row>
                             <Table.HeaderCell width={1}/>
                             <Table.HeaderCell>
-                                Estimate #
+                                Order #
                             </Table.HeaderCell>
                             <Table.HeaderCell>
                                 Date Created
@@ -68,13 +68,13 @@ export default class EstimatesGrid extends React.Component<{}, EstimatesGridStat
                                 Customer sighnoff
                             </Table.HeaderCell>
                             <Table.HeaderCell>
-                                Estimate status
+                                Order status
                             </Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
                     <Table.Body>
-                        {this.state.estimates.map((est) =>
-                            <EstimatesGridRow key={est.id} estimateItem={est}/>)}
+                        {this.state.orders.map((est) =>
+                            <OrdersGridRow key={est.id} estimateItem={est}/>)}
                     </Table.Body>
                     <Table.Footer fullWidth>
                         <Table.Row>
@@ -100,7 +100,7 @@ export default class EstimatesGrid extends React.Component<{}, EstimatesGridStat
     }
 }
 
-interface EstimatesGridState{
-    estimates: EstimateItemDto[];
+interface OrdersGridState{
+    orders: OrderItemDto[];
     isLoading: boolean;
 }

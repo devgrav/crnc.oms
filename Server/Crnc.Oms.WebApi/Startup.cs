@@ -70,34 +70,25 @@ namespace Crnc.Oms.WebApi
             {
                 c.EnableAnnotations();
                 c.SwaggerDoc("v1.0", new OpenApiInfo(){ Title = "Crnc Oms API", Version = "v1.0" });
-                var security = new Dictionary<string, IEnumerable<string>>
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+                    { In = ParameterLocation.Header, Description = "Please insert JWT with Bearer into field", Name = "Authorization", Type = SecuritySchemeType.ApiKey });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
-                    {"Bearer", new string[] { }},
-                };
- 
-                services.AddSwaggerGen(c =>
-                {
-                    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
-                    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
-                        { In = ParameterLocation.Header, Description = "Please insert JWT with Bearer into field", Name = "Authorization", Type = SecuritySchemeType.ApiKey });
-                    c.AddSecurityRequirement(new OpenApiSecurityRequirement
                     {
+                        new OpenApiSecurityScheme
                         {
-                            new OpenApiSecurityScheme
+                            Reference = new OpenApiReference
                             {
-                                Reference = new OpenApiReference
-                                {
-                                    Type = ReferenceType.SecurityScheme, 
-                                    Id = "Bearer"
-                                }
-                            }, new string[] { }
-                        }
-                    });
+                                Type = ReferenceType.SecurityScheme, 
+                                Id = "Bearer"
+                            }
+                        }, new string[] { }
+                    }
                 });
             });
 
-            services.AddControllers()
-                .AddJsonOptions(options => options.JsonSerializerOptions.PropertyNameCaseInsensitive = true);
+            services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.PropertyNameCaseInsensitive = true);
             services.AddScoped<IUserRepository, MongoDbUserRepository>();
             services.AddSingleton<MongoDataContext>();     
         }
