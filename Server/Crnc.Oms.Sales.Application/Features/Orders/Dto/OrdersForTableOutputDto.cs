@@ -4,8 +4,8 @@ using Crnc.Oms.Sales.Domain.Aggregates.Orders;
 
 namespace Crnc.Oms.Sales.Application.Features.Orders.Dto
 {
-    public class OrdersForTableResponseDto
+    public class OrdersForTableOutputDto
     {
-        public List<OrdersForTableItemResponseDto> Items { get; set; }
+        public List<OrdersForTableItemOutputDto> Items { get; set; }
     }
 }

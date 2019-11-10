@@ -13,9 +13,9 @@ namespace Crnc.Oms.Sales.Application
         /// <summary>
         /// Handle command async
         /// </summary>
-        /// <param name="commandData">Data of command</param>
+        /// <param name="command">Data of command</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns></returns>
-        Task HandleAsync(IUseCaseCommandData commandData, CancellationToken cancellationToken=default); 
+        Task HandleAsync(IUseCaseCommand command, CancellationToken cancellationToken=default); 
     }
 }

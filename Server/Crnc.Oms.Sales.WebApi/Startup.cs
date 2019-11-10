@@ -35,11 +35,11 @@ namespace Crnc.Oms.Sales.WebApi
             {
                 options.UseNpgsql(Configuration.GetConnectionString("OmsSalesDb"));
             });
-            services.AddScoped<IUseCaseQueryHandler<OrdersForTableRequestDto, OrdersForTableResponseDto>,GetOrdersForTable>();
+            services.AddScoped<IUseCaseQueryHandler<OrdersForTableInputDto, OrdersForTableOutputDto>,GetOrdersForTable>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, SalesDataContext dbContext)
         {
             if (env.IsDevelopment())
             {
@@ -53,6 +53,8 @@ namespace Crnc.Oms.Sales.WebApi
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+            
+            SalesDbInitializer.Initialize(dbContext);
         }
     }
 }
