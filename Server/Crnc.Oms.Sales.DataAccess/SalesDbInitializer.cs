@@ -11,14 +11,11 @@ namespace Crnc.Oms.Sales.DataAccess
             dbContext.Database.EnsureDeleted();
             dbContext.Database.EnsureCreated();
 
-            var customer = new Customer()
-            {
-                Id = Guid.NewGuid(),
-                Email = "some@mail.ru",
-                Phone = "+79153423345",
-                FullName = "John Galt"
-            };
-            
+            var customer = new Customer(Guid.NewGuid(), 
+                new FullName("John", "Galt"), 
+                new Email("some@mail.ru"),
+                new Phone("+79153423345"));
+
             dbContext.Customers.Add(customer);
 
             dbContext.SaveChanges();
