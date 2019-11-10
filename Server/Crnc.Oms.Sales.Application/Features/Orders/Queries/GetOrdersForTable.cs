@@ -11,7 +11,7 @@ using Crnc.Oms.Sales.Application.Helpers;
 namespace Crnc.Oms.Sales.Application.Features.Orders.Queries
 {
     public class GetOrdersForTable
-        : IUseCaseQueryHandler<OrdersForTableRequestDto, OrdersForTableResponseDto>
+        : IUseCaseQueryHandler<OrdersForTableInputDto, OrdersForTableOutputDto>
     {
         private readonly SalesDataContext _context;
 
@@ -20,14 +20,14 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Queries
             _context = context;
         }
 
-        public async Task<OrdersForTableResponseDto> HandleAsync(OrdersForTableRequestDto queryData, CancellationToken cancellationToken = default)
+        public async Task<OrdersForTableOutputDto> HandleAsync(OrdersForTableInputDto queryData, CancellationToken cancellationToken = default)
         {
             var allOrders = await _context.Orders
                 .Include(x => x.Customer)
                 .ToListAsync(cancellationToken);
 
             var items = allOrders
-                .Select(x => new OrdersForTableItemResponseDto()
+                .Select(x => new OrdersForTableItemOutputDto()
                 {
                     
                     Id = x.Id,
@@ -43,7 +43,7 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Queries
                 })
                 .ToList();
 
-            return new OrdersForTableResponseDto()
+            return new OrdersForTableOutputDto()
             {
                 Items = items
             };

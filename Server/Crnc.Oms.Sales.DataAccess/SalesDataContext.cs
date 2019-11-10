@@ -39,36 +39,7 @@ namespace Crnc.Oms.Sales.DataAccess
         public SalesDataContext(DbContextOptions<SalesDataContext> options)
             : base(options)
         {
-            Database.EnsureDeleted();
-            Database.EnsureCreated();
 
-            var customer = new Customer()
-            {
-                Id = Guid.NewGuid(),
-                Email = "some@mail.ru",
-                Phone = "+79153423345",
-                FullName = "John Galt"
-            };
-            
-            Customers.Add(customer);
-
-            SaveChanges();
-            
-            Orders.Add(new Order()
-            {
-                Customer = customer,
-                Id = Guid.NewGuid(),
-                Number = "O-00001",
-                Status = OrderStatus.NeedSignoff,
-                DateCreated = DateTime.Now,
-                JobDescription = "Develop new wall",
-                JobType = JobType.New,
-                MaterialSource = MaterialSource.UserStock,
-                SignOffType = SignoffType.Email,
-                DateSentToCustomer = null
-            });
-
-            SaveChanges();
         }
     }
 }

@@ -3,7 +3,7 @@ using Crnc.Oms.Sales.Domain.Aggregates.Orders;
 
 namespace Crnc.Oms.Sales.Application.Features.Orders.Dto
 {
-    public class OrdersForTableItemResponseDto
+    public class OrdersForTableItemOutputDto
     {
         public Guid Id { get; set; }
 

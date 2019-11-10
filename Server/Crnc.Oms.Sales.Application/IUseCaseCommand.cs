@@ -1,6 +1,6 @@
 namespace Crnc.Oms.Sales.Application
 {
-    public interface IUseCaseCommandData
+    public interface IUseCaseCommand
     {
         
     }
