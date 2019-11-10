@@ -12,18 +12,18 @@ namespace Crnc.Oms.Sales.WebApi.Controllers
     [Route("api/[controller]")]
     public class OrdersController : ControllerBase
     {
-        private readonly IUseCaseQueryHandler<OrdersForTableRequestDto, OrdersForTableResponseDto> _getOrdersQueryHandler;
+        private readonly IUseCaseQueryHandler<OrdersForTableInputDto, OrdersForTableOutputDto> _getOrdersQueryHandler;
 
-        public OrdersController(IUseCaseQueryHandler<OrdersForTableRequestDto, OrdersForTableResponseDto> getOrdersQueryHandler)
+        public OrdersController(IUseCaseQueryHandler<OrdersForTableInputDto, OrdersForTableOutputDto> getOrdersQueryHandler)
         {
             _getOrdersQueryHandler = getOrdersQueryHandler;
         }
         
         // GET
         [HttpGet]
-        public async Task<OrdersForTableResponseDto> Get()
+        public async Task<OrdersForTableOutputDto> Get()
         {
-            var orders = await _getOrdersQueryHandler.HandleAsync(new OrdersForTableRequestDto());
+            var orders = await _getOrdersQueryHandler.HandleAsync(new OrdersForTableInputDto());
             return orders;
         }
     }
