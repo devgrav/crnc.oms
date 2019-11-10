@@ -10,8 +10,17 @@ namespace Crnc.Oms.Domain.SeedWork
         /// <summary>
         /// Id of entity
         /// </summary>
-        public Guid Id { get; set; }
-        
+        public Guid Id { get; protected set; }
+
+        public DomainEntity(Guid id)
+        {
+            Id = id;
+        }
+
+        protected DomainEntity()
+        {
+            
+        }
 
         #region Identity Management
         public static bool operator ==(DomainEntity e1, DomainEntity e2)

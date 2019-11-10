@@ -23,6 +23,6 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Dto
 
         public string CustomerSignOffType { get; set; }
 
-        public SignoffType CustomerSignOffTypeEnum { get; set; }
+        public SignoffType? CustomerSignOffTypeEnum { get; set; }
     }
 }

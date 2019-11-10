@@ -3,41 +3,39 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 
 namespace Crnc.Oms.Sales.Application.Helpers
 {
     public static class EnumHelper
     {
-        public static string GetDescription<T>(T e) where T : IConvertible
+        public static string GetDescription(Enum e)
         {
-            if (e is Enum)
-            {
-                Type type = e.GetType();
-                Array values = System.Enum.GetValues(type);
-
-                foreach (int val in values)
-                {
-                    if (val == e.ToInt32(CultureInfo.InvariantCulture))
-                    {
-                        var memInfo = type.GetMember(type.GetEnumName(val));
-                        var descriptionAttribute = memInfo[0]
-                            .GetCustomAttributes(typeof(DescriptionAttribute), false)
-                            .FirstOrDefault() as DescriptionAttribute;
-
-                        if (descriptionAttribute != null)
-                        {
-                            return descriptionAttribute.Description;
-                        }
-                    }
-                }
-            }
-
-            return string.Empty;
+            if (e == null)
+                return "";
+            
+            return
+                e.GetType()
+                .GetMember(e.ToString())
+                .FirstOrDefault()
+                ?.GetCustomAttribute<DescriptionAttribute>()
+                ?.Description
+                    ?? e.ToString();
         }
         
-        public static Dictionary<int, string> ToDictionaryWithKeysAndDescriptions<T>(T e) where T : Enum, IConvertible
+        public static Dictionary<int, string> ToDictionaryWithKeysAndDescriptions(Enum e)
         {
-            return Enum.GetValues(typeof(T)).Cast<T>().ToDictionary(e => e.ToInt32(CultureInfo.InvariantCulture), GetDescription);
+            var values = Enum.GetValues(e.GetType()).AsQueryable();
+            var dictionary = new Dictionary<int,string>();
+            
+            foreach (var val in values)
+            {
+                var key = (int)val;
+                var value = GetDescription((Enum)val);
+                dictionary.Add(key, value);
+            }
+
+            return dictionary;
         }
     }
 }
