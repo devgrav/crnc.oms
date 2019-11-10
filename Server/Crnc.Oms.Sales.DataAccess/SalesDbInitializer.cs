@@ -19,20 +19,14 @@ namespace Crnc.Oms.Sales.DataAccess
             dbContext.Customers.Add(customer);
 
             dbContext.SaveChanges();
-            
-            dbContext.Orders.Add(new Order()
-            {
-                Customer = customer,
-                Id = Guid.NewGuid(),
-                Number = "O-00001",
-                Status = OrderStatus.NeedSignoff,
-                DateCreated = DateTime.Now,
-                JobDescription = "Develop new wall",
-                JobType = JobType.New,
-                MaterialSource = MaterialSource.UserStock,
-                SignOffType = SignoffType.Email,
-                DateSentToCustomer = null
-            });
+
+            dbContext.Orders.Add(new Order(
+                Guid.NewGuid(), 
+                DateTime.Now, 
+                JobType.New, 
+                "Develop new wall", 
+                customer)
+            );
 
             dbContext.SaveChanges();
         }

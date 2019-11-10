@@ -12,24 +12,29 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Customers
         /// <summary>
         /// Full name
         /// </summary>
-        public FullName FullName { get; set; }
+        public FullName FullName { get; private set; }
 
         /// <summary>
         /// Email
         /// </summary>
-        public Email Email { get; set; }
+        public Email Email { get;private set; }
 
         /// <summary>
         /// Phone
         /// </summary>
-        public Phone Phone { get; set; }
+        public Phone Phone { get; private set; }
 
         public Customer(Guid id, FullName fullName, Email email, Phone phone)
+            : base(id)
         {
-            Id = id;
             FullName = fullName ?? throw new ArgumentNullException(nameof(fullName));
             Email = email ?? throw new ArgumentNullException(nameof(email));
             Phone = phone ?? throw new ArgumentNullException(nameof(phone));
+        }
+
+        protected Customer()
+        {
+            
         }
     }
 }
