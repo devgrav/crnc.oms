@@ -32,7 +32,7 @@ namespace Crnc.Oms.Sales.DataAccess
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
-            optionsBuilder.UseSnakeCaseNamingConvention();
+            //optionsBuilder.UseSnakeCaseNamingConvention();
         }
 
 
