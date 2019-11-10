@@ -32,7 +32,7 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Queries
                     
                     Id = x.Id,
                     Number = x.Number,
-                    Customer = x.Customer.FullName,
+                    Customer = x.Customer.FullName.Value,
                     CreatedDate = x.DateCreated.ToStandartFormatWithTime(),
                     JobType = EnumHelper.GetDescription(x.JobType),
                     JobDescription = x.JobDescription,
