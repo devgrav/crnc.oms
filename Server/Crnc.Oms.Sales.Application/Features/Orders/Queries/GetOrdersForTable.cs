@@ -39,7 +39,8 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Queries
                     JobTypeEnum = x.JobType,
                     CustomerSignOffType = EnumHelper.GetDescription(x.SignOffType),
                     DateSentToCustomer = x.DateSentToCustomer.ToStandartFormatWithTime(),
-                    CustomerSignOffTypeEnum = x.SignOffType
+                    CustomerSignOffTypeEnum = x.SignOffType,
+                    Status = EnumHelper.GetDescription(x.Status)
                 })
                 .ToList();
 
