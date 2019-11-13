@@ -1,38 +1,39 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
-import { Checkbox, Icon, Label, Table } from "semantic-ui-react";
-import { OrderItemDto } from "../../services/OrderService";
+import { Checkbox, Icon, Label, Table, Item } from "semantic-ui-react";
+import { OrdersForGridItemDto } from "../../services/OrderService";
 import {UserItemDto, UserService} from "../../services/UserService";
 
 const OrdersGridRow: React.StatelessComponent<OrdersGridRowProps> = (props) => {
+        const {item} = props;
         return (
                 <Table.Row>
                     <Table.Cell>
-                        <Label color="blue" as={Link}>
+                        <Label color="blue">
                             <Icon name="pencil"/>
                             Edit
                         </Label>
                     </Table.Cell>
                     <Table.Cell>
-                        <div>{""}</div>
+                        <div>{item.number}</div>
                     </Table.Cell>
                     <Table.Cell>
-                        <div>{}</div>
+                        <div>{item.createdDate}</div>
                     </Table.Cell>
                     <Table.Cell>
-                        <div>{}</div>
+                        <div>{item.customer}</div>
                     </Table.Cell>
                     <Table.Cell>
-                        <div>{}</div>
+                        <div>{item.jobDescription}</div>
                     </Table.Cell>
                     <Table.Cell>
-                        <div>{}</div>
+                        <div>{item.dateSentToCustomer}</div>
                     </Table.Cell>
                     <Table.Cell>
-                        <div>{}</div>
+                        <div>{item.customerSignOffType}</div>
                     </Table.Cell>
                     <Table.Cell>
-                        <div>{}</div>
+                        <div>{item.status}</div>
                     </Table.Cell>
                 </Table.Row>
         );
@@ -41,5 +42,5 @@ const OrdersGridRow: React.StatelessComponent<OrdersGridRowProps> = (props) => {
 export default OrdersGridRow;
 
 interface OrdersGridRowProps{
-    estimateItem: OrderItemDto;
+    item: OrdersForGridItemDto;
 }

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Button, Dimmer, Header, Icon, Loader, Menu, Segment, Table } from "semantic-ui-react";
-import { OrderItemDto } from "../../services/OrderService";
+import { OrdersForGridItemDto, OrderService } from "../../services/OrderService";
 import {UserItemDto, UserService} from "../../services/UserService";
 import OrdersGridRow from "./OrdersGridRow";
 
@@ -14,7 +14,25 @@ export default class OrdersGrid extends React.Component<{}, OrdersGridState> {
         };
     }
 
-    public componentDidMount(): void{
+    private async getOrders(): Promise<OrdersForGridItemDto[]>{
+        try{
+            this.showLoading();
+            const orders = await OrderService.getOrders();            
+            this.hideLoading();
+            if(orders)
+                return orders.items;
+            return [];
+        }catch (error) {
+            this.hideLoading();
+            return Promise.reject(error);
+        }  
+    }
+
+    public async componentDidMount(): Promise<void>{
+        const orders = await this.getOrders();            
+        this.setState({
+            ...this.state, orders
+        });
     }
 
     public showLoading(): void{
@@ -73,8 +91,8 @@ export default class OrdersGrid extends React.Component<{}, OrdersGridState> {
                         </Table.Row>
                     </Table.Header>
                     <Table.Body>
-                        {this.state.orders.map((est) =>
-                            <OrdersGridRow key={est.id} estimateItem={est}/>)}
+                        {this.state.orders.map((o) =>
+                            <OrdersGridRow key={o.id} item={o}/>)}
                     </Table.Body>
                     <Table.Footer fullWidth>
                         <Table.Row>
@@ -101,6 +119,6 @@ export default class OrdersGrid extends React.Component<{}, OrdersGridState> {
 }
 
 interface OrdersGridState{
-    orders: OrderItemDto[];
+    orders: OrdersForGridItemDto[];
     isLoading: boolean;
 }
