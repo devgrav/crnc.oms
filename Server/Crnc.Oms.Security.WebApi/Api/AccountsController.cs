@@ -9,6 +9,7 @@ using Crnc.Oms.Security.Infrastructure.DataAccess.Exceptions;
 using Crnc.Oms.Security.WebApi.Authorization;
 using Crnc.Oms.Security.WebApi.DTO;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -31,8 +32,16 @@ namespace Crnc.Oms.Security.WebApi.Api
         }
 
 
+        /// <summary>
+        /// Authenticate user
+        /// </summary>
+        /// <param name="account"></param>
+        /// <remarks>Returns user info with token in JWT format</remarks>
+        /// <response code="200">Authorized.</response>
+        /// <response code="400">Invalid auth data</response>
         [HttpPost("auth")]
-        [OpenApiOperation("Authenticate token","Authenticate user","Returns user info with token in JWT format")]                
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult Authenticate([FromBody]AccountDto account)
         {
             if(!ModelState.IsValid)
@@ -82,13 +91,13 @@ namespace Crnc.Oms.Security.WebApi.Api
 
         private string GetToken(ClaimsIdentity identity)
         {
-            var secretKey = AuthSettings.GetSymmetricSecurityKey(_authSettings.JwtBase64SymmetricKey);
+            var secretKey = _authSettings.SymmetricSecurityKey;
             var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
  
             var now = DateTime.Now; 
             var tokenOptions = new JwtSecurityToken(
-                issuer: AuthSettings.ISSUER,
-                audience: AuthSettings.AUDIENCE,
+                issuer: _authSettings.JwtIssuer,
+                audience: _authSettings.JwtAudience,
                 claims: identity.Claims,
                 expires: now.AddSeconds(_authSettings.JwtLifetimeSeconds),
                 signingCredentials: signinCredentials

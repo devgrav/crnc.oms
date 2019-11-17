@@ -52,7 +52,8 @@ namespace Crnc.Oms.Security.WebApi
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
-                    var securityKey = Configuration.GetSection("Auth").GetValue<string>("JwtBase64SymmetricKey");
+                    var authSettings = new AuthSettings();
+                    Configuration.GetSection("Auth").Bind(authSettings);
 
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
@@ -60,16 +61,16 @@ namespace Crnc.Oms.Security.WebApi
                         ValidateAudience = true,
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
-                        ValidIssuer = AuthSettings.ISSUER,
-                        ValidAudience = AuthSettings.AUDIENCE,
-                        IssuerSigningKey = AuthSettings.GetSymmetricSecurityKey(securityKey)
+                        ValidIssuer = authSettings.JwtIssuer,
+                        ValidAudience = authSettings.JwtAudience,
+                        IssuerSigningKey = authSettings.SymmetricSecurityKey
                     };
                 });
 
             services.AddOpenApiDocument(options =>
             {
                 //Title in header of api
-                options.Title = "Crnc Oms Sales API Doc";
+                options.Title = "Crnc Oms Security API Doc";
                 //Version in header of api
                 options.Version = "1.0";
                 options.AddSecurity("JWT", Enumerable.Empty<string>(), new OpenApiSecurityScheme

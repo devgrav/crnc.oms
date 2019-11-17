@@ -24,8 +24,13 @@ namespace Crnc.Oms.Security.WebApi.Api
             _userRepository = userRepository;
         }
 
+        /// <summary>
+        /// Get all user roles
+        /// </summary>
+        /// <remarks>Requires admin role</remarks>
+        /// <response code="200">Returns roles.</response>
         [HttpGet]
-        [OpenApiOperation("Get roles", "Get all user roles", "Requires admin role")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public IEnumerable<TextValueDto> Get()
         {
             return _userRepository.GetRoles().Select(r => new TextValueDto
