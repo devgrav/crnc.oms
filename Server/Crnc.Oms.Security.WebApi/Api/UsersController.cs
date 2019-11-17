@@ -8,9 +8,12 @@ using Crnc.Oms.Security.Domain.Aggregates.Users;
 using UserEntity = Crnc.Oms.Security.Domain.Aggregates.Users.User;
 using System.ComponentModel.DataAnnotations;
 using Crnc.Oms.Security.Infrastructure.CrossCutting;
+using Crnc.Oms.Security.Infrastructure.DataAccess.Exceptions;
 using Crnc.Oms.Security.WebApi.Authorization;
 using Crnc.Oms.Security.WebApi.DTO;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using NSwag.Annotations;
 
 namespace Crnc.Oms.Security.WebApi.Api
@@ -28,13 +31,17 @@ namespace Crnc.Oms.Security.WebApi.Api
             _userRepository = userRepository;
         }
 
-        // GET: api/users
+        /// <summary>
+        /// Get all users
+        /// </summary>
+        /// <remarks>Requires admin role</remarks>
+        /// <response code="200">Returns users.</response>
         [HttpGet]
-        [OpenApiOperation("Get users", "Get all users", "Requires admin role")]
-        public IEnumerable<UserItemDto> Get()
+        [ProducesResponseType(typeof(List<UserItemDto>),StatusCodes.Status200OK)]
+        public ActionResult<List<UserItemDto>> Get()
         {
             var users = _userRepository.FindAll();
-            return users.Select(u => new UserItemDto()
+            return Ok(users.Select(u => new UserItemDto()
             {
                 Id = u.Id,
                 FirstName = u.FirstName,
@@ -49,36 +56,56 @@ namespace Crnc.Oms.Security.WebApi.Api
                 PhotoBase64 = u.Photo?.ContentBase64,
                 PhotoMimeType = u.Photo?.MimeType,
                 IsActive = u.IsActive
-            }).ToList();           
+            }).ToList());           
         }
 
-        // GET api/users/5
+        /// <summary>
+        /// Get users by Id
+        /// </summary>
+        /// <remarks>Requires admin role</remarks>
+        /// <response code="200">Returns users.</response>
+        /// <response code="404">Not found user.</response>
         [HttpGet("{id}")]
-        [OpenApiOperation("Get user", "Get users by Id","Requires admin role")]
-        public UserItemDto Get(Guid id)
+        [ProducesResponseType(typeof(UserItemDto),StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IActionResult Get(Guid id)
         {
-            var user = _userRepository.FindById(id);
-
-            return new UserItemDto()
+            try
             {
-                Id = user.Id,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                FullName = user.FullName,
-                Email = user.Email,
-                Password = user.PasswordHash,
-                Login = user.Login,
-                Phone = user.Phone,
-                Role = user.Role.Title,
-                PhotoBase64 = user.Photo?.ContentBase64,
-                PhotoMimeType = user.Photo?.MimeType,
-                IsActive = user.IsActive
-            };
+                var user = _userRepository.FindById(id);
+
+                return Ok(new UserItemDto()
+                {
+                    Id = user.Id,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    FullName = user.FullName,
+                    Email = user.Email,
+                    Password = user.PasswordHash,
+                    Login = user.Login,
+                    Phone = user.Phone,
+                    Role = user.Role.Title,
+                    PhotoBase64 = user.Photo?.ContentBase64,
+                    PhotoMimeType = user.Photo?.MimeType,
+                    IsActive = user.IsActive
+                });
+            }
+            catch (MissingEntityException)
+            {
+                return NotFound();
+            }
         }
 
-        // POST api/users
+        /// <summary>
+        /// Create new user
+        /// </summary>
+        /// <remarks>Requires admin role</remarks>
+        /// <response code="200">User has created</response>
+        /// <response code="400">User is not valid.</response>
         [HttpPost]
         [OpenApiOperation("Create user", "Create new user", "Requires admin role")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ModelStateDictionary), StatusCodes.Status400BadRequest)]
         public IActionResult Post([FromBody]UserItemDto user)
         {
             if (ModelState.IsValid)
@@ -97,36 +124,65 @@ namespace Crnc.Oms.Security.WebApi.Api
                 return BadRequest(ModelState);
         }
 
-        // PUT api/users/5
+        /// <summary>
+        /// Update user
+        /// </summary>
+        /// <remarks>Requires admin role</remarks>
+        /// <response code="200">User has updated</response>
+        /// <response code="400">User is not valid.</response>
+        /// <response code="404">User has not found.</response>
         [HttpPut("{id}")]
-        [OpenApiOperation("Update user", "Update user by id","Requires admin role")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ModelStateDictionary), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult Put(Guid id, [FromBody]UserItemDto user)
         {
             if (ModelState.IsValid)
             {
+                try
+                {
+                    var password = PasswordHelper.GetHash(user.Password);
 
-                var password = PasswordHelper.GetHash(user.Password);
+                    var entity = UserEntity.CreateExisted(id, user.Login, password.Hash, password.Salt,
+                        user.FirstName, user.LastName, user.Email, new Role(user.Role), 
+                        user.IsActive, user.Phone, !string.IsNullOrWhiteSpace(user.PhotoBase64) 
+                                                   && !string.IsNullOrWhiteSpace(user.PhotoMimeType)
+                            ? new UserPhoto(user.PhotoBase64, user.PhotoMimeType) : null);
 
-                var entity = UserEntity.CreateExisted(id, user.Login, password.Hash, password.Salt,
-                    user.FirstName, user.LastName, user.Email, new Role(user.Role), 
-                    user.IsActive, user.Phone, !string.IsNullOrWhiteSpace(user.PhotoBase64) 
-                        && !string.IsNullOrWhiteSpace(user.PhotoMimeType)
-                    ? new UserPhoto(user.PhotoBase64, user.PhotoMimeType) : null);
+                    _userRepository.Save(entity);
 
-                _userRepository.Save(entity);
-
-                return Ok();
+                    return Ok();
+                }
+                catch (MissingEntityException e)
+                {
+                    return NotFound();
+                }
             }
-            else
-                return BadRequest(ModelState);
+            
+            return BadRequest(ModelState);
         }
 
-        // DELETE api/users/5
+        /// <summary>
+        /// Delete user
+        /// </summary>
+        /// <remarks>Requires admin role</remarks>
+        /// <response code="200">User has deleted</response>
+        /// <response code="404">User has not found.</response>
         [HttpDelete("{id}")]
-        [OpenApiOperation("Delete user","Delete user by id","Requires admin role")]
-        public void Delete(Guid id)
-        {            
-            _userRepository.Delete(id);
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IActionResult Delete(Guid id)
+        {
+            try
+            {
+                _userRepository.Delete(id);
+                
+                return Ok();
+            }
+            catch (MissingEntityException)
+            {
+                return NotFound();
+            }
         }
     }
 }
