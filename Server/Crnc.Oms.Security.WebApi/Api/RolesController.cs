@@ -8,7 +8,7 @@ using Crnc.Oms.Security.WebApi.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
+using NSwag.Annotations;
 
 namespace Crnc.Oms.Security.WebApi.Api
 {
@@ -25,11 +25,7 @@ namespace Crnc.Oms.Security.WebApi.Api
         }
 
         [HttpGet]
-        [SwaggerOperation(
-            Summary = "Get all user roles",
-            Description = "Requires admin role",
-            OperationId = "Get roles",
-            Tags = new[] { "Roles" })]
+        [OpenApiOperation("Get roles", "Get all user roles", "Requires admin role")]
         public IEnumerable<TextValueDto> Get()
         {
             return _userRepository.GetRoles().Select(r => new TextValueDto
