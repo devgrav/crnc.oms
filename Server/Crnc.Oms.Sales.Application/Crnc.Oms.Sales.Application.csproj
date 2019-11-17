@@ -7,7 +7,6 @@
     <ItemGroup>
       <ProjectReference Include="..\Crnc.Oms.Sales.DataAccess\Crnc.Oms.Sales.DataAccess.csproj" />
       <ProjectReference Include="..\Crnc.Oms.Sales.Domain\Crnc.Oms.Sales.Domain.csproj" />
-      <ProjectReference Include="..\Crnc.Oms.Sales.Dto\Crnc.Oms.Sales.Dto.csproj" />
     </ItemGroup>
 
     <ItemGroup>

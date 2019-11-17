@@ -1,11 +1,11 @@
 ﻿{
   "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "Crnc.Oms.Sales.WebApi": {
+    "Crnc.Oms.WebApiCore": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger/index.html",
-      "applicationUrl": "http://localhost:64708",
+      "applicationUrl": "http://localhost:64707",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
