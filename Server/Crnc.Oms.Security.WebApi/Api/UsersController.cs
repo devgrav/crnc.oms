@@ -11,7 +11,7 @@ using Crnc.Oms.Security.Infrastructure.CrossCutting;
 using Crnc.Oms.Security.WebApi.Authorization;
 using Crnc.Oms.Security.WebApi.DTO;
 using Microsoft.AspNetCore.Authorization;
-using Swashbuckle.AspNetCore.Annotations;
+using NSwag.Annotations;
 
 namespace Crnc.Oms.Security.WebApi.Api
 {
@@ -30,10 +30,7 @@ namespace Crnc.Oms.Security.WebApi.Api
 
         // GET: api/users
         [HttpGet]
-        [SwaggerOperation(
-            Summary = "Get all users",
-            Description = "Requires admin role",
-            OperationId = "Get users")]
+        [OpenApiOperation("Get users", "Get all users", "Requires admin role")]
         public IEnumerable<UserItemDto> Get()
         {
             var users = _userRepository.FindAll();
@@ -57,10 +54,7 @@ namespace Crnc.Oms.Security.WebApi.Api
 
         // GET api/users/5
         [HttpGet("{id}")]
-        [SwaggerOperation(
-            Summary = "Get users by Id",
-            Description = "Requires admin role",
-            OperationId = "Get user")]
+        [OpenApiOperation("Get user", "Get users by Id","Requires admin role")]
         public UserItemDto Get(Guid id)
         {
             var user = _userRepository.FindById(id);
@@ -84,10 +78,7 @@ namespace Crnc.Oms.Security.WebApi.Api
 
         // POST api/users
         [HttpPost]
-        [SwaggerOperation(
-            Summary = "Create new user",
-            Description = "Requires admin role",
-            OperationId = "Create user")]
+        [OpenApiOperation("Create user", "Create new user", "Requires admin role")]
         public IActionResult Post([FromBody]UserItemDto user)
         {
             if (ModelState.IsValid)
@@ -108,10 +99,7 @@ namespace Crnc.Oms.Security.WebApi.Api
 
         // PUT api/users/5
         [HttpPut("{id}")]
-        [SwaggerOperation(
-            Summary = "Update user by id",
-            Description = "Requires admin role",
-            OperationId = "Update user")]        
+        [OpenApiOperation("Update user", "Update user by id","Requires admin role")]
         public IActionResult Put(Guid id, [FromBody]UserItemDto user)
         {
             if (ModelState.IsValid)
@@ -135,10 +123,7 @@ namespace Crnc.Oms.Security.WebApi.Api
 
         // DELETE api/users/5
         [HttpDelete("{id}")]
-        [SwaggerOperation(
-            Summary = "Delete user by id",
-            Description = "Requires admin role",
-            OperationId = "Delete user")]  
+        [OpenApiOperation("Delete user","Delete user by id","Requires admin role")]
         public void Delete(Guid id)
         {            
             _userRepository.Delete(id);

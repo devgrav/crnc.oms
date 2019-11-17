@@ -18,10 +18,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using Crnc.Oms.Security.WebApi.Authorization;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
-using Swashbuckle.AspNetCore.SwaggerUI;
-using Swashbuckle.AspNetCore.Swagger;
+using NSwag;
 
 namespace Crnc.Oms.Security.WebApi
 {
@@ -68,28 +66,18 @@ namespace Crnc.Oms.Security.WebApi
                     };
                 });
 
-            services.AddSwaggerGen(c =>
+            services.AddOpenApiDocument(options =>
             {
-                c.EnableAnnotations();
-                c.SwaggerDoc("v1.0", new OpenApiInfo() {Title = "Crnc Oms Security API", Version = "v1.0"});
-                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+                //Title in header of api
+                options.Title = "Crnc Oms Sales API Doc";
+                //Version in header of api
+                options.Version = "1.0";
+                options.AddSecurity("JWT", Enumerable.Empty<string>(), new OpenApiSecurityScheme
                 {
-                    In = ParameterLocation.Header, Description = "Please insert JWT with Bearer into field",
-                    Name = "Authorization", Type = SecuritySchemeType.ApiKey
-                });
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        new string[] { }
-                    }
+                    Type = OpenApiSecuritySchemeType.ApiKey,
+                    Name = "Authorization",
+                    In = OpenApiSecurityApiKeyLocation.Header,
+                    Description = "Please insert JWT with Bearer into field"
                 });
             });
 
@@ -123,14 +111,8 @@ namespace Crnc.Oms.Security.WebApi
             app.UseEndpoints(e => 
                 e.MapControllers());
 
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.RoutePrefix = "swagger";
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Crnc Oms Security API v1.0");
-                c.DocumentTitle = "Crnc Oms Security API Doc";
-                c.DocExpansion(DocExpansion.None);
-            });
+            app.UseOpenApi();
+            app.UseSwaggerUi3();
             
             new MongoDbInitializer(mongoDataContext).Initialize();
         }

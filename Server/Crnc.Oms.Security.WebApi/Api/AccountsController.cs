@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Swashbuckle.AspNetCore.Annotations;
+using NSwag.Annotations;
 
 namespace Crnc.Oms.Security.WebApi.Api
 {
@@ -32,10 +32,7 @@ namespace Crnc.Oms.Security.WebApi.Api
 
 
         [HttpPost("auth")]
-        [SwaggerOperation(
-            Summary = "Authenticate user",
-            Description = "Returns user info with token in JWT format",
-            OperationId = "Authenticate token")]                
+        [OpenApiOperation("Authenticate token","Authenticate user","Returns user info with token in JWT format")]                
         public IActionResult Authenticate([FromBody]AccountDto account)
         {
             if(!ModelState.IsValid)
