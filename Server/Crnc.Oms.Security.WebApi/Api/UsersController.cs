@@ -153,7 +153,7 @@ namespace Crnc.Oms.Security.WebApi.Api
 
                     return Ok();
                 }
-                catch (MissingEntityException e)
+                catch (MissingEntityException)
                 {
                     return NotFound();
                 }

@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Crnc.Oms.Sales.Application;
 using Crnc.Oms.Sales.Application.Features.Orders.Dto;
 using Crnc.Oms.Sales.Application.Features.Orders.Queries;
 using Crnc.Oms.Sales.DataAccess;
+using Crnc.Oms.Sales.WebApi.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -15,6 +18,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
 using NSwag;
 using Newtonsoft.Json.Converters;
@@ -50,6 +54,25 @@ namespace Crnc.Oms.Sales.WebApi
                 options.UseNpgsql(Configuration.GetConnectionString("OmsSalesDb"));
             });
             services.AddScoped<IUseCaseQueryHandler<OrdersForTableInputDto, OrdersForTableOutputDto>,GetOrdersForTable>();
+            services.Configure<AuthSettings>(Configuration.GetSection("Auth"));
+            
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    var authSettings = new AuthSettings();
+                    Configuration.GetSection("Auth").Bind(authSettings);
+
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = authSettings.JwtIssuer,
+                        ValidAudience = authSettings.JwtAudience,
+                        IssuerSigningKey = authSettings.SymmetricSecurityKey
+                    };
+                });
             
             services.AddOpenApiDocument(options =>
             {
@@ -74,15 +97,21 @@ namespace Crnc.Oms.Sales.WebApi
             {
                 app.UseDeveloperExceptionPage();
             }
+            
+            var cultureInfo = new CultureInfo("en-US");
+            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
             app.UseRouting();
             app.UseCors("AllOrigins");
+            app.UseAuthentication();
+            app.UseAuthorization();
+            app.UseEndpoints(e => 
+                e.MapControllers());
             
             app.UseOpenApi();
             app.UseSwaggerUi3();
 
-            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
-            
             SalesDbInitializer.Initialize(dbContext);
         }
     }

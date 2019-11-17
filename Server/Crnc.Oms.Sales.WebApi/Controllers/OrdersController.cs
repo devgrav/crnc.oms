@@ -5,10 +5,12 @@ using Crnc.Oms.Sales.Application;
 using Crnc.Oms.Sales.Application.Features.Orders.Dto;
 using Crnc.Oms.Sales.DataAccess;
 using Crnc.Oms.Sales.Domain.Aggregates.Orders;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Crnc.Oms.Sales.WebApi.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     public class OrdersController : ControllerBase
     {
