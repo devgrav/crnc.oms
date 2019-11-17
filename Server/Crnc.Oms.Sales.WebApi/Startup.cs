@@ -15,6 +15,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Serialization;
+using NSwag;
+using Newtonsoft.Json.Converters;
 
 namespace Crnc.Oms.Sales.WebApi
 {
@@ -37,12 +40,31 @@ namespace Crnc.Oms.Sales.WebApi
                     .AllowAnyMethod());
             });
             
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                options.SerializerSettings.Converters.Add(new StringEnumConverter());
+            });
             services.AddDbContext<SalesDataContext>(options =>
             {
                 options.UseNpgsql(Configuration.GetConnectionString("OmsSalesDb"));
             });
             services.AddScoped<IUseCaseQueryHandler<OrdersForTableInputDto, OrdersForTableOutputDto>,GetOrdersForTable>();
+            
+            services.AddOpenApiDocument(options =>
+            {
+                //Title in header of api
+                options.Title = "Crnc Oms Sales API Doc";
+                //Version in header of api
+                options.Version = "1.0";
+                options.AddSecurity("JWT", Enumerable.Empty<string>(), new OpenApiSecurityScheme
+                {
+                    Type = OpenApiSecuritySchemeType.ApiKey,
+                    Name = "Authorization",
+                    In = OpenApiSecurityApiKeyLocation.Header,
+                    Description = "Please insert JWT with Bearer into field"
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -55,6 +77,9 @@ namespace Crnc.Oms.Sales.WebApi
 
             app.UseRouting();
             app.UseCors("AllOrigins");
+            
+            app.UseOpenApi();
+            app.UseSwaggerUi3();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
             

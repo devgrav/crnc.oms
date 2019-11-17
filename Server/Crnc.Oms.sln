@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.WebApi", "Crnc.Oms.WebApi\Crnc.Oms.WebApi.csproj", "{519EE645-8AE7-4D83-9C40-26B4832C59EA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Security.WebApi", "Crnc.Oms.Security.WebApi\Crnc.Oms.Security.WebApi.csproj", "{519EE645-8AE7-4D83-9C40-26B4832C59EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Domain", "Crnc.Oms.Domain\Crnc.Oms.Domain.csproj", "{B9F66CEF-403C-4A13-BEB9-40CA1DB91909}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Security.Domain", "Crnc.Oms.Security.Domain\Crnc.Oms.Security.Domain.csproj", "{B9F66CEF-403C-4A13-BEB9-40CA1DB91909}"
 EndProject
-Project("{EEA76D2F-B3C8-4DE0-8B07-CE3C728A4BED}") = "Crnc.Oms.Infrastructure.DataAccess", "Crnc.Oms.Infrastructure.DataAccess\Crnc.Oms.Infrastructure.DataAccess.csproj", "{EEA76D2F-B3C8-4DE0-8B07-CE3C728A4BED}"
+Project("{EEA76D2F-B3C8-4DE0-8B07-CE3C728A4BED}") = "Crnc.Oms.Security.Infrastructure.DataAccess", "Crnc.Oms.Security.Infrastructure.DataAccess\Crnc.Oms.Security.Infrastructure.DataAccess.csproj", "{EEA76D2F-B3C8-4DE0-8B07-CE3C728A4BED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Infrastructure.CrossCutting", "Crnc.Oms.Infrastructure.CrossCutting\Crnc.Oms.Infrastructure.CrossCutting.csproj", "{FA50AB09-6DC5-4BF9-9CB1-86385B9FC379}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Security.Infrastructure.CrossCutting", "Crnc.Oms.Security.Infrastructure.CrossCutting\Crnc.Oms.Security.Infrastructure.CrossCutting.csproj", "{FA50AB09-6DC5-4BF9-9CB1-86385B9FC379}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Crnc.Oms.Security", "Crnc.Oms.Security", "{E692D9FF-B199-4D8F-AFEE-64754E7ED8CF}"
 EndProject

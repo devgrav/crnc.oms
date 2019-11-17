@@ -7,12 +7,13 @@
     <ItemGroup>
       <ProjectReference Include="..\Crnc.Oms.Sales.Application\Crnc.Oms.Sales.Application.csproj" />
       <ProjectReference Include="..\Crnc.Oms.Sales.DataAccess\Crnc.Oms.Sales.DataAccess.csproj" />
-      <ProjectReference Include="..\Crnc.Oms.Sales.Dto\Crnc.Oms.Sales.Dto.csproj" />
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.0.0" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.0.1" />
+      <PackageReference Include="NSwag.AspNetCore" Version="13.1.5" />
     </ItemGroup>
 
 </Project>
