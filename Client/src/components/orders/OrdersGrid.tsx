@@ -57,7 +57,7 @@ export default class OrdersGrid extends React.Component<{}, OrdersGridState> {
                     <Table.Header fullWidth>
                         <Table.Row>
                             <Table.HeaderCell colSpan="9">
-                                <Button floated="right" primary content="Add estimate" icon="plus"/>
+                                <Button floated="right" primary content="Add order" icon="plus"/>
                             </Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
