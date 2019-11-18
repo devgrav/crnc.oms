@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Crnc.Oms.Security.Domain.Aggregates.Users;
-using Crnc.Oms.Security.Domain.IRepositories;
+using Crnc.Oms.Security.Domain.Repositories;
 using Crnc.Oms.Security.Infrastructure.DataAccess.Exceptions;
 using MongoDB.Driver.Linq;
 using MongoDB.Driver;
@@ -25,9 +26,9 @@ namespace Crnc.Oms.Security.Infrastructure.DataAccess.Repositories
             _dbContext = dbContext;
         }
 
-        public User FindByLogin(string login)
+        public async Task<User> FindByLoginAsync(string login, CancellationToken cancellationToken = default)
         {
-            var user = _dbContext.Users.AsQueryable().SingleOrDefault(u => u.Login == login);
+            var user = await _dbContext.Users.AsQueryable().SingleOrDefaultAsync(u => u.Login == login, cancellationToken);
 
             if (user == null)
                 throw new MissingEntityException($"User with such login is not found");
@@ -35,39 +36,39 @@ namespace Crnc.Oms.Security.Infrastructure.DataAccess.Repositories
             return user;
         }
 
-        public IEnumerable<Role> GetRoles()
+        public async Task<IEnumerable<Role>> GetRolesAsync(CancellationToken cancellationToken = default)
         {
-            return _dbContext.Roles.AsQueryable().ToList();
+            return await _dbContext.Roles.AsQueryable().ToListAsync(cancellationToken);
         }
 
         #region IRepository 
 
-        public void Add(User entity)
+        public async Task AddAsync(User entity, CancellationToken cancellationToken = default)
         {
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
            
-            _dbContext.Users.InsertOne(entity);                               
+            await _dbContext.Users.InsertOneAsync(entity);                               
         }
 
-        public void Delete(Guid entityId)
+        public async Task DeleteAsync(Guid entityId, CancellationToken cancellationToken = default)
         {
             var user = _dbContext.Users.AsQueryable().SingleOrDefault(x => x.Id == entityId);
 
             if (user == null)
                 throw new MissingEntityException($"User with such entityId is not found");
 
-            _dbContext.Users.DeleteOne(x => x.Id == entityId);            
+            await _dbContext.Users.DeleteOneAsync(x => x.Id == entityId,cancellationToken);            
         }
 
-        public IEnumerable<User> FindAll()
+        public async Task<IEnumerable<User>> FindAllAsync(CancellationToken cancellationToken = default)
         {
-            return _dbContext.Users.AsQueryable().ToList();
+            return await _dbContext.Users.AsQueryable().ToListAsync(cancellationToken);
         }
 
-        public User FindById(Guid id)
+        public async Task<User> FindByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            var user = _dbContext.Users.AsQueryable().SingleOrDefault(u => u.Id == id);
+            var user = await _dbContext.Users.AsQueryable().SingleOrDefaultAsync(u => u.Id == id,cancellationToken);
 
             if (user == null)
                 throw new MissingEntityException($"User with Id={id} is not found");
@@ -75,14 +76,14 @@ namespace Crnc.Oms.Security.Infrastructure.DataAccess.Repositories
             return user;
         }
 
-        public void Save(User entity)
+        public async Task SaveAsync(User entity, CancellationToken cancellationToken = default)
         {
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
 
             var modifiedUser = entity;
 
-            var currentUser = _dbContext.Users.AsQueryable().SingleOrDefault(u => u.Id == modifiedUser.Id);
+            var currentUser = await _dbContext.Users.AsQueryable().SingleOrDefaultAsync(u => u.Id == modifiedUser.Id, cancellationToken);
 
             if (currentUser == null)
                 throw new MissingEntityException($"User with Id={entity.Id} is not found");
@@ -100,7 +101,7 @@ namespace Crnc.Oms.Security.Infrastructure.DataAccess.Repositories
             else
                 currentUser.Deactivate();
 
-            _dbContext.Users.ReplaceOne(x => x.Id == entity.Id, currentUser, new UpdateOptions(){IsUpsert = true});
+            await _dbContext.Users.ReplaceOneAsync(x => x.Id == entity.Id, currentUser, new UpdateOptions(){IsUpsert = true},cancellationToken);
         }
 
         #endregion

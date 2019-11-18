@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Crnc.Oms.Domain.SeedWork;
 using Crnc.Oms.Sales.Application;
 using Crnc.Oms.Sales.Application.Features.Orders.Dto;
 using Crnc.Oms.Sales.Application.Features.Orders.Queries;
@@ -53,7 +54,12 @@ namespace Crnc.Oms.Sales.WebApi
             {
                 options.UseNpgsql(Configuration.GetConnectionString("OmsSalesDb"));
             });
-            services.AddScoped<IUseCaseQueryHandler<OrdersForTableInputDto, OrdersForTableOutputDto>,GetOrdersForTable>();
+            
+            services.AddScoped<IUseCaseQueryHandler<GetOrdersForTableInputDto, GetOrdersForTableOutputDto>,GetOrdersForTable>();
+            services.AddScoped<IUseCaseQueryHandler<GetNewOrderInputDto, GetNewOrderOutputDto>,GetNewOrder>();
+
+            services.AddSingleton<ICurrentDateTimeProvider, CurrentDateTimeProvider>();
+            
             services.Configure<AuthSettings>(Configuration.GetSection("Auth"));
             
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

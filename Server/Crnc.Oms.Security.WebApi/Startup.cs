@@ -9,13 +9,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Crnc.Oms.Security.Infrastructure.DataAccess;
-using Crnc.Oms.Security.Domain.IRepositories;
+using Crnc.Oms.Security.Domain.Repositories;
 using Crnc.Oms.Security.Infrastructure.DataAccess.Repositories;
 using System.Globalization;
 using Newtonsoft.Json.Serialization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
+using Crnc.Oms.Domain.SeedWork;
 using Crnc.Oms.Security.WebApi.Authorization;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json.Converters;
@@ -89,6 +90,7 @@ namespace Crnc.Oms.Security.WebApi
             });
             
             services.AddScoped<IUserRepository, MongoDbUserRepository>();
+            services.AddSingleton<ICurrentDateTimeProvider, CurrentDateTimeProvider>();
             services.AddSingleton<MongoDataContext>();     
         }
 

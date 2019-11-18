@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Crnc.Oms.Security.Domain.IRepositories;
+using Crnc.Oms.Security.Domain.Repositories;
 using Crnc.Oms.Security.Domain.Aggregates.Users;
 using UserEntity = Crnc.Oms.Security.Domain.Aggregates.Users.User;
 using System.ComponentModel.DataAnnotations;
@@ -38,9 +38,9 @@ namespace Crnc.Oms.Security.WebApi.Api
         /// <response code="200">Returns users.</response>
         [HttpGet]
         [ProducesResponseType(typeof(List<UserItemDto>),StatusCodes.Status200OK)]
-        public ActionResult<List<UserItemDto>> Get()
+        public async Task<ActionResult<List<UserItemDto>>> Get()
         {
-            var users = _userRepository.FindAll();
+            var users = await _userRepository.FindAllAsync();
             return Ok(users.Select(u => new UserItemDto()
             {
                 Id = u.Id,
@@ -68,11 +68,11 @@ namespace Crnc.Oms.Security.WebApi.Api
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(UserItemDto),StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult Get(Guid id)
+        public async Task<IActionResult> Get(Guid id)
         {
             try
             {
-                var user = _userRepository.FindById(id);
+                var user = await _userRepository.FindByIdAsync(id);
 
                 return Ok(new UserItemDto()
                 {
@@ -106,7 +106,7 @@ namespace Crnc.Oms.Security.WebApi.Api
         [OpenApiOperation("Create user", "Create new user", "Requires admin role")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ModelStateDictionary), StatusCodes.Status400BadRequest)]
-        public IActionResult Post([FromBody]UserItemDto user)
+        public async Task<IActionResult> Post([FromBody]UserItemDto user)
         {
             if (ModelState.IsValid)
             {
@@ -116,7 +116,7 @@ namespace Crnc.Oms.Security.WebApi.Api
                     user.FirstName, user.LastName, user.Email, user.Phone, null, !string.IsNullOrWhiteSpace(user.PhotoBase64)
                         && !string.IsNullOrWhiteSpace(user.PhotoMimeType)
                     ? new UserPhoto(user.PhotoBase64, user.PhotoMimeType) : null);
-                _userRepository.Add(entity);
+                await _userRepository.AddAsync(entity);
 
                 return Ok();
             }
@@ -135,7 +135,7 @@ namespace Crnc.Oms.Security.WebApi.Api
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ModelStateDictionary), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult Put(Guid id, [FromBody]UserItemDto user)
+        public async Task<IActionResult> Put(Guid id, [FromBody]UserItemDto user)
         {
             if (ModelState.IsValid)
             {
@@ -149,7 +149,7 @@ namespace Crnc.Oms.Security.WebApi.Api
                                                    && !string.IsNullOrWhiteSpace(user.PhotoMimeType)
                             ? new UserPhoto(user.PhotoBase64, user.PhotoMimeType) : null);
 
-                    _userRepository.Save(entity);
+                    await _userRepository.SaveAsync(entity);
 
                     return Ok();
                 }
@@ -171,11 +171,11 @@ namespace Crnc.Oms.Security.WebApi.Api
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
             try
             {
-                _userRepository.Delete(id);
+                await _userRepository.DeleteAsync(id);
                 
                 return Ok();
             }

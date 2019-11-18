@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Crnc.Oms.Domain.SeedWork;
 
-namespace Crnc.Oms.Domain.SeedWork
+namespace Crnc.Oms.Security.Domain.Repositories
 {
     /// <summary>
     /// Base interface of repository
@@ -13,30 +16,30 @@ namespace Crnc.Oms.Domain.SeedWork
         /// Find all aggregate root entities
         /// </summary>
         /// <returns></returns>
-        IEnumerable<TEntity> FindAll();
+        Task<IEnumerable<TEntity>> FindAllAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Find aggregate root entity by id
         /// </summary>
         /// <param name="id">Id of entity</param>
         /// <returns></returns>
-        TEntity FindById(Guid id);
+        Task<TEntity> FindByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Add aggregate root entity
         /// </summary>
         /// <param name="entity">Entity</param>
-        void Add(TEntity entity);
+        Task AddAsync(TEntity entity, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Delete aggregate root entity
         /// </summary>
         /// <param name="entity">Entity</param>
-        void Delete(Guid entityId);
+        Task DeleteAsync(Guid entityId, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Save changes of entity
+        /// Save entity
         /// </summary>
-        void Save(TEntity entity);
+        Task SaveAsync(TEntity entity, CancellationToken cancellationToken = default);
     }
 }

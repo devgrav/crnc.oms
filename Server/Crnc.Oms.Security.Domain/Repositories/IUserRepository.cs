@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Crnc.Oms.Domain.SeedWork;
 using Crnc.Oms.Security.Domain.Aggregates.Users;
 
-namespace Crnc.Oms.Security.Domain.IRepositories
+namespace Crnc.Oms.Security.Domain.Repositories
 {
     /// <summary>
     /// Interface of users repository
@@ -19,12 +20,12 @@ namespace Crnc.Oms.Security.Domain.IRepositories
         /// </summary>
         /// <param name="login">login</param>
         /// <returns></returns>
-        User FindByLogin(string login);
+        Task<User> FindByLoginAsync(string login, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get all roles of application
         /// </summary>
         /// <returns></returns>
-        IEnumerable<Role> GetRoles();
+        Task<IEnumerable<Role>> GetRolesAsync(CancellationToken cancellationToken = default);
     }
 }

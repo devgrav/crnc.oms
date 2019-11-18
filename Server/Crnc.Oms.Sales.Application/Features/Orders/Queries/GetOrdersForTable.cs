@@ -7,27 +7,24 @@ using Crnc.Oms.Sales.DataAccess;
 using Crnc.Oms.Sales.Domain.Aggregates.Orders;
 using Microsoft.EntityFrameworkCore;
 using Crnc.Oms.Sales.Application.Helpers;
+using Crnc.Oms.Sales.Domain.Repositories;
 
 namespace Crnc.Oms.Sales.Application.Features.Orders.Queries
 {
     public class GetOrdersForTable
-        : IUseCaseQueryHandler<OrdersForTableInputDto, OrdersForTableOutputDto>
+        : IUseCaseQueryHandler<GetOrdersForTableInputDto, GetOrdersForTableOutputDto>
     {
-        private readonly SalesDataContext _context;
+        private readonly IOrderRepository _orderRepository;
 
-        public GetOrdersForTable(SalesDataContext context)
+        public GetOrdersForTable(IOrderRepository orderRepository)
         {
-            _context = context;
+            _orderRepository = orderRepository;
         }
 
-        public async Task<OrdersForTableOutputDto> HandleAsync(OrdersForTableInputDto queryData, CancellationToken cancellationToken = default)
+        public async Task<GetOrdersForTableOutputDto> HandleAsync(GetOrdersForTableInputDto queryData, CancellationToken cancellationToken = default)
         {
-            var allOrders = await _context.Orders
-                .Include(x => x.Customer)
-                .ToListAsync(cancellationToken);
-
-            var items = allOrders
-                .Select(x => new OrdersForTableItemOutputDto()
+            var items = (await _orderRepository.FindAllAsync(cancellationToken))
+                .Select(x => new GetOrdersForTableItemOutputDto()
                 {
                     
                     Id = x.Id,
@@ -44,7 +41,7 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Queries
                 })
                 .ToList();
 
-            return new OrdersForTableOutputDto()
+            return new GetOrdersForTableOutputDto()
             {
                 Items = items
             };

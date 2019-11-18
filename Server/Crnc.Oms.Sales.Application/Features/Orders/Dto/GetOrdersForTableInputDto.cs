@@ -4,8 +4,8 @@ using Crnc.Oms.Sales.Domain.Aggregates.Orders;
 
 namespace Crnc.Oms.Sales.Application.Features.Orders.Dto
 {
-    public class OrdersForTableInputDto
-        : IUseCaseQuery<OrdersForTableOutputDto>
+    public class GetOrdersForTableInputDto
+        : IUseCaseQuery<GetOrdersForTableOutputDto>
     {
 
         
