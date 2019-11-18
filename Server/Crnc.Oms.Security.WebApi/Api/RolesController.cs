@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Crnc.Oms.Security.Domain.IRepositories;
+using Crnc.Oms.Security.Domain.Repositories;
 using Crnc.Oms.Security.WebApi.Authorization;
 using Crnc.Oms.Security.WebApi.DTO;
 using Microsoft.AspNetCore.Authorization;
@@ -31,9 +31,10 @@ namespace Crnc.Oms.Security.WebApi.Api
         /// <response code="200">Returns roles.</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IEnumerable<TextValueDto> Get()
+        public async Task<IEnumerable<TextValueDto>> Get()
         {
-            return _userRepository.GetRoles().Select(r => new TextValueDto
+            return (await _userRepository.GetRolesAsync())
+                .Select(r => new TextValueDto
             {
                 Value = r.Id,
                 Text = r.Title

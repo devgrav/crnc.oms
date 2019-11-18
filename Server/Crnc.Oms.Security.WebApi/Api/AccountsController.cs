@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Crnc.Oms.Security.Domain.Aggregates.Users;
-using Crnc.Oms.Security.Domain.IRepositories;
+using Crnc.Oms.Security.Domain.Repositories;
 using Crnc.Oms.Security.Infrastructure.CrossCutting;
 using Crnc.Oms.Security.Infrastructure.DataAccess.Exceptions;
 using Crnc.Oms.Security.WebApi.Authorization;
@@ -42,7 +43,7 @@ namespace Crnc.Oms.Security.WebApi.Api
         [HttpPost("auth")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult Authenticate([FromBody]AccountDto account)
+        public async Task<IActionResult> Authenticate([FromBody]AccountDto account)
         {
             if(!ModelState.IsValid)
                 return BadRequest();
@@ -51,7 +52,7 @@ namespace Crnc.Oms.Security.WebApi.Api
             
             try
             {
-                user = _userRepository.FindByLogin(account.Login);
+                user = await _userRepository.FindByLoginAsync(account.Login);
             }
             catch(MissingEntityException)
             {                

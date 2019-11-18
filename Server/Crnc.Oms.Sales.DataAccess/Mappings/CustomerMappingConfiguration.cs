@@ -14,6 +14,8 @@ namespace Crnc.Oms.Sales.DataAccess.Mappings
                 e => { e.Property(x => x.Value).HasMaxLength(300); });
             builder.OwnsOne(x => x.Phone, 
                 e => { e.Property(x => x.Value).HasMaxLength(300); });
+            builder.OwnsOne(x => x.Abbreviation, 
+                e => { e.Property(x => x.Value).HasMaxLength(300); });
             builder.OwnsOne(x => x.FullName,
                 e =>
                 {

@@ -15,6 +15,11 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Customers
         public FullName FullName { get; private set; }
 
         /// <summary>
+        /// Abbreviation of name
+        /// </summary>
+        public NameAbbreviation Abbreviation { get; set; }
+
+        /// <summary>
         /// Email
         /// </summary>
         public Email Email { get;private set; }
