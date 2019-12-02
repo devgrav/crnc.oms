@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="$APPLICATION_CONFIG_DIR$/scratches" t="IncludeRecursive" />
+    <e p="$USER_HOME$/.Rider2019.2/system/extResources" t="IncludeRecursive" />
+    <e p="$USER_HOME$/.Rider2019.2/system/resharper-host/local/Transient/ReSharperHost/v192/SolutionCaches/_Crnc.Oms.-478336407.00" t="ExcludeRecursive" />
+    <e p="$PROJECT_DIR$" t="IncludeFlat">
+      <e p="Crnc.Oms.Domain.SeedWork" t="IncludeRecursive">
+        <e p="Crnc.Oms.Domain.SeedWork.csproj" t="IncludeRecursive" />
+        <e p="CurrentDateTimeProvider.cs" t="Include" />
+        <e p="DomainEntity.cs" t="Include" />
+        <e p="DomainException.cs" t="Include" />
+        <e p="IAggregateRoot.cs" t="Include" />
+        <e p="ICurrentDateTimeProvider.cs" t="Include" />
+        <e p="IValueObject.cs" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.0" t="Include">
+              <e p="Crnc.Oms.Domain.SeedWork.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+      </e>
+      <e p="Crnc.Oms.Sales" t="Include" />
+      <e p="Crnc.Oms.Sales.Application" t="IncludeRecursive">
+        <e p="Crnc.Oms.Sales.Application.csproj" t="IncludeRecursive" />
+        <e p="Features" t="Include">
+          <e p="Orders" t="Include">
+            <e p="Commands" t="Include" />
+            <e p="Dto" t="Include">
+              <e p="GetNewOrderInputDto.cs" t="Include" />
+              <e p="GetNewOrderOutputDto.cs" t="Include" />
+              <e p="GetOrdersForTableInputDto.cs" t="Include" />
+              <e p="GetOrdersForTableItemOutputDto.cs" t="Include" />
+              <e p="GetOrdersForTableOutputDto.cs" t="Include" />
+            </e>
+            <e p="Queries" t="Include">
+              <e p="GetNewOrder.cs" t="Include" />
+              <e p="GetOrdersForTable.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+        <e p="Helpers" t="Include">
+          <e p="DateTimeExtensions.cs" t="Include" />
+          <e p="EnumHelper.cs" t="Include" />
+        </e>
+        <e p="IUseCaseCommand.cs" t="Include" />
+        <e p="IUseCaseCommandHandler.cs" t="Include" />
+        <e p="IUseCaseQuery.cs" t="Include" />
+        <e p="IUseCaseQueryHandler.cs" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.0" t="Include">
+              <e p="Crnc.Oms.Sales.Application.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+      </e>
+      <e p="Crnc.Oms.Sales.DataAccess" t="IncludeRecursive">
+        <e p="Crnc.Oms.Sales.DataAccess.csproj" t="IncludeRecursive" />
+        <e p="Mappings" t="Include">
+          <e p="CustomerMappingConfiguration.cs" t="Include" />
+          <e p="OrderMappingConfiguration.cs" t="Include" />
+        </e>
+        <e p="Repositories" t="Include">
+          <e p="OrderRepository.cs" t="Include" />
+        </e>
+        <e p="SalesDataContext.cs" t="Include" />
+        <e p="SalesDbInitializer.cs" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.0" t="Include">
+              <e p="Crnc.Oms.Sales.DataAccess.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+      </e>
+      <e p="Crnc.Oms.Sales.Domain" t="IncludeRecursive">
+        <e p="Aggregates" t="Include">
+          <e p="Customers" t="Include">
+            <e p="Customer.cs" t="Include" />
+            <e p="Email.cs" t="Include" />
+            <e p="FullName.cs" t="Include" />
+            <e p="NameAbbreviation.cs" t="Include" />
+            <e p="Phone.cs" t="Include" />
+          </e>
+          <e p="Orders" t="Include">
+            <e p="JobType.cs" t="Include" />
+            <e p="MaterialSource.cs" t="Include" />
+            <e p="Order.cs" t="Include" />
+            <e p="OrderStatus.cs" t="Include" />
+            <e p="SignoffType.cs" t="Include" />
+          </e>
+        </e>
+        <e p="Crnc.Oms.Sales.Domain.csproj" t="IncludeRecursive" />
+        <e p="Repositories" t="Include">
+          <e p="IOrderRepository.cs" t="Include" />
+          <e p="IRepository.cs" t="Include" />
+        </e>
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.0" t="Include">
+              <e p="Crnc.Oms.Sales.Domain.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+      </e>
+      <e p="Crnc.Oms.Sales.WebApi" t="IncludeRecursive">
+        <e p="Authorization" t="Include">
+          <e p="AuthSettings.cs" t="Include" />
+        </e>
+        <e p="Controllers" t="Include">
+          <e p="OrdersController.cs" t="Include" />
+        </e>
+        <e p="Crnc.Oms.Sales.WebApi.csproj" t="IncludeRecursive" />
+        <e p="Program.cs" t="Include" />
+        <e p="Properties" t="Include">
+          <e p="launchSettings.json" t="Include" />
+        </e>
+        <e p="Startup.cs" t="Include" />
+        <e p="appsettings.Development.json" t="Include" />
+        <e p="appsettings.json" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.0" t="Include">
+              <e p="Crnc.Oms.Sales.WebApi.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+      </e>
+      <e p="Crnc.Oms.Security" t="Include" />
+      <e p="Crnc.Oms.Security.Domain" t="IncludeRecursive">
+        <e p="Aggregates" t="Include">
+          <e p="Users" t="Include">
+            <e p="Role.cs" t="Include" />
+            <e p="User.cs" t="Include" />
+            <e p="UserPhoto.cs" t="Include" />
+          </e>
+        </e>
+        <e p="Crnc.Oms.Security.Domain.csproj" t="IncludeRecursive" />
+        <e p="Repositories" t="Include">
+          <e p="IRepository.cs" t="Include" />
+          <e p="IUserRepository.cs" t="Include" />
+        </e>
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.0" t="Include">
+              <e p="Crnc.Oms.Security.Domain.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+      </e>
+      <e p="Crnc.Oms.Security.Infrastructure.CrossCutting" t="IncludeRecursive">
+        <e p="Crnc.Oms.Security.Infrastructure.CrossCutting.csproj" t="IncludeRecursive" />
+        <e p="PasswordHelper.cs" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.0" t="Include">
+              <e p="Crnc.Oms.Security.Infrastructure.CrossCutting.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+      </e>
+      <e p="Crnc.Oms.Security.Infrastructure.DataAccess" t="IncludeRecursive">
+        <e p="Crnc.Oms.Security.Infrastructure.DataAccess.csproj" t="IncludeRecursive" />
+        <e p="Data" t="Include">
+          <e p="DataFactory.cs" t="Include" />
+          <e p="UserPhotos.xml" t="Include" />
+        </e>
+        <e p="DataAccessException.cs" t="Include" />
+        <e p="Exceptions" t="Include">
+          <e p="MissingEntityException.cs" t="Include" />
+        </e>
+        <e p="Mappings" t="Include">
+          <e p="MongoDbConvention.cs" t="Include" />
+          <e p="MongoDbMapping.cs" t="Include" />
+        </e>
+        <e p="MongoDataContext.cs" t="Include" />
+        <e p="MongoDbInitializer.cs" t="Include" />
+        <e p="MongoDbSettings.cs" t="Include" />
+        <e p="Repositories" t="Include">
+          <e p="MongoDbUserRepository.cs" t="Include" />
+        </e>
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.0" t="Include">
+              <e p="Crnc.Oms.Security.Infrastructure.DataAccess.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+      </e>
+      <e p="Crnc.Oms.Security.WebApi" t="IncludeRecursive">
+        <e p="Api" t="Include">
+          <e p="AccountsController.cs" t="Include" />
+          <e p="RolesController.cs" t="Include" />
+          <e p="UsersController.cs" t="Include" />
+        </e>
+        <e p="Authorization" t="Include">
+          <e p="AuthSettings.cs" t="Include" />
+          <e p="Roles.cs" t="Include" />
+        </e>
+        <e p="Crnc.Oms.Security.WebApi.csproj" t="IncludeRecursive" />
+        <e p="DTO" t="Include">
+          <e p="AccountDto.cs" t="Include" />
+          <e p="CurrentUserDto.cs" t="Include" />
+          <e p="TextValueDto.cs" t="Include" />
+          <e p="UserItemDto.cs" t="Include" />
+        </e>
+        <e p="Program.cs" t="Include" />
+        <e p="Properties" t="Include">
+          <e p="launchSettings.json" t="Include" />
+        </e>
+        <e p="Startup.cs" t="Include" />
+        <e p="appsettings.Development.json" t="Include" />
+        <e p="appsettings.json" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.0" t="Include">
+              <e p="Crnc.Oms.Security.WebApi.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+      </e>
+      <e p="Crnc.Oms.SeedWork" t="Include" />
+      <e p="Crnc.Oms.sln" t="IncludeFlat" />
+      <e p="packages" t="ExcludeRecursive" />
+    </e>
+  </component>
+</project>
