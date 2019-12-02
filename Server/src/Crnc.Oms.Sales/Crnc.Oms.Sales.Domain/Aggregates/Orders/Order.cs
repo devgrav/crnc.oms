@@ -1,0 +1,82 @@
+﻿using System;
+using Crnc.Oms.Sales.Domain.SeedWork;
+using Crnc.Oms.Sales.Domain.Aggregates.Customers;
+
+namespace Crnc.Oms.Sales.Domain.Aggregates.Orders
+{
+    /// <summary>
+    /// Order for job
+    /// </summary>
+    public class Order
+        : DomainEntity, IAggregateRoot
+    {
+        /// <summary>
+        /// Number of order, tempalte E-value of id, may be put in manually
+        /// </summary>
+        public string Number { get; private set; }
+
+        /// <summary>
+        /// Date of created
+        /// </summary>
+        public DateTime DateCreated { get; private set; }
+
+        /// <summary>
+        /// Date sent to customer
+        /// </summary>
+        public DateTime? DateSentToCustomer { get; private set; }
+
+        /// <summary>
+        /// Job type
+        /// </summary>
+        public JobType JobType { get; private set; }
+
+        /// <summary>
+        /// Comments
+        /// </summary>
+        public string JobDescription { get; private set; }
+
+        /// <summary>
+        /// Current status of order
+        /// </summary>
+        public OrderStatus Status { get; private set; }
+
+        /// <summary>
+        /// Source of material
+        /// </summary>
+        public MaterialSource? MaterialSource { get; private set; }
+
+        /// <summary>
+        /// Type of signoff
+        /// </summary>
+        public SignoffType? SignOffType { get; private set; }
+        
+        /// <summary>
+        /// Customer Id
+        /// </summary>
+        public Guid CustomerId { get; private set; }
+        
+        /// <summary>
+        /// Customer of order
+        /// </summary>
+        public virtual Customer Customer { get; private set; }
+
+        public Order(Guid id, DateTime dateCreated, JobType jobType, string jobDescription, Customer customer)
+            : base(id)
+        {
+            if(string.IsNullOrWhiteSpace(jobDescription))
+                throw new ArgumentNullException(nameof(jobDescription));
+
+            Customer = customer ?? throw new ArgumentNullException(nameof(customer));
+            CustomerId = customer.Id;
+            DateCreated = dateCreated;
+            JobType = jobType;
+            JobDescription = jobDescription;
+            Status = OrderStatus.NotSent;
+        }
+
+        protected Order()
+        {
+            
+        }
+    }
+}
