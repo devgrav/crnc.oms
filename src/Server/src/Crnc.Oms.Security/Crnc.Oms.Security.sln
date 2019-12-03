@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Security.Domain", "Crnc.Oms.Security.Domain\Crnc.Oms.Security.Domain.csproj", "{9C569D19-DCB9-496A-A8EF-14819E792F2D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Security.Infrastructure.CrossCutting", "Crnc.Oms.Security.Infrastructure.CrossCutting\Crnc.Oms.Security.Infrastructure.CrossCutting.csproj", "{262E1D76-C25F-4DBE-9CF6-F894DE2D8857}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Security.Infrastructure.DataAccess", "Crnc.Oms.Security.Infrastructure.DataAccess\Crnc.Oms.Security.Infrastructure.DataAccess.csproj", "{2E6A9703-6289-4777-8525-D653AE8C1E93}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Security.WebApi", "Crnc.Oms.Security.WebApi\Crnc.Oms.Security.WebApi.csproj", "{55080C53-EFCD-4676-8976-022E8AEC5EA0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9C569D19-DCB9-496A-A8EF-14819E792F2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C569D19-DCB9-496A-A8EF-14819E792F2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C569D19-DCB9-496A-A8EF-14819E792F2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C569D19-DCB9-496A-A8EF-14819E792F2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{262E1D76-C25F-4DBE-9CF6-F894DE2D8857}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{262E1D76-C25F-4DBE-9CF6-F894DE2D8857}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{262E1D76-C25F-4DBE-9CF6-F894DE2D8857}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{262E1D76-C25F-4DBE-9CF6-F894DE2D8857}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E6A9703-6289-4777-8525-D653AE8C1E93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E6A9703-6289-4777-8525-D653AE8C1E93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E6A9703-6289-4777-8525-D653AE8C1E93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E6A9703-6289-4777-8525-D653AE8C1E93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55080C53-EFCD-4676-8976-022E8AEC5EA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55080C53-EFCD-4676-8976-022E8AEC5EA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55080C53-EFCD-4676-8976-022E8AEC5EA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55080C53-EFCD-4676-8976-022E8AEC5EA0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
