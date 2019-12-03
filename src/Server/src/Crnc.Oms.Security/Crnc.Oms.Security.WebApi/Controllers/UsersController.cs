@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using NSwag.Annotations;
 
-namespace Crnc.Oms.Security.WebApi.Api
+namespace Crnc.Oms.Security.WebApi.Controllers
 {
     [Produces("application/json")]
     [Route("api/[controller]")]
