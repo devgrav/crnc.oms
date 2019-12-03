@@ -16,7 +16,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using NSwag.Annotations;
 
-namespace Crnc.Oms.Security.WebApi.Api
+namespace Crnc.Oms.Security.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [AllowAnonymous]
