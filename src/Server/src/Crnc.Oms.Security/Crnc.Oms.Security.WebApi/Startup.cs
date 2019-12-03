@@ -47,7 +47,7 @@ namespace Crnc.Oms.Security.WebApi
                     .AllowAnyMethod());
             });
             services.AddOptions();
-            services.Configure<MongoDbSettings>(Configuration.GetSection("ConnectionStrings:Omsdb"));
+            services.Configure<MongoDbSettings>(Configuration.GetSection("ConnectionStrings:OmsSecurityDb"));
             services.Configure<AuthSettings>(Configuration.GetSection("Auth"));
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
