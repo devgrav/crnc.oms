@@ -41,19 +41,30 @@ namespace Crnc.Oms.Security.Infrastructure.DataAccess.Repositories
             return await _dbContext.Roles.AsQueryable().ToListAsync(cancellationToken);
         }
 
+        public async Task<Role> GetRoleByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Roles.AsQueryable().SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+        }
+
         #region IRepository 
 
         public async Task AddAsync(User entity, CancellationToken cancellationToken = default)
         {
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
+
+            var isExisted = await _dbContext.Users.AsQueryable().AnyAsync(x => x.Id == entity.Id 
+                                                                               || x.Login.ToLower() == entity.Login.ToLower(), cancellationToken);
+
+            if(isExisted)
+                throw new EntityAlreadyExistedException("User has already existed");
            
             await _dbContext.Users.InsertOneAsync(entity);                               
         }
 
         public async Task DeleteAsync(Guid entityId, CancellationToken cancellationToken = default)
         {
-            var user = _dbContext.Users.AsQueryable().SingleOrDefault(x => x.Id == entityId);
+            var user = await _dbContext.Users.AsQueryable().SingleOrDefaultAsync(x => x.Id == entityId, cancellationToken);
 
             if (user == null)
                 throw new MissingEntityException($"User with such entityId is not found");

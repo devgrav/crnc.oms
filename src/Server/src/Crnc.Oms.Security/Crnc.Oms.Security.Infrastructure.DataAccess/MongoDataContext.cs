@@ -4,6 +4,7 @@ using Crnc.Oms.Security.Infrastructure.DataAccess.Data;
 using Crnc.Oms.Security.Domain.Aggregates.Users;
 using Crnc.Oms.Security.Infrastructure.DataAccess.Mappings;
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Crnc.Oms.Security.Infrastructure.DataAccess
@@ -21,6 +22,7 @@ namespace Crnc.Oms.Security.Infrastructure.DataAccess
             //MongoDbConvention.RegisterConventions();
             MongoDbMapping.RegisterAllMappings();
 
+            BsonDefaults.GuidRepresentation = GuidRepresentation.Standard;
             Client = new MongoClient(settings.Value.Server);
             Database = Client.GetDatabase(settings.Value.Database);
         }
