@@ -2,5 +2,17 @@ version: '3'
 services:
   db:
     image: "mongo:latest"
+    restart: always
     ports:
-      - "27017:27017"
+      - "27020:27017" 
+  web:
+    build: .
+    restart: always
+    ports:
+      - "64708:80"
+    environment:
+      - 'ConnectionStrings:Omsdb:Server=mongodb://db'  
+    links:
+      - db 
+    depends_on: 
+      - db

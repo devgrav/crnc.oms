@@ -21,7 +21,7 @@ namespace Crnc.Oms.Security.Infrastructure.DataAccess
             //MongoDbConvention.RegisterConventions();
             MongoDbMapping.RegisterAllMappings();
 
-            Client = new MongoClient(settings.Value.ConnectionString);
+            Client = new MongoClient(settings.Value.Server);
             Database = Client.GetDatabase(settings.Value.Database);
         }
 
