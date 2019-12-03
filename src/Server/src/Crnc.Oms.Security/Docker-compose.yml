@@ -11,7 +11,7 @@ services:
     ports:
       - "64708:80"
     environment:
-      - 'ConnectionStrings:Omsdb:Server=mongodb://db'  
+      - "ConnectionStrings:Omsdb:Server=mongodb://db"
     links:
       - db 
     depends_on: 
