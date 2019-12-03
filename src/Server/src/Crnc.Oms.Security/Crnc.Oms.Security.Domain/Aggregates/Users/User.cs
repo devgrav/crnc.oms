@@ -27,11 +27,11 @@ namespace Crnc.Oms.Security.Domain.Aggregates.Users
         /// <param name="lastName">LastName</param>
         /// <returns></returns>
         public static User CreateNew(string login, string passwordHash, string passwordSalt,
-            string firstName, string lastName, string email, string phone=null, Role role=null, UserPhoto photo = null)
+            string firstName, string lastName, string email, string phone=null, Role role=null, UserPhoto photo = null, Guid? id = null)
         {
             return new User()
             {
-                Id = Guid.NewGuid(),
+                Id = id ?? Guid.NewGuid(),
                 Login = login,
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,

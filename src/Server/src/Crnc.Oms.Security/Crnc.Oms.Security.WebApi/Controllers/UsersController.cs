@@ -18,6 +18,9 @@ using NSwag.Annotations;
 
 namespace Crnc.Oms.Security.WebApi.Controllers
 {
+    /// <summary>
+    /// Management of users 
+    /// </summary>
     [Produces("application/json")]
     [Route("api/[controller]")]
     [Authorize(Roles = Roles.Admin)]
@@ -62,6 +65,7 @@ namespace Crnc.Oms.Security.WebApi.Controllers
         /// <summary>
         /// Get users by Id
         /// </summary>
+        /// <param name="id">Id of user, for example: <example>2a89985f-f013-4f2a-9545-395efb43a142</example></param>
         /// <remarks>Requires admin role</remarks>
         /// <response code="200">Returns users.</response>
         /// <response code="404">Not found user.</response>
@@ -85,6 +89,7 @@ namespace Crnc.Oms.Security.WebApi.Controllers
                     Login = user.Login,
                     Phone = user.Phone,
                     Role = user.Role.Title,
+                    RoleId = user.Role.Id,
                     PhotoBase64 = user.Photo?.ContentBase64,
                     PhotoMimeType = user.Photo?.MimeType,
                     IsActive = user.IsActive
@@ -106,19 +111,32 @@ namespace Crnc.Oms.Security.WebApi.Controllers
         [OpenApiOperation("Create user", "Create new user", "Requires admin role")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ModelStateDictionary), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Post([FromBody]UserItemDto user)
+        public async Task<IActionResult> Post([FromBody]SaveUserDto user)
         {
             if (ModelState.IsValid)
             {
                 var password = PasswordHelper.GetHash(user.Password);
 
-                var entity = UserEntity.CreateNew(user.Login, password.Hash, password.Salt,
-                    user.FirstName, user.LastName, user.Email, user.Phone, null, !string.IsNullOrWhiteSpace(user.PhotoBase64)
-                        && !string.IsNullOrWhiteSpace(user.PhotoMimeType)
-                    ? new UserPhoto(user.PhotoBase64, user.PhotoMimeType) : null);
-                await _userRepository.AddAsync(entity);
+                UserPhoto photo = null;
+                if (!string.IsNullOrWhiteSpace(user.PhotoBase64)
+                    && !string.IsNullOrWhiteSpace(user.PhotoMimeType))
+                    photo = new UserPhoto(user.PhotoBase64, user.PhotoMimeType);
 
-                return Ok();
+                var role = await _userRepository.GetRoleByIdAsync(user.RoleId);
+                
+                var entity = UserEntity.CreateNew(user.Login, password.Hash, password.Salt,
+                    user.FirstName, user.LastName, user.Email, user.Phone, role, photo);
+
+                try
+                {
+                    await _userRepository.AddAsync(entity);
+                }
+                catch (EntityAlreadyExistedException e)
+                {
+                    return BadRequest(e.Message);
+                }
+
+                return Ok(entity.Id);
             }
             else
                 return BadRequest(ModelState);
@@ -135,19 +153,24 @@ namespace Crnc.Oms.Security.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ModelStateDictionary), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Put(Guid id, [FromBody]UserItemDto user)
+        public async Task<IActionResult> Put(Guid id, [FromBody]SaveUserDto user)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
                     var password = PasswordHelper.GetHash(user.Password);
+                    
+                    UserPhoto photo = null;
+                    if (!string.IsNullOrWhiteSpace(user.PhotoBase64)
+                        && !string.IsNullOrWhiteSpace(user.PhotoMimeType))
+                        photo = new UserPhoto(user.PhotoBase64, user.PhotoMimeType);
 
+                    var role = await _userRepository.GetRoleByIdAsync(user.RoleId);
+                    
                     var entity = UserEntity.CreateExisted(id, user.Login, password.Hash, password.Salt,
-                        user.FirstName, user.LastName, user.Email, new Role(user.Role), 
-                        user.IsActive, user.Phone, !string.IsNullOrWhiteSpace(user.PhotoBase64) 
-                                                   && !string.IsNullOrWhiteSpace(user.PhotoMimeType)
-                            ? new UserPhoto(user.PhotoBase64, user.PhotoMimeType) : null);
+                        user.FirstName, user.LastName, user.Email, role, 
+                        user.IsActive, user.Phone, photo);
 
                     await _userRepository.SaveAsync(entity);
 

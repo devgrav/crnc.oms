@@ -25,9 +25,9 @@ namespace Crnc.Oms.Security.Domain.Aggregates.Users
 
         }
 
-        public Role(string title)
+        public Role(string title, Guid? id = null)
         {
-            Id = Guid.NewGuid();
+            Id = id ?? Guid.NewGuid();
             Title = title;
         }
     }

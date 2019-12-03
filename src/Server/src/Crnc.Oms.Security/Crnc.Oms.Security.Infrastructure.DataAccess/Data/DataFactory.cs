@@ -18,9 +18,9 @@ namespace Crnc.Oms.Security.Infrastructure.DataAccess.Data
         {
             var roles = new List<Role>()
             {
-                new Role("Admin"),
-                new Role("Main manager"),
-                new Role("Manager"),
+                new Role("Admin",Guid.Parse("0c7871c3-4751-4af6-b0ef-21c38064e9f2")),
+                new Role("Main manager", Guid.Parse("f1ba72d8-5ebc-4cc4-8b31-eaa0baa87293")),
+                new Role("Manager",Guid.Parse("29679868-fcfe-4350-913d-526a54ea896d")),
             };
 
             return roles;
@@ -33,7 +33,7 @@ namespace Crnc.Oms.Security.Infrastructure.DataAccess.Data
 
                 var users = new List<User>()
                 {
-                    User.CreateNew("admin",password.Hash, password.Salt,"John","Admin","admin@crnc.com",null, roles.First(r=> r.Title.Equals("Admin")),null),
+                    User.CreateNew("admin",password.Hash, password.Salt,"John","Admin","admin@crnc.com",null, roles.First(r=> r.Title.Equals("Admin")),null, Guid.Parse("2a89985f-f013-4f2a-9545-395efb43a142")),
                     User.CreateNew("jack_richer",password.Hash, password.Salt,"Jack","Richer","jack_richer@crnc.com",null, roles.First(r=> r.Title.Equals("Admin")),photos[0]),
                     User.CreateNew("shon_bean",password.Hash, password.Salt,"Shon","Bean","shon_bean@crnc.com",null,roles.First(r=> r.Title.Equals("Main manager")),photos[1]),
                     User.CreateNew("helen_smith",password.Hash, password.Salt,"Helen","Smith","helen_smith@crnc.com",null,roles.First(r=> r.Title.Equals("Manager")),photos[2]),
