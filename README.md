@@ -1,5 +1,25 @@
-Part of system for order management, that inclide authentification module and admin functions (search users, adding/editing users, delete users) for little manufactiring CRNC company.
-Developed by  Asp.Net Core and Mongo Db for backend and React.js, Typescript and Semantic UI for frontend.
-/
-Часть системы для управления заказами в небольшой производственной компании CRNC. Реализована авторизация и модуль администрирования пользователей.
-Использует Asp.Net Core и Mongo Db на сервере и React.js, TypeScript, Semantic UI на клиенте.
+# CRNC Order Management System
+
+## Описание
+
+Cистема для управления заказами в виртуальной производственной компании CRNC. 
+Реализован модуль безопасности в виде авторизации и администрирования пользователей.
+Частично реализован frontend в виде spa и backend модуля продаж для управления заказами и клиентами.
+Планируется полная реализация модуля продаж и модуля управления производственными работами вместе с фронтендом, а также уведомления сотрудников через push сообщения и клиентов через email.  
+Использует Asp.Net Core, Mongo Db, PostgreSQL на сервере и React.js, TypeScript, Semantic UI на клиенте.
+
+## Модуль безопасности
+
+Модуль включает в себя авторизацию, управление ролями пользователей и управление пользователями в виде CRUD операций. 
+Создание/редактирование пользователя включает в себя изменеие персональных данных, учетных данных, добавление фотографии.   
+Полный список действий с примерами данных доступен по swagger endpoint
+
+## Запуск
+
+Backend для модуля безопасности можно запустить через docker-compose из корня репозитория
+
+`docker-compose up`
+
+После запуска api модуля безопасности будет доступно по ссылке через Swagger UI
+
+[CRNC Security API](http://localhost:64708/swagger).
