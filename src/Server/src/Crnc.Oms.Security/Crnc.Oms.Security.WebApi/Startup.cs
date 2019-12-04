@@ -79,7 +79,7 @@ namespace Crnc.Oms.Security.WebApi
                     Type = OpenApiSecuritySchemeType.ApiKey,
                     Name = "Authorization",
                     In = OpenApiSecurityApiKeyLocation.Header,
-                    Description = "Please insert JWT with Bearer into field"
+                    Description = "Please insert JWT with Bearer into field. Example: Bearer {your token}"
                 });
             });
 
