@@ -18,7 +18,7 @@ namespace Crnc.Oms.Security.WebApi.DTO
     ///     "roleId": "f1ba72d8-5ebc-4cc4-8b31-eaa0baa87293",
     ///     "role": "Main manager",
     ///     "isActive": true
-    ///  }
+    ///}
     /// </example>>
     public class SaveUserDto
     {
