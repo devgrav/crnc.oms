@@ -34,9 +34,15 @@ https://drive.google.com/file/d/1V3LICO6g1Y_IZgy9wiEEKMN0E_8Kywdr/view?usp=shari
 Включает в себя отправку уведомления через разные каналы, email для клиентов и email/push уведомления для сотрудников в зависомости от изменений в системе, к примеру, при смене статусов заказов и работ.
 
 ### Запуск
-Backend для модуля безопасности можно запустить через docker-compose из корня репозитория
+Backend для модуля безопасности можно запустить через docker-compose из корня репозитория:
+
+`docker-compose build`
 
 `docker-compose up`
+
+Для удаления:
+
+`docker-compose down`
 
 После запуска api модуля безопасности будет доступно по ссылке через Swagger UI
 
