@@ -36,11 +36,13 @@ https://drive.google.com/file/d/1V3LICO6g1Y_IZgy9wiEEKMN0E_8Kywdr/view?usp=shari
 ### Запуск
 Backend для модуля безопасности можно запустить через docker-compose из корня репозитория:
 
+###### Для запуска:
+
 `docker-compose build`
 
 `docker-compose up`
 
-Для удаления:
+###### Для удаления:
 
 `docker-compose down`
 
