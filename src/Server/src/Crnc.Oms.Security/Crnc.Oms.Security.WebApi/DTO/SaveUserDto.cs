@@ -8,7 +8,6 @@ namespace Crnc.Oms.Security.WebApi.DTO
     /// </summary>
     /// <example>
     ///{
-    ///     "id": "0b85df12-b9a1-48a7-a302-b209d63d7d13",
     ///     "firstName": "Adam",
     ///     "lastName": "Smith",
     ///     "email": "adamsmith@crnc.com",
