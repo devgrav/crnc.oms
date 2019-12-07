@@ -2,7 +2,7 @@ if(!process.env.REACT_APP_SECURITY_API_URL || !process.env.REACT_APP_SALES_API_U
     throw Error("Not found api urls in configuration of enviroment variabels")
 
 console.log("REACT_APP_SECURITY_API_URL: "+process.env.REACT_APP_SECURITY_API_URL)
-console.log("REACT_APP_SALES_API_URL: "+process.env.REACT_APP_SECURITY_API_URL)
+console.log("REACT_APP_SALES_API_URL: "+process.env.REACT_APP_SALES_API_URL)
 console.log("NODE_ENV: "+process.env.NODE_ENV)
 
 const securityApiUrl: string = process.env.REACT_APP_SECURITY_API_URL;
