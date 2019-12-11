@@ -1,11 +1,15 @@
 # => Build container
 FROM node:alpine as builder
+
+ARG SECURITY_API_URL
+ARG SALES_API_URL
+
 WORKDIR /app
 COPY package.json .
 COPY yarn.lock .
 RUN yarn
 COPY . .
-RUN yarn build --env MYVAR2=foo
+RUN yarn build --env NODE_ENV=production REACT_APP_SECURITY_API_URL=$SECURITY_API_URL REACT_APP_SALES_API_URL=$SALES_API_URL
 
 # => Run container
 FROM nginx:1.15.2-alpine
@@ -22,14 +26,6 @@ EXPOSE 80
 
 # Copy .env file and shell script to container
 WORKDIR /usr/share/nginx/html
-COPY ./env.sh .
-COPY .env .
-
-# Add bash
-RUN apk add --no-cache bash
-
-# Make our shell script executable
-RUN chmod +x env.sh
 
 # Start Nginx server
-CMD ["/bin/bash", "-c", "/usr/share/nginx/html/env.sh && nginx -g \"daemon off;\""]
+CMD ["nginx -g \"daemon off;\""]
