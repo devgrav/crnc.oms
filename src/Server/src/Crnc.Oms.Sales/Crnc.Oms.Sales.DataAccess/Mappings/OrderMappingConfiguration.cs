@@ -1,4 +1,4 @@
-using Crnc.Oms.Sales.Domain.Aggregates.Orders;
+using Crnc.Oms.Sales.Domain.Aggregates.Order;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -11,6 +11,23 @@ namespace Crnc.Oms.Sales.DataAccess.Mappings
         {
             builder.Property(x => x.Number).HasMaxLength(10);
             builder.Property(x => x.JobDescription).HasMaxLength(4000);
+
+            builder.OwnsOne(x => x.Customer, e =>
+            {
+                e.OwnsOne(x => x.Email,
+                    e => { e.Property(x => x.Value).HasMaxLength(300); });
+                e.OwnsOne(x => x.Phone,
+                    e => { e.Property(x => x.Value).HasMaxLength(300); });
+                e.OwnsOne(x => x.Abbreviation,
+                    e => { e.Property(x => x.Value).HasMaxLength(300); });
+                e.OwnsOne(x => x.FullName,
+                    e =>
+                    {
+                        e.Property(x => x.FirstName).HasMaxLength(300);
+                        e.Property(x => x.MiddleName).HasMaxLength(300);
+                        e.Property(x => x.LastName).HasMaxLength(300);
+                    });
+            });
         }
     }
 }

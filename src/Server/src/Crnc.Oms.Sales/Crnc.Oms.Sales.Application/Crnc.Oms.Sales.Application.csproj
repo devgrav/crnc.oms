@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.0</TargetFramework>
@@ -7,10 +7,6 @@
     <ItemGroup>
       <ProjectReference Include="..\Crnc.Oms.Sales.DataAccess\Crnc.Oms.Sales.DataAccess.csproj" />
       <ProjectReference Include="..\Crnc.Oms.Sales.Domain\Crnc.Oms.Sales.Domain.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Features\Orders\Commands" />
     </ItemGroup>
 
 </Project>

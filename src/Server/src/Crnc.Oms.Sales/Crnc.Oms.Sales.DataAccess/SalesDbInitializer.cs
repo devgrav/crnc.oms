@@ -1,6 +1,5 @@
 using System;
-using Crnc.Oms.Sales.Domain.Aggregates.Customers;
-using Crnc.Oms.Sales.Domain.Aggregates.Orders;
+using Crnc.Oms.Sales.Domain.Aggregates.Order;
 
 namespace Crnc.Oms.Sales.DataAccess
 {
@@ -11,15 +10,12 @@ namespace Crnc.Oms.Sales.DataAccess
             dbContext.Database.EnsureDeleted();
             dbContext.Database.EnsureCreated();
 
-            var customer = new Customer(Guid.NewGuid(), 
-                new FullName("John", "Galt"), 
+            var customer = new Customer( 
+                new FullName("John", "Galt"),
+                new NameAbbreviation("JG"), 
                 new Email("some@mail.ru"),
                 new Phone("+79153423345"));
-
-            dbContext.Customers.Add(customer);
-
-            dbContext.SaveChanges();
-
+            
             dbContext.Orders.Add(new Order(
                 Guid.NewGuid(), 
                 DateTime.Now, 

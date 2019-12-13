@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Crnc.Oms.Sales.Domain.Aggregates.Orders;
+using Crnc.Oms.Sales.Domain.Aggregates.Order;
 using Crnc.Oms.Sales.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 

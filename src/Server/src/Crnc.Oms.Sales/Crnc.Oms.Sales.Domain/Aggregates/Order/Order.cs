@@ -1,8 +1,7 @@
 ﻿using System;
 using Crnc.Oms.Sales.Domain.SeedWork;
-using Crnc.Oms.Sales.Domain.Aggregates.Customers;
 
-namespace Crnc.Oms.Sales.Domain.Aggregates.Orders
+namespace Crnc.Oms.Sales.Domain.Aggregates.Order
 {
     /// <summary>
     /// Order for job
@@ -11,7 +10,7 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Orders
         : DomainEntity, IAggregateRoot
     {
         /// <summary>
-        /// Number of order, tempalte E-value of id, may be put in manually
+        /// Number of order, tempalte E-value of id
         /// </summary>
         public string Number { get; private set; }
 
@@ -49,16 +48,11 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Orders
         /// Type of signoff
         /// </summary>
         public SignoffType? SignOffType { get; private set; }
-        
-        /// <summary>
-        /// Customer Id
-        /// </summary>
-        public Guid CustomerId { get; private set; }
-        
+
         /// <summary>
         /// Customer of order
         /// </summary>
-        public virtual Customer Customer { get; private set; }
+        public Customer Customer { get; private set; }
 
         public Order(Guid id, DateTime dateCreated, JobType jobType, string jobDescription, Customer customer)
             : base(id)
@@ -67,11 +61,25 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Orders
                 throw new ArgumentNullException(nameof(jobDescription));
 
             Customer = customer ?? throw new ArgumentNullException(nameof(customer));
-            CustomerId = customer.Id;
             DateCreated = dateCreated;
             JobType = jobType;
             JobDescription = jobDescription;
             Status = OrderStatus.NotSent;
+            Number = Id.ToString(); //TODO: add different algoritm
+        }
+
+        public void Edit(JobType jobType, string jobDescription, MaterialSource? materialSource,
+            SignoffType? signoffType, Customer customer)
+        {
+            JobType = jobType;
+            MaterialSource = materialSource;
+            SignOffType = signoffType;
+            Customer = customer;
+        }
+        
+        public void ChangeStatus(OrderStatus status)
+        {
+            Status = status;
         }
 
         protected Order()
