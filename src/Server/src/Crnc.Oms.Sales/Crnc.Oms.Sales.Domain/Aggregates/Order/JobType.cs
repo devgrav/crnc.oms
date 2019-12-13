@@ -1,4 +1,4 @@
-﻿namespace Crnc.Oms.Sales.Domain.Aggregates.Orders
+﻿namespace Crnc.Oms.Sales.Domain.Aggregates.Order
 {
     /// <summary>
     /// Types of job for estimate

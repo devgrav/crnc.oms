@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Crnc.Oms.Sales.Domain.Aggregates.Orders
+namespace Crnc.Oms.Sales.Domain.Aggregates.Order
 {
     /// <summary>
     /// Status of order

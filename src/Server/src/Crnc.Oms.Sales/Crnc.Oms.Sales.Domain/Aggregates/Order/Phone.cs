@@ -2,7 +2,7 @@ using System;
 using System.Text.RegularExpressions;
 using Crnc.Oms.Sales.Domain.SeedWork;
 
-namespace Crnc.Oms.Sales.Domain.Aggregates.Customers
+namespace Crnc.Oms.Sales.Domain.Aggregates.Order
 {
     public class Phone
         : IValueObject

@@ -1,6 +1,6 @@
 using System;
 
-namespace Crnc.Oms.Sales.Domain.Aggregates.Customers
+namespace Crnc.Oms.Sales.Domain.Aggregates.Order
 {
     public class NameAbbreviation
     {

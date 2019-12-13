@@ -1,5 +1,5 @@
 using System;
-using Crnc.Oms.Sales.Domain.Aggregates.Orders;
+using Crnc.Oms.Sales.Domain.Aggregates.Order;
 
 namespace Crnc.Oms.Sales.Application.Features.Orders.Dto
 {

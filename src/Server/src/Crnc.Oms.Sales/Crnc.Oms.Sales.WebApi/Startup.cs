@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Crnc.Oms.Sales.Domain.SeedWork;
 using Crnc.Oms.Sales.Application;
+using Crnc.Oms.Sales.Application.Features.Orders.Commands;
 using Crnc.Oms.Sales.Application.Features.Orders.Dto;
 using Crnc.Oms.Sales.Application.Features.Orders.Queries;
 using Crnc.Oms.Sales.DataAccess;
@@ -57,6 +58,10 @@ namespace Crnc.Oms.Sales.WebApi
             
             services.AddScoped<IUseCaseQueryHandler<GetOrdersForTableInputDto, GetOrdersForTableOutputDto>,GetOrdersForTable>();
             services.AddScoped<IUseCaseQueryHandler<GetNewOrderInputDto, GetNewOrderOutputDto>,GetNewOrder>();
+            
+            services.AddScoped<IUseCaseQueryHandler<GetOrderInputDto, GetOrderOutputDto>,GetOrder>();
+            services.AddScoped<IUseCaseCommandHandler<CreateOrderInputDto>,CreateOrder>();
+            services.AddScoped<IUseCaseCommandHandler<EditOrderInputDto>,EditOrder>();
 
             services.AddSingleton<ICurrentDateTimeProvider, CurrentDateTimeProvider>();
             

@@ -1,7 +1,7 @@
 using System;
 using Crnc.Oms.Sales.Domain.SeedWork;
 
-namespace Crnc.Oms.Sales.Domain.Aggregates.Customers
+namespace Crnc.Oms.Sales.Domain.Aggregates.Order
 {
     public class FullName
         : IValueObject
