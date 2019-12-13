@@ -27,5 +27,11 @@ namespace Crnc.Oms.Security.Domain.Repositories
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<Role>> GetRolesAsync(CancellationToken cancellationToken = default);
+        
+        /// <summary>
+        /// Get role by id
+        /// </summary>
+        /// <returns></returns>
+        Task<Role> GetRoleByIdAsync(Guid id, CancellationToken cancellationToken = default);
     }
 }

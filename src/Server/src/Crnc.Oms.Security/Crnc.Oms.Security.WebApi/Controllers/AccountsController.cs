@@ -18,6 +18,9 @@ using NSwag.Annotations;
 
 namespace Crnc.Oms.Security.WebApi.Controllers
 {
+    /// <summary>
+    /// Authentication and authorization users 
+    /// </summary>
     [Route("api/[controller]")]
     [AllowAnonymous]
     public class AccountsController
@@ -34,9 +37,8 @@ namespace Crnc.Oms.Security.WebApi.Controllers
 
 
         /// <summary>
-        /// Authenticate user
+        /// Authorize user
         /// </summary>
-        /// <param name="account"></param>
         /// <remarks>Returns user info with token in JWT format</remarks>
         /// <response code="200">Authorized.</response>
         /// <response code="400">Invalid auth data</response>

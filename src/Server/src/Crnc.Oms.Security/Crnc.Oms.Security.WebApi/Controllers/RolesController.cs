@@ -12,6 +12,9 @@ using NSwag.Annotations;
 
 namespace Crnc.Oms.Security.WebApi.Controllers
 {
+    /// <summary>
+    /// Management of roles of users 
+    /// </summary>
     [Produces("application/json")]
     [Route("api/[controller]")]
     [Authorize(Roles = Roles.Admin)]
