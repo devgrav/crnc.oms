@@ -6,8 +6,11 @@ using Crnc.Oms.Notification.Gateway.Application.Dto;
 using Crnc.Oms.Notification.Gateway.Application.Services.Abstractions;
 using Crnc.Oms.Notification.Gateway.WebApi.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
+using NSwag.Annotations;
 
 namespace Crnc.Oms.Notification.Gateway.WebApi.Controllers
 {
@@ -26,11 +29,18 @@ namespace Crnc.Oms.Notification.Gateway.WebApi.Controllers
             _notificationService = notificationService;
         }
 
+        /// <summary>
+        /// Send notification
+        /// </summary>
+        /// <response code="200">Notification sent to channel</response>
+        /// <response code="400">Sending data is not valid.</response>
         [HttpPost]
-        public async Task<IActionResult> Send(SendNotificationMessageInputModel inputModel)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ModelStateDictionary), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Send([FromBody]SendNotificationMessageInputModel inputModel)
         {
             if (!ModelState.IsValid)
-                return BadRequest();
+                return BadRequest(ModelState);
             
             var sendResult = await _notificationService.SendAsync(new SendNotificationMessageInputDto()
             {
