@@ -8,23 +8,9 @@ namespace Crnc.Oms.Notification.Gateway.WebApi.Models
     /// </summary>
     /// <example>
     ///{
-    ///     "Receiver": "receiver@mail.ru",
-    ///     "Message": "Some message",
-    ///     "Channel: "Email"
-    ///}
-    /// </example>
-    /// <example>
-    ///{
-    ///     "Receiver": "receiverId",
-    ///     "Message": "Some message",
-    ///     "Channel: "Push"
-    ///}
-    /// </example>
-    /// <example>
-    ///{
-    ///     "Receiver": "receiverId",
-    ///     "Message": "Some message",
-    ///     "Channel: "All"
+    ///     "receiver": "receiver@mail.ru",
+    ///     "message": "some message",
+    ///     "channel": "email"
     ///}
     /// </example>
     public class SendNotificationMessageInputModel
@@ -44,7 +30,6 @@ namespace Crnc.Oms.Notification.Gateway.WebApi.Models
         /// <summary>
         /// Channel
         /// </summary>
-        [Required]
         public ChannelType Channel { get; set; }
     }
 }
