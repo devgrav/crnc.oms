@@ -47,7 +47,7 @@ namespace Crnc.Oms.Notification.Gateway.WebApi.Controllers
         }
         
         /// <summary>
-        /// Send push
+        /// Send push notification
         /// </summary>
         /// <response code="200">Notification sent to push channel</response>
         /// <response code="400">Sending data is not valid.</response>
@@ -61,11 +61,11 @@ namespace Crnc.Oms.Notification.Gateway.WebApi.Controllers
 
             var sendResult = await _notificationService.SendToPushChannelAsync(inputDto);
 
-            return Ok();
+            return Ok(sendResult);
         }
         
         /// <summary>
-        /// Send notification
+        /// Send notification to all channels
         /// </summary>
         /// <response code="200">Notification sent to all channels</response>
         /// <response code="400">Sending data is not valid.</response>

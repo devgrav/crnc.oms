@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Crnc.Oms.Notification.Email.Integration.Dto
+namespace Crnc.Oms.Notification.Email.Application.Dto
 {
     public class SendEmailMessageInputDto
     {
@@ -9,11 +9,11 @@ namespace Crnc.Oms.Notification.Email.Integration.Dto
         
         [Required]
         [EmailAddress]
-        public string Sender { get; set; }
+        public string SenderEmail { get; set; }
         
         [Required]
         [EmailAddress]
-        public string Receiver { get; set; }
+        public string ReceiverEmail { get; set; }
 
         [Required]
         public string Message { get; set; }

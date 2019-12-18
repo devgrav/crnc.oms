@@ -29,22 +29,22 @@ namespace Crnc.Oms.Notification.Gateway.Application.Services
         public async Task<SendEmailNotificationOutputDto> SendToEmailChannelAsync(SendEmailNotificationInputDto dto, CancellationToken cancellationToken = default)
         {
             var messageId = Guid.NewGuid();
-            await _emailGateway.SendEmailAsync(new SendEmailInputDto(messageId, dto.ReceiverEmail, dto.Message), cancellationToken);
+            var response = await _emailGateway.SendEmailAsync(new SendEmailInputDto(messageId, dto.ReceiverEmail, dto.Message), cancellationToken);
 
             return new SendEmailNotificationOutputDto()
             {
-                MessageId = messageId
+                MessageId = response.MessageId
             };
         }
 
         public async Task<SendPushNotificationOutputDto> SendToPushChannelAsync(SendPushNotificationInputDto dto, CancellationToken cancellationToken = default)
         {
             var messageId = Guid.NewGuid();
-            await _pushGateway.SendPushAsync(new SendPushInputDto(messageId, dto.ReceiverUserId, dto.Message),cancellationToken);
+            var response = await _pushGateway.SendPushAsync(new SendPushInputDto(messageId, dto.ReceiverUserId, dto.Message),cancellationToken);
 
             return new SendPushNotificationOutputDto()
             {
-                MessageId = messageId
+                MessageId = response.MessageId
             };
         }
 

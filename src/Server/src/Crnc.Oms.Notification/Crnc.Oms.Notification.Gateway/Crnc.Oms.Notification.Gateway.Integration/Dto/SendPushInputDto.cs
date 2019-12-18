@@ -11,9 +11,9 @@ namespace Crnc.Oms.Notification.Gateway.Integration.Dto
 
         public string Message { get; set; }
 
-        public SendPushInputDto(Guid? messageId, Guid receiverUserId, string message)
+        public SendPushInputDto(Guid messageId, Guid receiverUserId, string message)
         {
-            MessageId = messageId ?? Guid.NewGuid();
+            MessageId = messageId;
             ReceiverUserId = receiverUserId;
             Message = message;
         }

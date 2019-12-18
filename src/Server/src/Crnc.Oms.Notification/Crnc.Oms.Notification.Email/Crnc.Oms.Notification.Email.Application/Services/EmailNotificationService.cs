@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
+using Crnc.Oms.Notification.Email.Application.Dto;
 using Crnc.Oms.Notification.Gateway.Integration.Gateways;
 using Crnc.Oms.Notification.Gateway.Integration.Gateways.Abstractions;
 using Crnc.Oms.Notification.Gateway.Integration.Dto;
-using Crnc.Oms.Notification.Email.Integration.Dto;
 using Crnc.Oms.Notification.Email.Application.Services.Abstractions;
 using Microsoft.Extensions.Logging;
 
@@ -28,7 +28,7 @@ namespace Crnc.Oms.Notification.Email.Application.Services
                 throw new ArgumentNullException(nameof(dto));
             
             var sentOutput = await _emailGateway.SendEmailAsync(new EmailMessageInputDto
-                (dto.MessageId, dto.Sender, dto.Receiver, dto.Message), cancellationToken);
+                (dto.MessageId, dto.SenderEmail, dto.ReceiverEmail, dto.Message), cancellationToken);
             
             return new SendEmailMessageOutputDto()
             {
