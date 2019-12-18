@@ -34,6 +34,31 @@ services:
       - sales-db
       - security-api
 
+  # Notification context
+  notification-email-api:
+    build: src/Server/src/Crnc.Oms.Notification/Crnc.Oms.Notification.Email/
+    restart: always
+    ports:
+      - "8104:80"
+
+  notification-push-api:
+    build: src/Server/src/Crnc.Oms.Notification/Crnc.Oms.Notification.Push/
+    restart: always
+    ports:
+      - "8107:80"
+  
+  notification-gateway-api:
+    build: src/Server/src/Crnc.Oms.Notification/Crnc.Oms.Notification.Gateway/
+    restart: always
+    ports:
+      - "8100:80"
+    environment:
+      - "IntegrationEndpoints:EmailNotificationServiceEndpoint=http://notification-email-api"
+      - "IntegrationEndpoints:PushNotificationServiceEndpoint=http://notification-push-api"
+    depends_on: 
+      - notification-email-api
+      - notification-push-api
+
   # UI
   crnc-oms-ui:
     build:

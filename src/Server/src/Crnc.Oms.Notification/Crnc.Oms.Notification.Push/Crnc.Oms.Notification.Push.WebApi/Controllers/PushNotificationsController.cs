@@ -20,7 +20,7 @@ namespace Crnc.Oms.Notification.Push.WebApi.Controllers
     /// </summary>
     [Produces("application/json")]
     [Route("api/[controller]")]
-    [AllowAnonymous]
+    [Authorize]
     public class PushNotificationsController : ControllerBase
     {
         private readonly IPushNotificationService _pushNotificationService;
