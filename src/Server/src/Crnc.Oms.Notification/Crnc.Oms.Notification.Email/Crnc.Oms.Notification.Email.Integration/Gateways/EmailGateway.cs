@@ -19,7 +19,7 @@ namespace Crnc.Oms.Notifiation.Gateway.Integration.Gateways
 
         public Task<EmailMessageOutputDto> SendEmailAsync(EmailMessageInputDto dto, CancellationToken cancellationToken = default)
         {
-            _logger.LogInformation($"Email sent with id {dto.MessageId}, sender : {dto.Sender} to receiver {dto.Receiver}");
+            _logger.LogInformation($"Email sent in EmailService with id {dto.MessageId}, sender : {dto.Sender} to receiver {dto.Receiver}, message: {dto.Message}");
 
             return Task.FromResult(new EmailMessageOutputDto()
             {
