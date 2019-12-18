@@ -16,12 +16,10 @@ namespace Crnc.Oms.Notification.Email.Application.Services
         : IEmailNotificationService
     {
         private readonly IEmailGateway _emailGateway;
-        private readonly ILogger<EmailNotificationService> _logger;
 
-        public EmailNotificationService(IEmailGateway emailGateway, ILogger<EmailNotificationService> logger)
+        public EmailNotificationService(IEmailGateway emailGateway)
         {
             _emailGateway = emailGateway;
-            _logger = logger;
         }
         
         public async Task<SendEmailMessageOutputDto> SendAsync(SendEmailMessageInputDto dto, CancellationToken cancellationToken = default)
