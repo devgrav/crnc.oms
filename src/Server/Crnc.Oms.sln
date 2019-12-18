@@ -37,7 +37,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Notification.Email
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Notification.Email.Application", "src\Crnc.Oms.Notification\Crnc.Oms.Notification.Email\Crnc.Oms.Notification.Email.Application\Crnc.Oms.Notification.Email.Application.csproj", "{DD28BDB2-F607-4D98-A9E8-7AA45A2EB304}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Notifiation.Gateway.Integration", "src\Crnc.Oms.Notification\Crnc.Oms.Notification.Gateway\Crnc.Oms.Notifiation.Gateway.Integration\Crnc.Oms.Notifiation.Gateway.Integration.csproj", "{6B14FB02-CDB1-4D5C-8734-A5C86595CCBA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Notification.Gateway.Integration", "src\Crnc.Oms.Notification\Crnc.Oms.Notification.Gateway\Crnc.Oms.Notification.Gateway.Integration\Crnc.Oms.Notification.Gateway.Integration.csproj", "{6B14FB02-CDB1-4D5C-8734-A5C86595CCBA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Notification.Gateway.Application", "src\Crnc.Oms.Notification\Crnc.Oms.Notification.Gateway\Crnc.Oms.Notification.Gateway.Application\Crnc.Oms.Notification.Gateway.Application.csproj", "{498313BF-E7A3-47B0-A3C4-C00FE58473D0}"
 EndProject

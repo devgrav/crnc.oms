@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Crnc.Oms.Notifiation.Gateway.Integration\Crnc.Oms.Notifiation.Gateway.Integration.csproj" />
       <ProjectReference Include="..\Crnc.Oms.Notification.Gateway.Application\Crnc.Oms.Notification.Gateway.Application.csproj" />
+      <ProjectReference Include="..\Crnc.Oms.Notification.Gateway.Integration\Crnc.Oms.Notification.Gateway.Integration.csproj" />
     </ItemGroup>
 
     <ItemGroup>
