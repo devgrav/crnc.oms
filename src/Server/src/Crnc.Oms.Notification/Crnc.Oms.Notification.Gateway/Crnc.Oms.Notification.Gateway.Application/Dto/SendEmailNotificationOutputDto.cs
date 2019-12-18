@@ -2,7 +2,7 @@
 
 namespace Crnc.Oms.Notification.Gateway.Application.Dto
 {
-    public class SendNotificationMessageOutputDto
+    public class SendEmailNotificationOutputDto
     {
         public Guid MessageId { get; set; }
     }

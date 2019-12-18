@@ -1,10 +1,10 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Crnc.Oms.Notifiation.Gateway.Integration.Gateways.Abstractions;
-using Crnc.Oms.Notifiation.Gateway.Integration.Gateways.Dto;
+using Crnc.Oms.Notification.Gateway.Integration.Dto;
+using Crnc.Oms.Notification.Gateway.Integration.Gateways.Abstractions;
 using Microsoft.Extensions.Logging;
 
-namespace Crnc.Oms.Notifiation.Gateway.Integration.Gateways
+namespace Crnc.Oms.Notification.Gateway.Integration.Gateways
 {
     public class PushGateway
         : IPushGateway
@@ -18,7 +18,7 @@ namespace Crnc.Oms.Notifiation.Gateway.Integration.Gateways
         
         public Task<SendPushOutputDto> SendPushAsync(SendPushInputDto dto, CancellationToken cancellationToken = default)
         {
-            _logger.LogInformation($"Push sent with id {dto.MessageId}, sender : {dto.Sender}");
+            _logger.LogInformation($"Push sent from gateway with id {dto.MessageId}, receiver id : {dto.ReceiverUserId}");
 
             return Task.FromResult(new SendPushOutputDto()
             {

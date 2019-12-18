@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using Crnc.Oms.Notification.Email.Application.Dto;
+using Crnc.Oms.Notification.Email.Integration.Dto;
 
 namespace Crnc.Oms.Notification.Email.WebApi.Models
 {

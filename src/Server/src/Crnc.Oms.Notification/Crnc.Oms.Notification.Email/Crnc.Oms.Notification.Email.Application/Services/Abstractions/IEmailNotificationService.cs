@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Crnc.Oms.Notification.Email.Application.Dto;
+using Crnc.Oms.Notification.Email.Integration.Dto;
 
 namespace Crnc.Oms.Notification.Email.Application.Services.Abstractions
 {

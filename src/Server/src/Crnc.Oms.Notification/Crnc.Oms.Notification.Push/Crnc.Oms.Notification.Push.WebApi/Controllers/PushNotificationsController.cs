@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Crnc.Oms.Notifiation.Gateway.Integration.Gateways.Dto;
+using Crnc.Oms.Notification.Gateway.Integration.Dto;
 using Crnc.Oms.Notification.Push.Application.Dto;
 using Crnc.Oms.Notification.Push.Application.Services.Abstractions;
 using Microsoft.AspNetCore.Authorization;
