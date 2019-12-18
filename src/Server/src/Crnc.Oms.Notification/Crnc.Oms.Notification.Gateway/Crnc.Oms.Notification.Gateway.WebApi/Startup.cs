@@ -54,6 +54,7 @@ namespace Crnc.Oms.Notification.Gateway.WebApi
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IEmailGateway, EmailGateway>();
             services.AddScoped<IPushGateway, PushGateway>();
+            services.AddScoped<IUserInfoGateway, UserInfoGateway>();
 
             services.AddLogging();
             

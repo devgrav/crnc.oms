@@ -3,16 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Crnc.Oms.Notification.Gateway.Integration.Dto;
-using Crnc.Oms.Notification.Email.Integration.Dto;
+using Crnc.Oms.Notification.Email.Application.Dto;
 using Crnc.Oms.Notification.Email.Application.Services.Abstractions;
-using Crnc.Oms.Notification.Email.WebApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.Extensions.Logging;
-using NSwag.Annotations;
 
 namespace Crnc.Oms.Notification.Email.WebApi.Controllers
 {
@@ -39,25 +35,14 @@ namespace Crnc.Oms.Notification.Email.WebApi.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ModelStateDictionary), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Send([FromBody]SendEmailMessageInputModel messageInputModel, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> Send([FromBody]SendEmailMessageInputDto inputDto, CancellationToken cancellationToken = default)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var dto = new SendEmailMessageInputDto()
-            {
-                MessageId = messageInputModel.MessageId,
-                Message = messageInputModel.Message,
-                Receiver = messageInputModel.Receiver,
-                Sender = messageInputModel.Sender
-            };
-            
-            var sendResult = await _emailNotificationService.SendAsync(dto,cancellationToken);
+            var sendResult = await _emailNotificationService.SendAsync(inputDto,cancellationToken);
 
-            return Ok(new SendEmailMessageOutputModel()
-            {
-                MessageId = sendResult.MessageId
-            });
+            return Ok(sendResult);
         }
     }
 }

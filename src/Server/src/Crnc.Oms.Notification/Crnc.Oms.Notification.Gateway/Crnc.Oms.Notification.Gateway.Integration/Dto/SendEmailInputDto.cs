@@ -19,5 +19,10 @@ namespace Crnc.Oms.Notification.Gateway.Integration.Dto
             ReceiverEmail = receiverEmail;
             SenderEmail = "notifications@crnc.ru";
         }
+
+        public SendEmailInputDto()
+        {
+            
+        }
     }
 }

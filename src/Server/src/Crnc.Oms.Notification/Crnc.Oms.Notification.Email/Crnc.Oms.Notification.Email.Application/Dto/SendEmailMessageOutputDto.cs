@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Crnc.Oms.Notification.Email.Integration.Dto
+namespace Crnc.Oms.Notification.Email.Application.Dto
 {
     public class SendEmailMessageOutputDto
     {
