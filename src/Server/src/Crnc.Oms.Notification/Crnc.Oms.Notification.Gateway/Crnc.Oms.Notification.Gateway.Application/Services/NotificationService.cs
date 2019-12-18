@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Crnc.Oms.Notifiation.Gateway.Integration.Gateways;
-using Crnc.Oms.Notifiation.Gateway.Integration.Gateways.Abstractions;
-using Crnc.Oms.Notifiation.Gateway.Integration.Gateways.Dto;
+using Crnc.Oms.Notification.Gateway.Integration.Gateways;
+using Crnc.Oms.Notification.Gateway.Integration.Dto;
+using Crnc.Oms.Notification.Email.Integration.Dto;
 using Crnc.Oms.Notification.Gateway.Application.Dto;
 using Crnc.Oms.Notification.Gateway.Application.Services.Abstractions;
+using Crnc.Oms.Notification.Gateway.Integration.Gateways.Abstractions;
 using Microsoft.Extensions.Logging;
 
 namespace Crnc.Oms.Notification.Gateway.Application.Services
@@ -14,72 +16,58 @@ namespace Crnc.Oms.Notification.Gateway.Application.Services
         : INotificationService
     {
         private readonly IEmailGateway _emailGateway;
-        private readonly IPushGateway _pushGateway;
-        private readonly ILogger<NotificationService> _logger;
+        private readonly IPushGateway _pushGateway; 
+        private readonly IUserInfoGateway _userInfoGateway; 
 
-        public NotificationService(IEmailGateway emailGateway, IPushGateway pushGateway, ILogger<NotificationService> logger)
+        public NotificationService(IEmailGateway emailGateway, IPushGateway pushGateway, IUserInfoGateway userInfoGateway)
         {
             _emailGateway = emailGateway;
             _pushGateway = pushGateway;
-            _logger = logger;
+            _userInfoGateway = userInfoGateway;
         }
-        
-        public async Task<SendNotificationMessageOutputDto> SendAsync(SendNotificationMessageInputDto dto, CancellationToken cancellationToken = default)
+
+        public async Task<SendEmailNotificationOutputDto> SendToEmailChannelAsync(SendEmailNotificationInputDto dto, CancellationToken cancellationToken = default)
         {
-            if(dto == null)
-                throw new ArgumentNullException(nameof(dto));
-            
-            if(string.IsNullOrWhiteSpace(dto.Message))
-                throw new Exception($"Empty {nameof(dto.Message)}");
-            
-            if(string.IsNullOrWhiteSpace(dto.Receiver))
-                throw new Exception($"Empty {nameof(dto.Receiver)}");
-
             var messageId = Guid.NewGuid();
-            switch (dto.Channel)
-            {
-                case ChannelType.All:
-                    LogSending(dto, messageId);
-                    
-                    await _emailGateway.SendEmailAsync(new SendEmailInputDto(messageId,dto.Receiver, dto.Message), cancellationToken);
-                    await _pushGateway.SendPushAsync(new SendPushInputDto(messageId, dto.Receiver, dto.Message), cancellationToken);
-                    
-                    LogSent(dto, messageId);
-                    break;
-                case ChannelType.Email:
-                    LogSending(dto, messageId);
-                    
-                    await _emailGateway.SendEmailAsync(new SendEmailInputDto(messageId, dto.Receiver, dto.Message),cancellationToken);
-                    
-                    LogSent(dto, messageId);
-                    break;
-                case ChannelType.Push:
-                    LogSending(dto, messageId);
-                    
-                    await _pushGateway.SendPushAsync(new SendPushInputDto(messageId, dto.Receiver, dto.Message), cancellationToken);
-                    
-                    LogSent(dto, messageId);
-                    break;
-                default:
-                    throw new InvalidOperationException("Not valid channel");
-            }
+            await _emailGateway.SendEmailAsync(new SendEmailInputDto(messageId, dto.ReceiverEmail, dto.Message), cancellationToken);
 
-            return new SendNotificationMessageOutputDto()
+            return new SendEmailNotificationOutputDto()
             {
                 MessageId = messageId
             };
         }
 
-        private void LogSending(SendNotificationMessageInputDto dto, Guid messageId)
+        public async Task<SendPushNotificationOutputDto> SendToPushChannelAsync(SendPushNotificationInputDto dto, CancellationToken cancellationToken = default)
         {
-            _logger.LogInformation($"Message is sending  to channel: {dto.Channel} with id {messageId}. " +
-                                   $"{nameof(dto.Receiver)}: {dto.Receiver}; {nameof(dto.Message)}: {dto.Message};");
+            var messageId = Guid.NewGuid();
+            await _pushGateway.SendPushAsync(new SendPushInputDto(messageId, dto.ReceiverUserId, dto.Message),cancellationToken);
+
+            return new SendPushNotificationOutputDto()
+            {
+                MessageId = messageId
+            };
         }
-        
-        private void LogSent(SendNotificationMessageInputDto dto, Guid messageId)
+
+        public async Task<SendAllChannelsNotificationOutputDto> SendToAllChannelsAsync(SendAllChannelsNotificationInputDto dto, CancellationToken cancellationToken = default)
         {
-            _logger.LogInformation($"Message sent to channel: {dto.Channel} with id {messageId}. " +
-                                   $"{nameof(dto.Receiver)}: {dto.Receiver}; {nameof(dto.Message)}: {dto.Message};");
+            var messageId = Guid.NewGuid();
+            
+            //Get email by user id
+            var userInfo = await _userInfoGateway.GetUserInfoAsync(new GetUserInfoInputDto()
+            {
+                UserId = dto.ReceiverUserId
+            });
+            
+            if(userInfo == null)
+                throw new ArgumentNullException("Could not get user info for all channels notification");
+
+            await _emailGateway.SendEmailAsync(new SendEmailInputDto(messageId,userInfo.Email, dto.Message), cancellationToken);
+            await _pushGateway.SendPushAsync(new SendPushInputDto(messageId, dto.ReceiverUserId, dto.Message), cancellationToken);
+
+            return new SendAllChannelsNotificationOutputDto()
+            {
+                MessageId = messageId
+            };
         }
     }
 }

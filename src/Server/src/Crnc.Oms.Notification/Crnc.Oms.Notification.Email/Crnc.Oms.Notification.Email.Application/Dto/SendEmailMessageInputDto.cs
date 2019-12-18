@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Crnc.Oms.Notification.Email.Application.Dto
+namespace Crnc.Oms.Notification.Email.Integration.Dto
 {
     public class SendEmailMessageInputDto
     {

@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using Crnc.Oms.Notifiation.Gateway.Integration.Gateways;
-using Crnc.Oms.Notifiation.Gateway.Integration.Gateways.Abstractions;
-using Crnc.Oms.Notifiation.Gateway.WebApi.Authorization;
+using Crnc.Oms.Notification.Gateway.Integration.Gateways;
+using Crnc.Oms.Notification.Gateway.Integration.Gateways.Abstractions;
+using Crnc.Oms.Notification.Gateway.WebApi.Authorization;
 using Crnc.Oms.Notification.Gateway.Application.Services;
 using Crnc.Oms.Notification.Gateway.Application.Services.Abstractions;
+using Crnc.Oms.Notification.Gateway.Integration.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -57,6 +58,7 @@ namespace Crnc.Oms.Notification.Gateway.WebApi
             services.AddLogging();
             
             services.Configure<AuthSettings>(Configuration.GetSection("Auth"));
+            services.Configure<IntegrationEndpointSettings>(Configuration.GetSection("IntegrationEndpoints"));
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>

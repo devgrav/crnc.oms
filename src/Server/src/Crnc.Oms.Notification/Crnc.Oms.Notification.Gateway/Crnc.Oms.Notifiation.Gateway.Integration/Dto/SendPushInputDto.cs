@@ -1,16 +1,17 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
-namespace Crnc.Oms.Notifiation.Gateway.Integration.Gateways.Dto
+namespace Crnc.Oms.Notification.Gateway.Integration.Dto
 {
-    public class PushMessageInputDto
-    {
+    public class SendPushInputDto
+    { 
         public Guid MessageId { get; set; }
 
         public Guid ReceiverUserId { get; set; }
 
         public string Message { get; set; }
 
-        public PushMessageInputDto(Guid? messageId, Guid receiverUserId, string message)
+        public SendPushInputDto(Guid? messageId, Guid receiverUserId, string message)
         {
             MessageId = messageId ?? Guid.NewGuid();
             ReceiverUserId = receiverUserId;

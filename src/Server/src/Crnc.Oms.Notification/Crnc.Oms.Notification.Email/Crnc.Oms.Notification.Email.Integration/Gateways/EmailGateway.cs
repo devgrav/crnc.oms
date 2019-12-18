@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Crnc.Oms.Notifiation.Gateway.Integration.Gateways.Abstractions;
-using Crnc.Oms.Notifiation.Gateway.Integration.Gateways.Dto;
+using Crnc.Oms.Notification.Gateway.Integration.Dto;
+using Crnc.Oms.Notification.Gateway.Integration.Gateways.Abstractions;
 using Microsoft.Extensions.Logging;
 
-namespace Crnc.Oms.Notifiation.Gateway.Integration.Gateways
+namespace Crnc.Oms.Notification.Gateway.Integration.Gateways
 {
     public class EmailGateway
         : IEmailGateway

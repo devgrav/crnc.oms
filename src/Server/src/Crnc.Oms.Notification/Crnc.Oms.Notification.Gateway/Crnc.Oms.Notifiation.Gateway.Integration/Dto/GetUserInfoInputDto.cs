@@ -2,8 +2,8 @@
 
 namespace Crnc.Oms.Notification.Email.Integration.Dto
 {
-    public class SendEmailMessageOutputDto
+    public class GetUserInfoInputDto
     {
-        public Guid MessageId { get; set; }
+        public Guid UserId { get; set; }
     }
 }

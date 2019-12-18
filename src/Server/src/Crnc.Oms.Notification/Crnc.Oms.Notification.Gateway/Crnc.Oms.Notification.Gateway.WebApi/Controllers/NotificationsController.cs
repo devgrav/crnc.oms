@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Crnc.Oms.Notification.Gateway.Application.Dto;
 using Crnc.Oms.Notification.Gateway.Application.Services.Abstractions;
-using Crnc.Oms.Notification.Gateway.WebApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -30,29 +29,57 @@ namespace Crnc.Oms.Notification.Gateway.WebApi.Controllers
         }
 
         /// <summary>
-        /// Send notification
+        /// Send email notification
         /// </summary>
-        /// <response code="200">Notification sent to channel</response>
+        /// <response code="200">Notification sent to email channel</response>
         /// <response code="400">Sending data is not valid.</response>
-        [HttpPost]
+        [HttpPost("email")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ModelStateDictionary), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Send([FromBody]SendNotificationMessageInputModel inputModel)
+        public async Task<IActionResult> SendEmail([FromBody]SendEmailNotificationInputDto inputDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var sendResult = await _notificationService.SendToEmailChannelAsync(inputDto);
+
+            return Ok(sendResult);
+        }
+        
+        /// <summary>
+        /// Send push
+        /// </summary>
+        /// <response code="200">Notification sent to push channel</response>
+        /// <response code="400">Sending data is not valid.</response>
+        [HttpPost("push")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ModelStateDictionary), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> SendPush([FromBody]SendPushNotificationInputDto inputDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var sendResult = await _notificationService.SendToPushChannelAsync(inputDto);
+
+            return Ok();
+        }
+        
+        /// <summary>
+        /// Send notification
+        /// </summary>
+        /// <response code="200">Notification sent to all channels</response>
+        /// <response code="400">Sending data is not valid.</response>
+        [HttpPost("allChannels")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ModelStateDictionary), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> SendToAllChannels([FromBody]SendAllChannelsNotificationInputDto inputDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             
-            var sendResult = await _notificationService.SendAsync(new SendNotificationMessageInputDto()
-            {
-                Channel = inputModel.Channel,
-                Message = inputModel.Message,
-                Receiver = inputModel.Receiver
-            });
+            var sendResult = await _notificationService.SendToAllChannelsAsync(inputDto);
 
-            return Ok(new SendNotificationOutputModel()
-            {
-                MessageId = sendResult.MessageId
-            });
+            return Ok(sendResult);
         }
     }
 }

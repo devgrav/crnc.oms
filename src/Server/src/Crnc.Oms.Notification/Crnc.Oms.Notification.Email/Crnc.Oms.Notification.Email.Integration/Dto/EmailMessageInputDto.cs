@@ -1,22 +1,23 @@
 ﻿using System;
 
-namespace Crnc.Oms.Notifiation.Gateway.Integration.Gateways.Dto
+namespace Crnc.Oms.Notification.Gateway.Integration.Dto
 {
-    public class SendEmailInputDto
+    public class EmailMessageInputDto
     {
         public Guid MessageId { get; set; }
+        
         public string Sender { get; set; }
 
         public string Receiver { get; set; }
 
         public string Message { get; set; }
 
-        public SendEmailInputDto(Guid messageId, string receiver, string message)
+        public EmailMessageInputDto(Guid? messageId, string sender, string receiver, string message)
         {
-            MessageId = messageId;
+            MessageId = messageId ?? Guid.NewGuid();
             Message = message;
             Receiver = receiver;
-            Sender = "notifications@crnc.ru";
+            Sender = sender;
         }
     }
 }
