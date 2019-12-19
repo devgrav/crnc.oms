@@ -44,6 +44,7 @@ namespace Crnc.Oms.Sales.WebApi.Controllers
         /// </summary>
         /// <remarks>Returns orders for table</remarks>
         /// <response code="200">Returned orders</response>
+        [HttpGet()]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<GetOrdersForTableOutputDto> Get(GetOrdersForTableInputDto dto, CancellationToken  cancellationToken = default)
         {
@@ -56,13 +57,17 @@ namespace Crnc.Oms.Sales.WebApi.Controllers
         /// <remarks>Returns orders for table</remarks>
         /// <response code="200">Returned orders</response>
         /// <response code="401">Not found</response>
+        [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Get(GetOrderInputDto dto, CancellationToken  cancellationToken = default)
+        public async Task<IActionResult> Get(Guid id, CancellationToken  cancellationToken = default)
         {
             try
             {
-                return Ok(await _getOrderQueryHandler.HandleAsync(dto,cancellationToken));
+                return Ok(await _getOrderQueryHandler.HandleAsync(new GetOrderInputDto()
+                {
+                    Id =  id
+                },cancellationToken));
             }
             catch (MissingEntityException)
             {
