@@ -81,13 +81,6 @@ namespace Crnc.Oms.Notification.Push.WebApi
                 options.Title = "Crnc Oms Push Notification API Doc";
                 //Version in header of api
                 options.Version = "1.0";
-                options.AddSecurity("JWT", Enumerable.Empty<string>(), new OpenApiSecurityScheme
-                {
-                    Type = OpenApiSecuritySchemeType.ApiKey,
-                    Name = "Authorization",
-                    In = OpenApiSecurityApiKeyLocation.Header,
-                    Description = "Please insert JWT with Bearer into field"
-                });
             });
         }
 
