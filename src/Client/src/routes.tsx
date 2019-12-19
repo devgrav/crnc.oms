@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Route, Switch, RouteProps, Redirect } from "react-router";
 import OrdersGrid from "./components/orders/OrdersGrid";
-import JobsGrid from "./components/jobs/JobsGrid";
 import NotFound from "./components/notFound/NotFound";;
 import UserCards from "./components/users/UserCards";
 import OrderEdit from "./components/orders/OrderEdit";
@@ -18,8 +17,7 @@ const Routes: React.StatelessComponent = () => {
             <PrivateRoute roles={[Roles.Admin]} path="/users/:id" component={UserCards}/>
             <PrivateRoute roles={[Roles.Admin]} path="/users" component={UserCards}/>
             <PrivateRoute roles={[Roles.MainManager, Roles.Manager]} path="/orders/:id" component={OrderEdit}/>
-            <PrivateRoute roles={[Roles.MainManager, Roles.Manager]} path="/orders" component={OrdersGrid}/>
-            <PrivateRoute roles={[Roles.MainManager, Roles.Manager]} path="/jobs" component={JobsGrid}/>            
+            <PrivateRoute roles={[Roles.MainManager, Roles.Manager]} path="/orders" component={OrdersGrid}/>   
             <Route path="/login" component={Login}/>
             <Route component={NotFound}/>
         </Switch>
