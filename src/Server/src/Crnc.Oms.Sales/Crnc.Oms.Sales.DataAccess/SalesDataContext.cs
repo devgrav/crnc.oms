@@ -1,7 +1,6 @@
 using System;
 using Crnc.Oms.Sales.DataAccess.Mappings;
-using Crnc.Oms.Sales.Domain.Aggregates.Customers;
-using Crnc.Oms.Sales.Domain.Aggregates.Orders;
+using Crnc.Oms.Sales.Domain.Aggregates.Order;
 using Microsoft.EntityFrameworkCore;
 
 namespace Crnc.Oms.Sales.DataAccess
@@ -13,11 +12,6 @@ namespace Crnc.Oms.Sales.DataAccess
     : DbContext
     {
         /// <summary>
-        /// Customers aggregates set
-        /// </summary>
-        public DbSet<Customer> Customers { get; set; }
-
-        /// <summary>
         /// Orders aggregates set
         /// </summary>
         public DbSet<Order> Orders { get; set; }
@@ -26,7 +20,6 @@ namespace Crnc.Oms.Sales.DataAccess
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfiguration(new OrderMappingConfiguration());
-            modelBuilder.ApplyConfiguration(new CustomerMappingConfiguration());
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
