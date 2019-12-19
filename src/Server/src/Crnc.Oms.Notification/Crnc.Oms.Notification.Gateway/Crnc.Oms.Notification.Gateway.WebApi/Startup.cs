@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 using Crnc.Oms.Notification.Gateway.Integration.Gateways;
@@ -8,14 +9,17 @@ using Crnc.Oms.Notification.Gateway.Integration.Gateways.Abstractions;
 using Crnc.Oms.Notification.Gateway.WebApi.Authorization;
 using Crnc.Oms.Notification.Gateway.Application.Services;
 using Crnc.Oms.Notification.Gateway.Application.Services.Abstractions;
+using Crnc.Oms.Notification.Gateway.Integration;
 using Crnc.Oms.Notification.Gateway.Integration.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -55,7 +59,10 @@ namespace Crnc.Oms.Notification.Gateway.WebApi
             services.AddScoped<IEmailGateway, EmailGateway>();
             services.AddScoped<IPushGateway, PushGateway>();
             services.AddScoped<IUserInfoGateway, UserInfoGateway>();
+            services.AddScoped<ICurrentUserContext, CurrentUserContext>();
 
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            
             services.AddLogging();
             
             services.Configure<AuthSettings>(Configuration.GetSection("Auth"));
@@ -66,7 +73,6 @@ namespace Crnc.Oms.Notification.Gateway.WebApi
                 {
                     var authSettings = new AuthSettings();
                     Configuration.GetSection("Auth").Bind(authSettings);
-
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,

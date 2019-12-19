@@ -17,7 +17,7 @@ namespace Crnc.Oms.Notification.Email.WebApi.Controllers
     /// </summary>
     [Produces("application/json")]
     [Route("api/[controller]")]
-    [Authorize]
+    [AllowAnonymous]
     public class EmailNotificationsController : ControllerBase
     {
         private readonly IEmailNotificationService _emailNotificationService;
