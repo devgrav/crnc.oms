@@ -4,8 +4,14 @@ using System.ComponentModel.DataAnnotations;
 namespace Crnc.Oms.Notification.Gateway.Application.Dto
 {
     ///<summary>
-    /// Sending notification data
+    /// Notification data
     /// </summary>
+    /// <example>
+    ///{
+    ///     "receiverEmail": "some@email.ru",
+    ///     "message": "Some message"
+    ///}
+    /// </example>
     public class SendEmailNotificationInputDto
     {
         [Required]

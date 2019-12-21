@@ -30,7 +30,7 @@ namespace Crnc.Oms.Notification.Gateway.Integration.Gateways
 
         public async Task<SendEmailOutputDto> SendEmailAsync(SendEmailInputDto dto, CancellationToken cancellationToken = default)
         {
-            _logger.LogInformation($"Email is sending with id {dto.MessageId}; sender : {dto.SenderEmail}; receiver: {dto.ReceiverEmail}");
+            _logger.LogInformation($"Email is sending from gateway with id {dto.MessageId}; senderEmail : {dto.SenderEmail}; receiverEmail: {dto.ReceiverEmail}");
             
             var request = new RestRequest("/api/emailNotifications", DataFormat.Json);
             request.Method = Method.POST;
@@ -55,7 +55,7 @@ namespace Crnc.Oms.Notification.Gateway.Integration.Gateways
                 throw exception;
             }
 
-            _logger.LogInformation($"Email sent with id {dto.MessageId}; sender : {dto.SenderEmail}; receiver: {dto.ReceiverEmail}");
+            _logger.LogInformation($"Email sent from gateway with id {dto.MessageId}; senderEmail : {dto.SenderEmail}; receiverEmail: {dto.ReceiverEmail}");
 
             return response.Data;
         }
