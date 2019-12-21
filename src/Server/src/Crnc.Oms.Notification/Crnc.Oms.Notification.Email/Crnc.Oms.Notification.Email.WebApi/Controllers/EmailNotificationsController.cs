@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 namespace Crnc.Oms.Notification.Email.WebApi.Controllers
 {
     /// <summary>
-    /// Management of notifications 
+    /// Management of email notifications 
     /// </summary>
     [Produces("application/json")]
     [Route("api/[controller]")]
