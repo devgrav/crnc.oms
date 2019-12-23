@@ -34,8 +34,8 @@
     "webpack-hot-middleware": "^2.21.0"
   },
   "scripts": {
-    "start": "webpack-dev-server",
-    "build": "webpack -p"
+    "start": "webpack-dev-server --env.NODE_ENV=development",
+    "build": "webpack -p --env.NODE_ENV=production"
   },
   "dependencies": {
     "axios": "^0.18.0",

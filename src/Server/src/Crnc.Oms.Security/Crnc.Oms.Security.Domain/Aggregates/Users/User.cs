@@ -211,10 +211,19 @@ namespace Crnc.Oms.Security.Domain.Aggregates.Users
         /// <summary>
         /// Change phone
         /// </summary>
-        /// <param name="phone">email</param>
+        /// <param name="phone">phone</param>
         public void ChangePhone(string phone)
         {
             Phone = phone;
+        }
+        
+        /// <summary>
+        /// Change role
+        /// </summary>
+        /// <param name="role">role</param>
+        public void ChangeRole(Role role)
+        {
+            Role = role;
         }
 
         /// <summary>
