@@ -3,6 +3,7 @@ import { Button, ButtonProps, Card, Divider, Form, Grid, Image, InputOnChangeDat
 import * as noAvatar from "../../assets/images/noavatar.png";
 import { UserItemDto, UserService } from "../../services/UserService";
 import { Guid } from "guid-typescript";
+import RoleSelect from "./RoleSelect";
 
 export default class UserCardEdit extends React.Component<UserCardEditProps, UserCardEditState>{
 
@@ -195,6 +196,12 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                         autoComplete="off"
                                     />
                                 </Form.Group>
+                                <RoleSelect
+                                    selectedRoleId={this.state.user.roleId}                                        
+                                    onChange={this.onChange}      
+                                    name="roleId"     
+                                    error={this.hasFieldValidationError("roleId")}
+                                />
                                 <Form.Group widths="equal">
                                     <Form.Input
                                         name="firstName"

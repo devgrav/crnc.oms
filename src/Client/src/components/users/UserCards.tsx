@@ -18,6 +18,7 @@ export default class UserCards extends React.Component<any, UserCardsState>{
 
         this.state = {
             users: [],
+            usersForShow: [],
             activePage: 1,
             isLoading: false,
             isRequiredRedirectToNotFound: false,
@@ -25,7 +26,7 @@ export default class UserCards extends React.Component<any, UserCardsState>{
             search: {
                 fullName: "",
                 login: "",
-                role: 0,
+                role: Guid.EMPTY,
                 isActive: true
             }
         };
@@ -59,11 +60,11 @@ export default class UserCards extends React.Component<any, UserCardsState>{
             users = users.filter((u) =>
                 u.roleId === this.state.search.role);
         }
-
+    
         users = users.filter((u) => u.isActive === this.state.search.isActive);
 
         this.setState({
-            users
+            usersForShow: users
         });
     }
 
@@ -73,10 +74,11 @@ export default class UserCards extends React.Component<any, UserCardsState>{
             search: {
                 fullName: "",
                 login: "",
-                role: 0,
+                role: Guid.EMPTY,
                 isActive: true
             },
-            users
+            users,
+            usersForShow: users
         });
     }
 
@@ -166,14 +168,17 @@ export default class UserCards extends React.Component<any, UserCardsState>{
     private async handleSave(): Promise<void> {
         const users = await this.getUsers();
         this.setState({
-            users
+            users,
+            usersForShow: users
         });
     }
 
     public async componentDidMount(): Promise<void>{
         const users = await this.getUsers();
         this.setState({
-            ...this.state, users
+            ...this.state, 
+            users,
+            usersForShow: users
         });
         this.handleEditedUserByRoute(this.props, users);
     }
@@ -246,7 +251,7 @@ export default class UserCards extends React.Component<any, UserCardsState>{
 
         const deletedUser = this.state.deletedUser ? this.state.deletedUser.fullName : "";
 
-        return (
+         return (
             <div>
                 <Segment loading={this.state.isLoading} basic>
                     <Confirm 
@@ -293,9 +298,11 @@ export default class UserCards extends React.Component<any, UserCardsState>{
                         />
                     </Button.Group>
                     <Card.Group>
-                        {this.getUsersPerPage(this.state.users,this.state.activePage).map((u) => {
-                            return <UserCardView key={u.id.toString()} userItem={u} onUserDelete={this.handleOpenDeleteConfirm}/>;
-                        })}
+                        {                            
+                            this.getUsersPerPage(this.state.usersForShow,this.state.activePage).map((u) => {
+                                return <UserCardView key={u.id.toString()} userItem={u} onUserDelete={this.handleOpenDeleteConfirm}/>;
+                            })
+                        }
                     </Card.Group>
                     {this.state.editedUser &&
                         <UserCardEdit
@@ -311,6 +318,7 @@ export default class UserCards extends React.Component<any, UserCardsState>{
 
 interface UserCardsState{
     users: UserItemDto[];
+    usersForShow: UserItemDto[];
     activePage: number;
     search: UserSearchDto;
     editedUser?: UserItemDto;

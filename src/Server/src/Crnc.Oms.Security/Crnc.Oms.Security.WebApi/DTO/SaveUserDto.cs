@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using Crnc.Oms.Security.WebApi.Validation;
 
 namespace Crnc.Oms.Security.WebApi.DTO
 {
@@ -64,12 +65,8 @@ namespace Crnc.Oms.Security.WebApi.DTO
         /// <summary>
         /// Id of user's role
         /// </summary>
+        [RequiredNotEmpty]
         public Guid RoleId { get; set; }
-
-        /// <summary>
-        /// Role name
-        /// </summary>
-        public string Role { get; set; }
 
         /// <summary>
         /// Photo in base64

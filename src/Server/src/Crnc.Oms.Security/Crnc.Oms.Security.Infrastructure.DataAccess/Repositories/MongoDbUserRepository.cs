@@ -106,6 +106,7 @@ namespace Crnc.Oms.Security.Infrastructure.DataAccess.Repositories
             currentUser.ChangeLastName(modifiedUser.LastName);
             currentUser.ChangePassword(modifiedUser.PasswordHash, modifiedUser.PasswordSalt);            
             currentUser.ChangePhoto(modifiedUser.Photo);
+            currentUser.ChangeRole(modifiedUser.Role);
 
             if (modifiedUser.IsActive)
                 currentUser.Activate();

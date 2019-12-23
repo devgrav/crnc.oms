@@ -43,7 +43,7 @@ export interface UserItemDto{
     password?: string;
     email?: string;
     phone?: string;
-    roleId?: number;
+    roleId?: string;
     role?: string;
     photoBase64?: string;
     photoMimeType?: string;
@@ -53,6 +53,6 @@ export interface UserItemDto{
 export interface UserSearchDto{
     fullName: string;
     login: string;
-    role: number;
+    role: string;
     isActive: boolean;
 }
