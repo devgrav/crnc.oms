@@ -49,7 +49,7 @@ export default class RoleSelect extends React.Component<RoleSelectProps, RoleSel
     }
 
     public render() {
-        const {onChange, name, error} = this.props;
+        const {onChange, name, error, className} = this.props;
         const {roles, isLoading} = this.state;
 
         let selectedRoleId = this.props.selectedRoleId;
@@ -66,6 +66,7 @@ export default class RoleSelect extends React.Component<RoleSelectProps, RoleSel
                 name={name}
                 label="Role"
                 error={error}
+                className = {className}
             />   
         );
     }
@@ -76,6 +77,7 @@ interface RoleSelectProps{
     name: string;    
     onChange(event: React.SyntheticEvent<HTMLElement>, data: any): void;
     error?: boolean;
+    className?: string;
 }
 
 interface RoleSelectState{

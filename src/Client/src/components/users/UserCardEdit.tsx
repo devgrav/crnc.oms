@@ -197,9 +197,10 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                     />
                                 </Form.Group>
                                 <RoleSelect
-                                    selectedRoleId={this.state.user.roleId}                                        
-                                    onChange={this.onChange}      
                                     name="roleId"     
+                                    className="required"
+                                    onChange={this.onChange}
+                                    selectedRoleId={this.state.user.roleId}                                                                            
                                     error={this.hasFieldValidationError("roleId")}
                                 />
                                 <Form.Group widths="equal">
