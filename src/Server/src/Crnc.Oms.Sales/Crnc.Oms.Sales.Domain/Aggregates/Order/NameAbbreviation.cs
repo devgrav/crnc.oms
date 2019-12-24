@@ -11,11 +11,13 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Order
             if(string.IsNullOrWhiteSpace(abbreviation))
                 throw new ArgumentNullException(nameof(abbreviation));
 
-            if (abbreviation.Length != 2)
-                throw new Exception("Name abbreviation must be 2 symbols");
+            if (!IsNameAbbreviationValid(abbreviation))
+                throw new Exception("Name abbreviation is not valid");
 
             Value = abbreviation;
         }
+
+        public static bool IsNameAbbreviationValid(string abbreviation) => abbreviation.Length == 2;
 
         protected NameAbbreviation()
         {

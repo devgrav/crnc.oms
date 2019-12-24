@@ -7,8 +7,12 @@ using Crnc.Oms.Sales.Domain.SeedWork;
 using Crnc.Oms.Sales.Application;
 using Crnc.Oms.Sales.Application.Features.Orders.Commands;
 using Crnc.Oms.Sales.Application.Features.Orders.Dto;
+using Crnc.Oms.Sales.Application.Features.Orders.Dto.Input;
+using Crnc.Oms.Sales.Application.Features.Orders.Dto.Output;
 using Crnc.Oms.Sales.Application.Features.Orders.Queries;
 using Crnc.Oms.Sales.DataAccess;
+using Crnc.Oms.Sales.DataAccess.Repositories;
+using Crnc.Oms.Sales.Domain.Repositories;
 using Crnc.Oms.Sales.WebApi.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -60,8 +64,10 @@ namespace Crnc.Oms.Sales.WebApi
             services.AddScoped<IUseCaseQueryHandler<GetNewOrderInputDto, GetNewOrderOutputDto>,GetNewOrder>();
             
             services.AddScoped<IUseCaseQueryHandler<GetOrderInputDto, GetOrderOutputDto>,GetOrder>();
-            services.AddScoped<IUseCaseCommandHandler<CreateOrderInputDto>,CreateOrder>();
-            services.AddScoped<IUseCaseCommandHandler<EditOrderInputDto>,EditOrder>();
+            services.AddScoped<IUseCaseCommandHandler<CreateOrderInputDto, CreateOrderOutputDto>,CreateOrder>();
+            services.AddScoped<IUseCaseCommandHandler<EditOrderInputDto, EmptyOutputDto> ,EditOrder>();
+
+            services.AddScoped<IOrderRepository, OrderRepository>();
 
             services.AddSingleton<ICurrentDateTimeProvider, CurrentDateTimeProvider>();
             

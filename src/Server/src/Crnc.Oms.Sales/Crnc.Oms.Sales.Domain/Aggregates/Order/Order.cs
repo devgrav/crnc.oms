@@ -72,6 +72,7 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Order
             SignoffType? signoffType, Customer customer)
         {
             JobType = jobType;
+            JobDescription = jobDescription;
             MaterialSource = materialSource;
             SignOffType = signoffType;
             Customer = customer;

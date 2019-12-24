@@ -1,10 +1,12 @@
 ﻿using System;
+using Crnc.Oms.Sales.Application.Features.Orders.Dto.Output;
 using Crnc.Oms.Sales.Domain.Aggregates.Order;
+using Crnc.Oms.Sales.WebApi.Validation;
 
-namespace Crnc.Oms.Sales.Application.Features.Orders.Dto
+namespace Crnc.Oms.Sales.Application.Features.Orders.Dto.Input
 {
     public class EditOrderInputDto
-        : IUseCaseCommand
+        : IUseCaseCommand<EmptyOutputDto>
     {
         public Guid Id { get; set; }
 
@@ -24,10 +26,13 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Dto
         
         public string LastName { get; set; }
         
+        [NameAbbreviationValueObject]
         public string Abbreviation { get; set; }
         
+        [EmailValueObject]
         public string Email { get; set; }
         
+        [PhoneValueObject]
         public string Phone { get; set; }
     }
 }
