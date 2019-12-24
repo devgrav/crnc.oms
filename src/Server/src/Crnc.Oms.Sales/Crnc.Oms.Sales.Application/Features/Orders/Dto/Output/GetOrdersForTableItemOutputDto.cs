@@ -1,7 +1,7 @@
 using System;
 using Crnc.Oms.Sales.Domain.Aggregates.Order;
 
-namespace Crnc.Oms.Sales.Application.Features.Orders.Dto
+namespace Crnc.Oms.Sales.Application.Features.Orders.Dto.Output
 {
     public class GetOrdersForTableItemOutputDto
     {

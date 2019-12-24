@@ -3,13 +3,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using Crnc.Oms.Sales.Application.Exceptions;
 using Crnc.Oms.Sales.Application.Features.Orders.Dto;
+using Crnc.Oms.Sales.Application.Features.Orders.Dto.Input;
+using Crnc.Oms.Sales.Application.Features.Orders.Dto.Output;
 using Crnc.Oms.Sales.Domain.Aggregates.Order;
 using Crnc.Oms.Sales.Domain.Repositories;
 
 namespace Crnc.Oms.Sales.Application.Features.Orders.Commands
 {
     public class EditOrder
-        : IUseCaseCommandHandler<EditOrderInputDto>
+        : IUseCaseCommandHandler<EditOrderInputDto, EmptyOutputDto>
     {
         private readonly IOrderRepository _orderRepository;
 
@@ -18,7 +20,7 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Commands
             _orderRepository = orderRepository;
         }
         
-        public async Task HandleAsync(EditOrderInputDto command, CancellationToken cancellationToken = default)
+        public async Task<EmptyOutputDto> HandleAsync(EditOrderInputDto command, CancellationToken cancellationToken = default)
         {
             if(command == null)
                 throw new ArgumentNullException(nameof(command));
@@ -48,6 +50,8 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Commands
             order.ChangeStatus(command.Status);
 
             await _orderRepository.SaveChangesAsync(cancellationToken);
+            
+            return new EmptyOutputDto();
         }
     }
 }

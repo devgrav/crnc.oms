@@ -2,6 +2,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Crnc.Oms.Sales.Application.Features.Orders.Dto;
+using Crnc.Oms.Sales.Application.Features.Orders.Dto.Input;
+using Crnc.Oms.Sales.Application.Features.Orders.Dto.Output;
 using Crnc.Oms.Sales.Domain.Aggregates.Order;
 using Crnc.Oms.Sales.Domain.Repositories;
 using Crnc.Oms.Sales.Domain.SeedWork;
@@ -9,7 +11,7 @@ using Crnc.Oms.Sales.Domain.SeedWork;
 namespace Crnc.Oms.Sales.Application.Features.Orders.Commands
 {
     public class CreateOrder
-        : IUseCaseCommandHandler<CreateOrderInputDto>
+        : IUseCaseCommandHandler<CreateOrderInputDto, CreateOrderOutputDto>
     {
         private readonly IOrderRepository _orderRepository;
         private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
@@ -20,7 +22,7 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Commands
             _currentDateTimeProvider = currentDateTimeProvider;
         }
         
-        public async Task HandleAsync(CreateOrderInputDto command, CancellationToken cancellationToken = default)
+        public async Task<CreateOrderOutputDto> HandleAsync(CreateOrderInputDto command, CancellationToken cancellationToken = default)
         {
             if(command == null)
                 throw new ArgumentNullException(nameof(command));
@@ -46,6 +48,11 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Commands
             _orderRepository.Add(order);
 
             await _orderRepository.SaveChangesAsync(cancellationToken);
+
+            return new CreateOrderOutputDto()
+            {
+                Id = order.Id
+            };
         }
     }
 }
