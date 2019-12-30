@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Crnc.Oms.Sales.Application.Exceptions;
+using Crnc.Oms.Sales.Application.Factories;
 using Crnc.Oms.Sales.Application.Features.Orders.Dto;
 using Crnc.Oms.Sales.Application.Features.Orders.Dto.Input;
 using Crnc.Oms.Sales.Application.Features.Orders.Dto.Output;
@@ -29,23 +30,8 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Commands
             
             if(order == null)
                 throw new MissingEntityException("Order not found");
-            
-            var customer = new Customer(new FullName
-                (
-                    command.FirstName,
-                    command.LastName,
-                    command.MiddleName
-                ),
-                new NameAbbreviation(command.Abbreviation), 
-                new Email(command.Email),
-                new Phone(command.Phone)
-            );
-            
-            order.Edit(command.JobType, 
-                command.JobDescription, 
-                command.MaterialSource, 
-                command.SignOffType, 
-                customer);
+
+            order = OrderMapper.MapExistedOrder(order, command);
             
             order.ChangeStatus(command.Status);
 

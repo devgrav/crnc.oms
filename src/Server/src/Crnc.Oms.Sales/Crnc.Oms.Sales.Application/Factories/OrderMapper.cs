@@ -5,17 +5,17 @@ using Crnc.Oms.Sales.Domain.SeedWork;
 
 namespace Crnc.Oms.Sales.Application.Factories
 {
-    public static class OrderFactory
+    public static class OrderMapper
     {
-        public static Order CreateNewOrder(CreateOrderInputDto dto, ICurrentDateTimeProvider currentDateTimeProvider)
+        public static Order MapNewOrder(CreateOrderInputDto dto, ICurrentDateTimeProvider currentDateTimeProvider)
         {
             var customer = new Customer(
                 new Title(dto.CustomerTitle, 
                     new NameAbbreviation(dto.CustomerAbbreviation)), 
                 new ContactPerson(new FullName(
-                        dto.CustomerFirstName,
-                        dto.CustomerLastName,
-                        dto.CustomerMiddleName), 
+                        dto.CustomerContactPersonFirstName,
+                        dto.CustomerContactPersonLastName,
+                        dto.CustomerContactPersonMiddleName), 
                     new Email(dto.CustomerContactPersonEmail),
                     new Phone(dto.CustomerContactPersonPhone)));
 
@@ -23,13 +23,13 @@ namespace Crnc.Oms.Sales.Application.Factories
                 Guid.NewGuid(), 
                 currentDateTimeProvider.GetNow(), 
                 dto.JobType, 
-                dto.JobDescription, 
+                dto.JobDescription,
                 customer);
 
             return order;
         }
         
-        public static Order CreateExistedOrder(Order order, EditOrderInputDto dto)
+        public static Order MapExistedOrder(Order order, EditOrderInputDto dto)
         {
             var customer = new Customer(
                 new Title(dto.CustomerTitle, 

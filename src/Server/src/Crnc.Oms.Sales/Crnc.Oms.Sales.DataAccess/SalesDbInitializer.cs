@@ -10,11 +10,13 @@ namespace Crnc.Oms.Sales.DataAccess
             dbContext.Database.EnsureDeleted();
             dbContext.Database.EnsureCreated();
 
-            var customer = new Customer( 
-                new FullName("John", "Galt"),
-                new NameAbbreviation("JG"), 
-                new Email("some@mail.ru"),
-                new Phone("+79153423345"));
+            var customer = new Customer(
+                new Title("Amazing Sales Company", 
+                    new NameAbbreviation("AS")), 
+                new ContactPerson(
+                    new FullName("John", "Galt"), 
+                    new Email("some@mail.ru"), 
+                    new Phone("+79153423345")));
             
             dbContext.Orders.Add(new Order(
                 Guid.NewGuid(), 

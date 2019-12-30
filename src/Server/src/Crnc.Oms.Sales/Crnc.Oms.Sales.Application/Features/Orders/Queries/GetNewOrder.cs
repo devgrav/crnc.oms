@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Crnc.Oms.Sales.Domain.SeedWork;
@@ -24,18 +25,20 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Queries
         {
             return await Task.FromResult(new GetNewOrderOutputDto()
             {
-                DateCreated = _currentDateTimeProvider.GetNow().ToShortDateString(),
-                StatusEnum = OrderStatus.NotSent,
-                Customer = new GetNewOrderCustomerOutputDto()
-                {
-                    Abbreviation = "",
-                    Email = "",
-                    Phone = "",
-                    FullName = ""
-                },
-                Status = EnumHelper.GetDescription(OrderStatus.NotSent),
+                CustomerAbbreviation = "",
+                CustomerTitle = "",
+                CustomerContactPersonFirstName = "",
+                CustomerContactPersonMiddleName = "",
+                CustomerContactPersonLastName = "",
+                CustomerContactPersonEmail = "",
+                CustomerContactPersonPhone = "",
                 JobDescription = "",
-                JobType = ""
+                JobType = JobType.New,
+                JobTypes = EnumHelper.ToDictionaryWithKeysAndDescriptions(JobType.New).Select(x => new TextValueOutputDto<int, string>()
+                {
+                    Text = x.Value,
+                    Value = x.Key
+                }).ToList()
             });
         }
     }

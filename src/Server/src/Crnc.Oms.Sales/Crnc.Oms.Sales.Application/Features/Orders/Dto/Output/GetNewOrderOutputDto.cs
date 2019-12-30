@@ -1,32 +1,29 @@
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Crnc.Oms.Sales.Domain.Aggregates.Order;
+using Crnc.Oms.Sales.WebApi.Validation;
 
 namespace Crnc.Oms.Sales.Application.Features.Orders.Dto.Output
 {
     public class GetNewOrderOutputDto
     {
-        public OrderStatus StatusEnum { get; set; }
-
-        public string Status { get; set; }
-
-        public string DateCreated { get; set; }
-
-        public string JobType { get; set; }
-
-        public JobType? JobTypeEnum { get; set; }
-
+        public JobType JobType { get; set; }
+        
+        public List<TextValueOutputDto<int, string>> JobTypes { get; set; }
         public string JobDescription { get; set; }
-        public GetNewOrderCustomerOutputDto Customer { get; set; }
-
-    }
-
-    public class GetNewOrderCustomerOutputDto
-    {
-        public string FullName { get; set; }
         
-        public string Abbreviation { get; set; }
+        public string CustomerContactPersonFirstName { get; set; }
         
-        public string Email { get; set; }
+        public string CustomerContactPersonMiddleName { get; set; }
         
-        public string Phone { get; set; }
+        public string CustomerContactPersonLastName { get; set; }
+        
+        public string CustomerTitle { get; set; }
+        
+        public string CustomerAbbreviation { get; set; }
+        
+        public string CustomerContactPersonEmail { get; set; }
+        
+        public string CustomerContactPersonPhone { get; set; }
     }
 }

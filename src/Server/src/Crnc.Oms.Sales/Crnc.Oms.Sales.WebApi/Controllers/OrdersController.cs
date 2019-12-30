@@ -85,9 +85,9 @@ namespace Crnc.Oms.Sales.WebApi.Controllers
         /// <response code="200">Returned new order</response>
         [HttpGet("new")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<GetNewOrderOutputDto> Get(GetNewOrderInputDto dto, CancellationToken  cancellationToken = default)
+        public async Task<GetNewOrderOutputDto> GetNew(CancellationToken  cancellationToken = default)
         {
-            return await _getNewOrderQueryHandler.HandleAsync(dto,cancellationToken);
+            return await _getNewOrderQueryHandler.HandleAsync(new GetNewOrderInputDto(),cancellationToken);
         }
         
         /// <summary>

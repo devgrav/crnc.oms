@@ -1,18 +1,21 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
-import { Checkbox, Icon, Label, Table, Item } from "semantic-ui-react";
-import { OrdersForGridItemDto } from "../../services/OrderService";
-import {UserItemDto, UserService} from "../../services/UserService";
+import { Checkbox, Icon, Label, Table, Item, Button } from "semantic-ui-react";
+import OrderGridRowModel from "./OrderGridModelRow";
 
 const OrdersGridRow: React.StatelessComponent<OrdersGridRowProps> = (props) => {
         const {item} = props;
         return (
                 <Table.Row>
                     <Table.Cell>
-                        <Label color="blue">
-                            <Icon name="pencil"/>
-                            Edit
-                        </Label>
+                    <Button 
+                        as={Link}
+                        to={`/orders/${item.id}`}                                    
+                        primary 
+                        content="Edit" 
+                        icon="pencil"
+                        size="tiny"
+                    />
                     </Table.Cell>
                     <Table.Cell>
                         <div>{item.number}</div>
@@ -22,6 +25,9 @@ const OrdersGridRow: React.StatelessComponent<OrdersGridRowProps> = (props) => {
                     </Table.Cell>
                     <Table.Cell>
                         <div>{item.customer}</div>
+                    </Table.Cell>
+                    <Table.Cell>
+                        <div>{item.jobType}</div>
                     </Table.Cell>
                     <Table.Cell>
                         <div>{item.jobDescription}</div>
@@ -42,5 +48,5 @@ const OrdersGridRow: React.StatelessComponent<OrdersGridRowProps> = (props) => {
 export default OrdersGridRow;
 
 interface OrdersGridRowProps{
-    item: OrdersForGridItemDto;
+    item: OrderGridRowModel;
 }
