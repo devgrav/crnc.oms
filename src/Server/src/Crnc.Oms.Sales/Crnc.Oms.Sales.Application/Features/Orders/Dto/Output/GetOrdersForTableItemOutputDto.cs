@@ -13,8 +13,6 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Dto.Output
 
         public string JobType { get; set; }
 
-        public JobType JobTypeEnum { get; set; }
-
         public string JobDescription { get; set; }
 
         public string DateSentToCustomer { get; set; }
@@ -22,8 +20,6 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Dto.Output
         public string Customer { get; set; }
 
         public string CustomerSignOffType { get; set; }
-
-        public SignoffType? CustomerSignOffTypeEnum { get; set; }
 
         public string Status { get; set; }
     }

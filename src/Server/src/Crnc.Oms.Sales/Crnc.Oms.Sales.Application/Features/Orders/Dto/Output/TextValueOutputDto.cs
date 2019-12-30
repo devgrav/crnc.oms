@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Crnc.Oms.Security.WebApi.DTO
+namespace Crnc.Oms.Sales.Application.Features.Orders.Dto.Output
 {
-    public class TextValueDto
+    public class TextValueOutputDto<Tkey,TValue>
     {
-        public Guid Value { get; set; }
+        public Tkey Value { get; set; }
 
-        public string Text { get; set; }
+        public TValue Text { get; set; }
     }
 }

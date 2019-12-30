@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Crnc.Oms.Sales.Application.Factories;
 using Crnc.Oms.Sales.Application.Features.Orders.Dto;
 using Crnc.Oms.Sales.Application.Features.Orders.Dto.Input;
 using Crnc.Oms.Sales.Application.Features.Orders.Dto.Output;
@@ -26,24 +27,8 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Commands
         {
             if(command == null)
                 throw new ArgumentNullException(nameof(command));
-            
-            var customer = new Customer(new FullName
-                (
-                    command.FirstName,
-                    command.LastName,
-                    command.MiddleName
-                ),
-                new NameAbbreviation(command.Abbreviation),
-                new Email(command.Email),
-                new Phone(command.Phone)
-            );
 
-            var order = new Order(
-                Guid.NewGuid(), 
-                _currentDateTimeProvider.GetNow(), 
-                command.JobType, 
-                command.JobDescription, 
-                customer);
+            var order = OrderMapper.MapNewOrder(command, _currentDateTimeProvider);
             
             _orderRepository.Add(order);
 

@@ -14,18 +14,27 @@ namespace Crnc.Oms.Sales.DataAccess.Mappings
 
             builder.OwnsOne(x => x.Customer, e =>
             {
-                e.OwnsOne(x => x.Email,
-                    e => { e.Property(x => x.Value).HasMaxLength(300); });
-                e.OwnsOne(x => x.Phone,
-                    e => { e.Property(x => x.Value).HasMaxLength(300); });
-                e.OwnsOne(x => x.Abbreviation,
-                    e => { e.Property(x => x.Value).HasMaxLength(300); });
-                e.OwnsOne(x => x.FullName,
+                e.OwnsOne(x => x.Title,
                     e =>
                     {
-                        e.Property(x => x.FirstName).HasMaxLength(300);
-                        e.Property(x => x.MiddleName).HasMaxLength(300);
-                        e.Property(x => x.LastName).HasMaxLength(300);
+                        e.OwnsOne(x => x.NameAbbreviation, 
+                            e => e.Property(x => x.Value).HasMaxLength(300));
+                        e.Property(x => x.Value).HasMaxLength(300);
+                    });
+                e.OwnsOne(x => x.ContactPerson,
+                    e =>
+                    {
+                        e.OwnsOne(x => x.Email,
+                            e => { e.Property(x => x.Value).HasMaxLength(300); });
+                        e.OwnsOne(x => x.Phone,
+                            e => { e.Property(x => x.Value).HasMaxLength(300); });
+                        e.OwnsOne(x => x.FullName,
+                            e =>
+                            {
+                                e.Property(x => x.FirstName).HasMaxLength(300);
+                                e.Property(x => x.MiddleName).HasMaxLength(300);
+                                e.Property(x => x.LastName).HasMaxLength(300);
+                            });
                     });
             });
         }

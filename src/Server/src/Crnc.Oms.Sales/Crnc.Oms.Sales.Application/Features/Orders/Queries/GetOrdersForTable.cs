@@ -31,14 +31,12 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Queries
                     
                     Id = x.Id,
                     Number = x.Number,
-                    Customer = x.Customer.FullName.Value,
                     CreatedDate = x.DateCreated.ToStandartFormatWithTime(),
+                    Customer = x.Customer.Title.Value,
                     JobType = EnumHelper.GetDescription(x.JobType),
                     JobDescription = x.JobDescription,
-                    JobTypeEnum = x.JobType,
-                    CustomerSignOffType = EnumHelper.GetDescription(x.SignOffType),
                     DateSentToCustomer = x.DateSentToCustomer.ToStandartFormatWithTime(),
-                    CustomerSignOffTypeEnum = x.SignOffType,
+                    CustomerSignOffType = EnumHelper.GetDescription(x.SignOffType),
                     Status = EnumHelper.GetDescription(x.Status)
                 })
                 .ToList();

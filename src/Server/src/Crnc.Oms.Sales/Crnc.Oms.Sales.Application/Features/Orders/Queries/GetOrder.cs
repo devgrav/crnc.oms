@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Crnc.Oms.Sales.Application.Exceptions;
@@ -31,19 +32,27 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Queries
             return new GetOrderOutputDto()
             {
                 Id = order.Id,
-                Status = EnumHelper.GetDescription(order.Status),
-                Customer = new GetNewOrderCustomerOutputDto()
-                {
-                    Abbreviation = order.Customer.Abbreviation.Value,
-                    Email = order.Customer.Email.Value,
-                    Phone = order.Customer.Phone.Value,
-                    FullName = order.Customer.FullName.Value
-                },
+                CustomerAbbreviation = order.Customer.Title.NameAbbreviation.Value,
+                CustomerTitle = order.Customer.Title.Value,
+                CustomerContactPersonFirstName = order.Customer.ContactPerson.FullName.FirstName,
+                CustomerContactPersonMiddleName = order.Customer.ContactPerson.FullName.MiddleName,
+                CustomerContactPersonLastName = order.Customer.ContactPerson.FullName.LastName,
+                CustomerContactPersonEmail = order.Customer.ContactPerson.Email.Value,
+                CustomerContactPersonPhone = order.Customer.ContactPerson.Phone.Value,
                 DateCreated = order.DateCreated.ToString(),
                 JobDescription = order.JobDescription,
-                JobType = EnumHelper.GetDescription(order.JobType),
-                StatusEnum = order.Status,
-                JobTypeEnum = order.JobType
+                JobType = order.JobType,
+                JobTypes = EnumHelper.ToDictionaryWithKeysAndDescriptions(order.JobType).Select(x => new TextValueOutputDto<int, string>()
+                {
+                    Text = x.Value,
+                    Value = x.Key
+                }).ToList(),
+                Status = order.Status,
+                Statuses = EnumHelper.ToDictionaryWithKeysAndDescriptions(order.Status).Select(x => new TextValueOutputDto<int, string>()
+                {
+                    Text = x.Value,
+                    Value = x.Key
+                }).ToList(),
             };
         }
     }

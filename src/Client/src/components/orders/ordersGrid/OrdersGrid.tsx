@@ -1,63 +1,52 @@
 import * as React from "react";
 import { Button, Dimmer, Header, Icon, Loader, Menu, Segment, Table } from "semantic-ui-react";
-import { OrdersForGridItemDto, OrderService } from "../../services/OrderService";
-import {UserItemDto, UserService} from "../../services/UserService";
 import OrdersGridRow from "./OrdersGridRow";
+import { inject, observer } from "mobx-react";
+import OrdersGridRootStore from "../OrdersRootStore";
+import OrdersGridStore from "./OrdersGridStore";
+import { Link } from "react-router-dom";
 
-export default class OrdersGrid extends React.Component<{}, OrdersGridState> {
-    constructor(props: any){
+@inject((allStores: OrdersGridRootStore) => ({
+    ordersGridStore: allStores.ordersGridStore
+}))
+@observer
+export default class OrdersGrid extends React.Component<OrdersGridProps> {
+
+    private readonly store: OrdersGridStore;
+
+    constructor(props: OrdersGridProps){
         super(props);
 
-        this.state = {
-            orders: [],
-            isLoading: false
-        };
-    }
-
-    private async getOrders(): Promise<OrdersForGridItemDto[]>{
-        try{
-            this.showLoading();
-            const orders = await OrderService.getOrders();            
-            this.hideLoading();
-            if(orders)
-                return orders.items;
-            return [];
-        }catch (error) {
-            this.hideLoading();
-            return Promise.reject(error);
-        }  
+        this.store = props.ordersGridStore || new OrdersGridStore(new OrdersGridRootStore());
     }
 
     public async componentDidMount(): Promise<void>{
-        const orders = await this.getOrders();            
-        this.setState({
-            ...this.state, orders
-        });
-    }
-
-    public showLoading(): void{
-        this.setState({
-            ...this.state, isLoading: true
-        });
-    }
-
-    public hideLoading(): void{
-        this.setState({
-            ...this.state, isLoading: false
-        });
+        const {store} = this;
+        const orders = await this.store.getOrders();            
+        store.setModel(orders);        
     }
 
     public render() {
+        const {items} = this.store.model;
+        const {isLoading} = this.store;
+
         return (
-            <Dimmer.Dimmable dimmed={this.state.isLoading}>
-                <Dimmer active={this.state.isLoading} inverted>
+            <Dimmer.Dimmable dimmed={isLoading}>
+                <Dimmer active={isLoading} inverted>
                     <Loader>Loading</Loader>
                 </Dimmer>
                 <Table celled selectable striped definition>
                     <Table.Header fullWidth>
                         <Table.Row>
                             <Table.HeaderCell colSpan="9">
-                                <Button floated="right" primary content="Add order" icon="plus"/>
+                                <Button 
+                                    as={Link}
+                                    to="/orders/new"
+                                    floated="right" 
+                                    primary 
+                                    content="Add order" 
+                                    icon="plus"
+                                />
                             </Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
@@ -74,10 +63,10 @@ export default class OrdersGrid extends React.Component<{}, OrdersGridState> {
                                 Customer
                             </Table.HeaderCell>
                             <Table.HeaderCell>
-                                Type
+                                Job Type
                             </Table.HeaderCell>
                             <Table.HeaderCell>
-                                Work description
+                                Job description
                             </Table.HeaderCell>
                             <Table.HeaderCell>
                                 Date sent to customer
@@ -86,12 +75,12 @@ export default class OrdersGrid extends React.Component<{}, OrdersGridState> {
                                 Customer sighnoff
                             </Table.HeaderCell>
                             <Table.HeaderCell>
-                                Order status
+                                Status
                             </Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
                     <Table.Body>
-                        {this.state.orders.map((o) =>
+                        {items.map((o) =>
                             <OrdersGridRow key={o.id} item={o}/>)}
                     </Table.Body>
                     <Table.Footer fullWidth>
@@ -118,7 +107,6 @@ export default class OrdersGrid extends React.Component<{}, OrdersGridState> {
     }
 }
 
-interface OrdersGridState{
-    orders: OrdersForGridItemDto[];
-    isLoading: boolean;
+interface OrdersGridProps{
+    ordersGridStore?: OrdersGridStore;
 }
