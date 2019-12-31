@@ -37,7 +37,8 @@ export default class NewOrderCard extends React.Component<NewOrderCardProps>{
 
     onSave(vent: React.FormEvent<HTMLFormElement>, data: FormProps){
         const {store} = this;
-        store.saveNewOrder();        
+
+        store.saveNewOrder();           
     }
 
     private onClose(event: React.MouseEvent<HTMLElement>, data: ModalProps): void{
@@ -53,23 +54,33 @@ export default class NewOrderCard extends React.Component<NewOrderCardProps>{
     }
 
     private onChange(event: any, data: any): void{
+        const {store} = this;
+
         const name = data.name;
-        const value = data.type === "checkbox" ? data.checked : data.value;
-        
-        this.store.setModelValue(name, value);
+        const value = data.type === "checkbox" ? data.checked : data.value;        
+
+        store.setModelValue(name, value);        
     }
 
     public render(){              
-        const {model, isLoading, jobTypes} = this.store;
+        const {model, isLoading, jobTypes, validationInfo} = this.store;
         const {isCreateOrEdit} = this.store.orderCardRootStore;
 
         if(!isCreateOrEdit)
             return <Redirect to="/orders"/>
 
+        console.log(validationInfo)
+        console.log(model)
+
         return (
             <Modal open={true} closeIcon onClose={this.onClose}>
                 <Modal.Header>{"Add new order"}</Modal.Header>
                 <Modal.Content as={Segment} basic clearing loading={isLoading}>
+                    {validationInfo && validationInfo.hasAnyValidationInfo && <Message
+                        error
+                        header="There was some errors with your submission"
+                        list={validationInfo.validationMessages}
+                    />}
                     <Form id="orderForm" className="ui form" onSubmit={this.onSave}>                                  
                         <Header as="h3" content="Order" dividing/>                                    
                         <Form.Select
@@ -78,6 +89,7 @@ export default class NewOrderCard extends React.Component<NewOrderCardProps>{
                             onChange={this.onChange}
                             label = "Job type"
                             value = {model.jobType}
+                            error={validationInfo.hasFieldValidationError(nameof<NewOrderModel>(x => x.jobType))}
                             options = {jobTypes}
                         />
                         <Form.TextArea
@@ -86,7 +98,8 @@ export default class NewOrderCard extends React.Component<NewOrderCardProps>{
                             onChange={this.onChange}                                        
                             label="Job Description"                                        
                             value={model.jobDescription}
-                            autoComplete="off"
+                            error={validationInfo.hasFieldValidationError(nameof<NewOrderModel>(x => x.jobDescription))}
+                            autoComplete="off"                            
                         />                             
                         <Header as="h3" content="Customer" dividing/>                                    
                         <Form.Input
@@ -95,6 +108,7 @@ export default class NewOrderCard extends React.Component<NewOrderCardProps>{
                             onChange={this.onChange}                                            
                             label="Title"                                            
                             value={model.customerTitle}
+                            error={validationInfo.hasFieldValidationError(nameof<NewOrderModel>(x => x.customerTitle))}
                             autoComplete="off"
                         />
                         <Form.Input
@@ -103,6 +117,7 @@ export default class NewOrderCard extends React.Component<NewOrderCardProps>{
                             onChange={this.onChange}                                            
                             label="Abbreviation"                                            
                             value={model.customerAbbreviation}
+                            error={validationInfo.hasFieldValidationError(nameof<NewOrderModel>(x => x.customerAbbreviation))}
                             autoComplete="off"
                         />                                                                            
                         <Header as="h3" content="Contact Person" dividing/>                                  
@@ -111,18 +126,19 @@ export default class NewOrderCard extends React.Component<NewOrderCardProps>{
                             className="required"
                             onChange={this.onChange}                                            
                             label="First name"
-                            value={model.customerContactPersonFirstName}
+                            error={validationInfo.hasFieldValidationError(nameof<NewOrderModel>(x => x.customerContactPersonFirstName))}
                             autoComplete="off"
                         />
                         <Form.Input
                             name={nameof<NewOrderModel>(x => x.customerContactPersonMiddleName)}                                     
                             onChange={this.onChange}                                            
                             label="Middle name"
-                            value={model.customerContactPersonMiddleName}
+                            error={validationInfo.hasFieldValidationError(nameof<NewOrderModel>(x => x.customerContactPersonMiddleName))}
                             autoComplete="off"
                         />
                         <Form.Input
-                            name={nameof<NewOrderModel>(x => x.customerContactPersonLastName)}     
+                            name={nameof<NewOrderModel>(x => x.customerContactPersonLastName)}
+                            error={validationInfo.hasFieldValidationError(nameof<NewOrderModel>(x => x.customerContactPersonLastName))}
                             className="required"
                             onChange={this.onChange}                                            
                             label="Last name"
@@ -130,7 +146,8 @@ export default class NewOrderCard extends React.Component<NewOrderCardProps>{
                             autoComplete="off"
                         />
                         <Form.Input
-                            name={nameof<NewOrderModel>(x => x.customerContactPersonEmail)}     
+                            name={nameof<NewOrderModel>(x => x.customerContactPersonEmail)}
+                            error={validationInfo.hasFieldValidationError(nameof<NewOrderModel>(x => x.customerContactPersonEmail))}
                             className="required"
                             onChange={this.onChange}                                            
                             label="Email"
@@ -140,6 +157,7 @@ export default class NewOrderCard extends React.Component<NewOrderCardProps>{
                         />
                         <Form.Input
                             name={nameof<NewOrderModel>(x => x.customerContactPersonPhone)}
+                            error={validationInfo.hasFieldValidationError(nameof<NewOrderModel>(x => x.customerContactPersonPhone))}
                             className="required"
                             onChange={this.onChange}                                            
                             label="Phone"

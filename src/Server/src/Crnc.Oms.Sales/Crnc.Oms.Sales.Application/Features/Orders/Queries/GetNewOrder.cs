@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,6 +24,26 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Queries
         
         public async Task<GetNewOrderOutputDto> HandleAsync(GetNewOrderInputDto queryData, CancellationToken cancellationToken = default)
         {
+            var allJobTypes = new List<TextValueOutputDto<int, string>>()
+                {
+                    new TextValueOutputDto<int, string>()
+                    {
+                        Value = 0,
+                        Text = "Not chosen"
+                    }
+                };
+            
+            var jobTypes =
+                EnumHelper.ToDictionaryWithKeysAndDescriptions(JobType.New).Select(x =>
+                    new TextValueOutputDto<int, string>()
+                    {
+                        Text = x.Value,
+                        Value = x.Key
+                    })
+                    .ToList();
+            
+            allJobTypes.AddRange(jobTypes);
+            
             return await Task.FromResult(new GetNewOrderOutputDto()
             {
                 CustomerAbbreviation = "",
@@ -33,12 +54,8 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Queries
                 CustomerContactPersonEmail = "",
                 CustomerContactPersonPhone = "",
                 JobDescription = "",
-                JobType = JobType.New,
-                JobTypes = EnumHelper.ToDictionaryWithKeysAndDescriptions(JobType.New).Select(x => new TextValueOutputDto<int, string>()
-                {
-                    Text = x.Value,
-                    Value = x.Key
-                }).ToList()
+                JobType = 0,
+                JobTypes = jobTypes 
             });
         }
     }

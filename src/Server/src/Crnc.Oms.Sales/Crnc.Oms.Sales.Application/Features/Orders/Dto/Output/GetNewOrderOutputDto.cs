@@ -1,13 +1,12 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Crnc.Oms.Sales.Domain.Aggregates.Order;
-using Crnc.Oms.Sales.WebApi.Validation;
 
 namespace Crnc.Oms.Sales.Application.Features.Orders.Dto.Output
 {
     public class GetNewOrderOutputDto
     {
-        public JobType JobType { get; set; }
+        public int JobType { get; set; }
         
         public List<TextValueOutputDto<int, string>> JobTypes { get; set; }
         public string JobDescription { get; set; }

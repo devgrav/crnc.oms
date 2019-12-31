@@ -1,22 +1,30 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Crnc.Oms.Sales.Domain.Aggregates.Order;
 
-namespace Crnc.Oms.Sales.WebApi.Validation
+namespace Crnc.Oms.Sales.Application.Validation
 {
     [AttributeUsage(AttributeTargets.Property)]
     public sealed class PhoneValueObjectAttribute : ValidationAttribute
     {
+        public string ErrorMessage { get; set; } = "Phone is not valid";
+        
+        public string EmptyErrorMessage { get; set; } = "Phone is required";
+        
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             if (value == null)                   
-                return ValidationResult.Success; 
+                return new ValidationResult(EmptyErrorMessage); 
 
-            string phone = value as string;
+            string validatedValue = value as string;
+            
+            if(string.IsNullOrWhiteSpace(validatedValue))
+                return new ValidationResult(EmptyErrorMessage);
 
-            if (!Phone.IsValidPhone(phone))
-                return new ValidationResult("Phone is not valid");
-
+            if (!Phone.IsValidPhone(validatedValue))
+                return new ValidationResult(ErrorMessage);
+            
             return ValidationResult.Success;
         }
     }
