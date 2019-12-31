@@ -35,9 +35,9 @@ namespace Crnc.Oms.Sales.Application.Factories
                 new Title(dto.CustomerTitle, 
                     new NameAbbreviation(dto.CustomerAbbreviation)), 
                 new ContactPerson(new FullName(
-                        dto.CustomerFirstName,
-                        dto.CustomerLastName,
-                        dto.CustomerMiddleName), 
+                        dto.CustomerContactPersonFirstName,
+                        dto.CustomerContactPersonLastName,
+                        dto.CustomerContactPersonMiddleName), 
                     new Email(dto.CustomerContactPersonEmail),
                     new Phone(dto.CustomerContactPersonPhone)));
 

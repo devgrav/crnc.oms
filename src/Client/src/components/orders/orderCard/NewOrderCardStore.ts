@@ -6,6 +6,7 @@ import { Guid } from "guid-typescript";
 import { JobType } from "../JobType";
 import TextValueDto from "../../shared/TextValueDto";
 import OrderCardRootStore from "./OrderCardRootStore";
+import ValidationInfo from "../../shared/ValidationInfo";
 
 export default class NewOrderCardStore{
 
@@ -18,10 +19,14 @@ export default class NewOrderCardStore{
     @observable
     isLoading: boolean;
 
+    @observable
+    validationInfo: ValidationInfo;
+
     constructor(rootStore: OrderCardRootStore){
         this.orderCardRootStore = rootStore;
         this.model = new NewOrderModel();
-        this.isLoading = false;
+        this.isLoading = false;        
+        this.validationInfo = new ValidationInfo();
     }
 
     @action
@@ -59,7 +64,9 @@ export default class NewOrderCardStore{
         }catch (error){
              this.hideLoader();
              if (error.response){
-                //TODO: Добавить обработку валидации
+                if (error.response.status === 400){
+                    this.setValidationInfo(error.response.data);
+                }
             }
         }
     }
@@ -71,8 +78,22 @@ export default class NewOrderCardStore{
     }
 
     @action
+    public setValidationInfoForModelValue(name: string){
+        this.validationInfo.tryRemoveFieldValidationInfo(name);
+    }
+
+    @action
+    public setValidationInfo(validationInfo: any){
+        if(validationInfo && validationInfo.errors){
+            this.validationInfo.info = validationInfo.errors;
+        }        
+    }
+
+    @action
     public setModelValue(name: string, value: any){
         this.model[name] = value;
+
+        //this.setValidationInfoForModelValue(name);
     }
 
     
@@ -85,7 +106,7 @@ export default class NewOrderCardStore{
     get jobTypes(): TextValueDto[]{
         let jobTypes: TextValueDto[] = [
             {
-                value: Guid.EMPTY,
+                value: 0,
                 text: "Not chosen"
             }
         ];        

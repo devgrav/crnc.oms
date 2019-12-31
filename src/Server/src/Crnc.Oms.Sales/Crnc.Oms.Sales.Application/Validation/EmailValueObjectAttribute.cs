@@ -2,21 +2,28 @@
 using System.ComponentModel.DataAnnotations;
 using Crnc.Oms.Sales.Domain.Aggregates.Order;
 
-namespace Crnc.Oms.Sales.WebApi.Validation
+namespace Crnc.Oms.Sales.Application.Validation
 {
     [AttributeUsage(AttributeTargets.Property)]
     public sealed class EmailValueObjectAttribute : ValidationAttribute
     {
+        public string ErrorMessage { get; set; } = "Email is not valid";
+        
+        public string EmptyErrorMessage { get; set; } = "Email is required";
+        
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             if (value == null)                   
-                return ValidationResult.Success; 
+                return new ValidationResult(EmptyErrorMessage); 
 
-            string email = value as string;
+            string validatedValue = value as string;
+            
+            if(string.IsNullOrWhiteSpace(validatedValue))
+                return new ValidationResult(EmptyErrorMessage);
 
-            if (!Email.IsEmailValid(email))
-                return new ValidationResult("Email is not valid");
-
+            if (!Email.IsEmailValid(validatedValue))
+                return new ValidationResult(ErrorMessage);
+            
             return ValidationResult.Success;
         }
     }
