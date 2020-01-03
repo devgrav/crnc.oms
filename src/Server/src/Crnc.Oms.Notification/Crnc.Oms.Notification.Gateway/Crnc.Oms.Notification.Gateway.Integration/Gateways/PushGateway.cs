@@ -11,6 +11,7 @@ using Crnc.Oms.Notification.Gateway.Integration.Settings;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RestSharp;
+using RestSharp.Authenticators;
 
 namespace Crnc.Oms.Notification.Gateway.Integration.Gateways
 {
@@ -18,23 +19,24 @@ namespace Crnc.Oms.Notification.Gateway.Integration.Gateways
         : IPushGateway
     {
         private readonly ILogger<EmailGateway> _logger;
-        private readonly ICurrentUserContext _currentUserContext;
         private readonly RestClient _client;
 
-        public PushGateway(IOptions<IntegrationEndpointSettings> settings, ILogger<EmailGateway> logger, ICurrentUserContext currentUserContext)
+        public PushGateway(IOptions<IntegrationEndpointSettings> settings, ILogger<EmailGateway> logger,  ICurrentUserContext currentUserContext)
         {
             _logger = logger;
-            _currentUserContext = currentUserContext;
             _client = new RestClient(settings.Value.PushNotificationServiceEndpoint);
+            _client.Authenticator = new JwtAuthenticator(currentUserContext.AuthToken);
         }
 
 
         public async Task<SendPushOutputDto> SendPushAsync(SendPushInputDto dto, CancellationToken cancellationToken = default)
         {
             _logger.LogInformation($"Push is sending from gateway with id {dto.MessageId}, receiver id : {dto.ReceiverUserId}");
-            
-            var request = new RestRequest("/api/pushNotifications", DataFormat.Json);
-            request.Method = Method.POST;
+
+            var request = new RestRequest("/api/pushNotifications", DataFormat.Json)
+            {
+                Method = Method.POST
+            };
             request.AddJsonBody(dto);
             
             var response = await _client.ExecuteTaskAsync<SendPushOutputDto>(request, cancellationToken);

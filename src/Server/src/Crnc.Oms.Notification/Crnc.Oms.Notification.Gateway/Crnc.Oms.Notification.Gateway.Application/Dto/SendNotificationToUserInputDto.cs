@@ -8,13 +8,13 @@ namespace Crnc.Oms.Notification.Gateway.Application.Dto
     /// </summary>
     /// <example>
     ///{
-    ///     "receiverUserId": "b5d75d01-4a8b-4b1f-889d-dd816b042eca",
+    ///     "userId": "2a89985f-f013-4f2a-9545-395efb43a142",
     ///     "message": "Some message"
     ///}
     /// </example>
-    public class SendAllChannelsNotificationInputDto
+    public class SendNotificationToUserInputDto
     {
-        public Guid ReceiverUserId { get; set; }
+        public Guid UserId { get; set; }
 
         [Required]
         public string Message { get; set; }
