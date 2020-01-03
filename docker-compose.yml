@@ -55,20 +55,21 @@ services:
     environment:
       - "IntegrationEndpoints:EmailNotificationServiceEndpoint=http://notification-email-api"
       - "IntegrationEndpoints:PushNotificationServiceEndpoint=http://notification-push-api"
+      - "IntegrationEndpoints:SecurityServiceEndpoint=http://security-api"
     depends_on: 
       - notification-email-api
       - notification-push-api
 
   # UI
-  crnc-oms-ui:
-    build:
-      context: "src/Client/"
-      args:
-        SECURITY_API_URL: "http://localhost:8090/api"
-        SALES_API_URL: "http://localhost:8091/api"
-    restart: always
-    ports:
-      - "8092:80"      
-    depends_on: 
-      - security-api
-      - sales-api      
+  #crnc-oms-ui:
+  #  build:
+  #    context: "src/Client/"
+  #    args:
+  #      SECURITY_API_URL: "http://localhost:8090/api"
+  #      SALES_API_URL: "http://localhost:8091/api"
+  #  restart: always
+  #  ports:
+  #    - "8092:80"      
+  #  depends_on: 
+  #    - security-api
+  #    - sales-api       
