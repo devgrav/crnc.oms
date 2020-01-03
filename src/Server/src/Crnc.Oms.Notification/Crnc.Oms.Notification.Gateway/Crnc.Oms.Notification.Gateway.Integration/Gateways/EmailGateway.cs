@@ -10,6 +10,7 @@ using Crnc.Oms.Notification.Gateway.Integration.Settings;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RestSharp;
+using RestSharp.Authenticators;
 
 
 namespace Crnc.Oms.Notification.Gateway.Integration.Gateways
@@ -18,22 +19,23 @@ namespace Crnc.Oms.Notification.Gateway.Integration.Gateways
         : IEmailGateway
     {
         private readonly ILogger<EmailGateway> _logger;
-        private readonly ICurrentUserContext _currentUserContext;
         private readonly RestClient _client;
 
         public EmailGateway(IOptions<IntegrationEndpointSettings> settings, ILogger<EmailGateway> logger, ICurrentUserContext currentUserContext)
         {
             _logger = logger;
-            _currentUserContext = currentUserContext;
             _client = new RestClient(settings.Value.EmailNotificationServiceEndpoint);
+            _client.Authenticator = new JwtAuthenticator(currentUserContext.AuthToken);
         }
 
         public async Task<SendEmailOutputDto> SendEmailAsync(SendEmailInputDto dto, CancellationToken cancellationToken = default)
         {
             _logger.LogInformation($"Email is sending from gateway with id {dto.MessageId}; senderEmail : {dto.SenderEmail}; receiverEmail: {dto.ReceiverEmail}");
-            
-            var request = new RestRequest("/api/emailNotifications", DataFormat.Json);
-            request.Method = Method.POST;
+
+            var request = new RestRequest("/api/emailNotifications", DataFormat.Json)
+            {
+                Method = Method.POST
+            };
             request.AddJsonBody(dto);
 
             var response = await _client.ExecuteTaskAsync<SendEmailOutputDto>(request, cancellationToken);
