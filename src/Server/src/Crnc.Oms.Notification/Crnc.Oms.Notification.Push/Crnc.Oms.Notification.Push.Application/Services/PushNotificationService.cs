@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
-using Crnc.Oms.Notification.Gateway.Integration.Gateways;
-using Crnc.Oms.Notification.Gateway.Integration.Gateways.Abstractions;
-using Crnc.Oms.Notification.Gateway.Integration.Dto;
 using Crnc.Oms.Notification.Push.Application.Dto;
 using Crnc.Oms.Notification.Push.Application.Services.Abstractions;
+using Crnc.Oms.Notification.Push.Integration.Dto;
+using Crnc.Oms.Notification.Push.Integration.Gateways.Abstractions;
 using Microsoft.Extensions.Logging;
 
 namespace Crnc.Oms.Notification.Push.Application.Services

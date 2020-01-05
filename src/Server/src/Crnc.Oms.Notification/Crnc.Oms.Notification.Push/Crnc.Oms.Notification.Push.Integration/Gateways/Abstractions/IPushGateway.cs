@@ -1,8 +1,8 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Crnc.Oms.Notification.Gateway.Integration.Dto;
+using Crnc.Oms.Notification.Push.Integration.Dto;
 
-namespace Crnc.Oms.Notification.Gateway.Integration.Gateways.Abstractions
+namespace Crnc.Oms.Notification.Push.Integration.Gateways.Abstractions
 {
     public interface IPushGateway
     {

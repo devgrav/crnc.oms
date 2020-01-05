@@ -1,17 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Crnc.Oms.Notification.Gateway.Integration.Dto;
 using Crnc.Oms.Notification.Push.Application.Dto;
 using Crnc.Oms.Notification.Push.Application.Services.Abstractions;
+using Crnc.Oms.Notification.Push.Integration.Clients;
+using Crnc.Oms.Notification.Push.Integration.Gateways;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.Extensions.Logging;
-using NSwag.Annotations;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Crnc.Oms.Notification.Push.WebApi.Controllers
 {
@@ -20,14 +18,16 @@ namespace Crnc.Oms.Notification.Push.WebApi.Controllers
     /// </summary>
     [Produces("application/json")]
     [Route("api/[controller]")]
-    [Authorize]
+    [AllowAnonymous]
     public class PushNotificationsController : ControllerBase
     {
         private readonly IPushNotificationService _pushNotificationService;
+        private readonly IHubContext<SignalRPushGateway, IPushNotificationClient> _pushHubContext;
 
-        public PushNotificationsController(IPushNotificationService pushNotificationService)
+        public PushNotificationsController(IPushNotificationService pushNotificationService, IHubContext<SignalRPushGateway, IPushNotificationClient> pushHubContext)
         {
             _pushNotificationService = pushNotificationService;
+            _pushHubContext = pushHubContext;
         }
 
         /// <summary>
@@ -43,7 +43,13 @@ namespace Crnc.Oms.Notification.Push.WebApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             
-            var sendResult = await _pushNotificationService.SendAsync(inputDto,cancellationToken);
+            //var sendResult = await _pushNotificationService.SendAsync(inputDto,cancellationToken);
+            await _pushHubContext.Clients.User(inputDto.ReceiverUserId.ToString()).ReceivePushMessageAsync(inputDto.ReceiverUserId.ToString(), inputDto.Message);
+
+            var sendResult = new SendPushMessageOutputDto()
+            {
+                MessageId = inputDto.MessageId ?? new Guid()
+            };
 
             return Ok(sendResult);
         }
