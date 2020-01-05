@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Crnc.Oms.Notification.Gateway.Integration.Dto
+namespace Crnc.Oms.Notification.Push.Integration.Dto
 {
     public class PushMessageInputDto
     {
