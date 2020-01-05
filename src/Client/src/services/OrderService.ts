@@ -5,6 +5,8 @@ import { StrictFormGroupProps } from "semantic-ui-react";
 import OrderGridRowModel from "../components/orders/ordersGrid/OrderGridModelRow";
 import OrdersGridModel from "../components/orders/ordersGrid/OrderGridModel";
 import NewOrderModel from "../components/orders/orderCard/NewOrderModel";
+import EditOrderModel from "../components/orders/orderCard/EditOrderModel";
+import { Guid } from "guid-typescript";
 
 export class OrderService{
 
@@ -22,8 +24,22 @@ export class OrderService{
         });
     }
 
-    public static saveNewOrder(order :NewOrderModel): Promise<void>{
+    public static getOrder(id: Guid): Promise<EditOrderModel>{
+        return AxiosProxy.instance.get(`${APP_CONFIG.ordersUrl}/${id}`)
+        .then((response) => {
+            return response.data;
+        });
+    }
+
+    public static createOrder(order: NewOrderModel): Promise<void>{
         return AxiosProxy.instance.post(APP_CONFIG.ordersUrl, order)
+            .then((response) => {
+                return;
+            });
+    }
+
+    public static editOrder(order: EditOrderModel): Promise<void>{
+        return AxiosProxy.instance.put(APP_CONFIG.ordersUrl, order)
             .then((response) => {
                 return;
             });

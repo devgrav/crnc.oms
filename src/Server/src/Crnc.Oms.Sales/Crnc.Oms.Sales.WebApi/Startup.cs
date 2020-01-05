@@ -53,7 +53,6 @@ namespace Crnc.Oms.Sales.WebApi
             services.AddControllers().AddNewtonsoftJson(options =>
             {
                 options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-                options.SerializerSettings.Converters.Add(new StringEnumConverter());
             });
             services.AddDbContext<SalesDataContext>(options =>
             {

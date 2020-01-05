@@ -7,34 +7,43 @@ import OrderCardRootStore from "./OrderCardRootStore";
 import OrderCard from "./OrderCard";
 import { nameof } from "ts-simple-nameof";
 import OrdersRootStores from "../OrdersRootStores";
+import EditOrderCardStore from "./EditOrderCardStore";
+import EditOrderModel from "./EditOrderModel";
 
 @inject(nameof<OrdersRootStores>(x => x.orderCardRootStore))
 @observer
-export default class NewOrderCard extends React.Component<NewOrderCardProps>{
+export default class EditOrderCard extends React.Component<EditOrderCardProps>{
 
-    private readonly store: NewOrderCardStore;
+    private readonly store: EditOrderCardStore;
 
-    constructor(props: NewOrderCardProps){
+    constructor(props: EditOrderCardProps){
         super(props);
 
         if(!props.orderCardRootStore)
             throw Error("Not found store");
 
-        this.store = props.orderCardRootStore.newOrderCardStore;
+        this.store = props.orderCardRootStore.editOrderCardStore;
 
         this.onSave = this.onSave.bind(this);
+        this.onChange = this.onChange.bind(this);
     }
 
     async componentDidMount(){
         const {store} = this;
-        let newOrder = await store.getNewOrder(); 
-        store.setModel(newOrder);
+        let order = await store.getOrder(); 
+        store.setModel(order);
     }
 
     onSave(event: React.FormEvent<HTMLFormElement>, data: FormProps){
         const {store} = this;
 
-        store.createOrder();           
+        store.editOrder();           
+    }
+
+    private onChange(event: any, data: any): void{
+        const {orderCardRootStore} = this.store;      
+
+        orderCardRootStore.setModelValue(data);        
     }
 
 
@@ -45,13 +54,14 @@ export default class NewOrderCard extends React.Component<NewOrderCardProps>{
             <OrderCard
                 orderCardRootStore = {store.orderCardRootStore} 
                 onSave = {onSave}
-                headerText = "Add new order"
-            />
+                headerText = {`Edit order ${store.orderCardRootStore.editedOrderId}`}
+                isEdit = {true}
+              />            
         );
     }
 }
 
 
-interface NewOrderCardProps{
+interface EditOrderCardProps{
     orderCardRootStore?: OrderCardRootStore;
 }

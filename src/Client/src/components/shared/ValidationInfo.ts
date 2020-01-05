@@ -16,11 +16,10 @@ export default class ValidationInfo{
 
     @action
     public tryRemoveFieldValidationInfo(name: string): void{        
-        if (this.validationInfo && this.validationInfo[name]){
-            let validationInfo = {...this.validationInfo};
-            delete validationInfo[name];
-            if (Object.keys(validationInfo).length === 0){
-                validationInfo = undefined;
+        if (this.validationInfo && this.validationInfo[name]){            
+            delete this.validationInfo[name];
+            if (Object.keys(this.validationInfo).length === 0){
+                this.validationInfo = {};
             }
         }        
     }

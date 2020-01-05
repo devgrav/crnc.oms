@@ -2,13 +2,13 @@ import * as React from "react";
 import { Button, Dimmer, Header, Icon, Loader, Menu, Segment, Table } from "semantic-ui-react";
 import OrdersGridRow from "./OrdersGridRow";
 import { inject, observer } from "mobx-react";
-import OrdersGridRootStore from "../OrdersRootStore";
+import OrdersGridRootStore from "./OrdersGridRootStore";
 import OrdersGridStore from "./OrdersGridStore";
 import { Link } from "react-router-dom";
+import { nameof } from "ts-simple-nameof";
+import OrdersRootStores from "../OrdersRootStores";
 
-@inject((allStores: OrdersGridRootStore) => ({
-    ordersGridStore: allStores.ordersGridStore
-}))
+@inject(nameof<OrdersRootStores>(x => x.ordersGridRootStore))
 @observer
 export default class OrdersGrid extends React.Component<OrdersGridProps> {
 
@@ -17,7 +17,10 @@ export default class OrdersGrid extends React.Component<OrdersGridProps> {
     constructor(props: OrdersGridProps){
         super(props);
 
-        this.store = props.ordersGridStore || new OrdersGridStore(new OrdersGridRootStore());
+        if(!props.ordersGridRootStore)
+            throw Error("Not found store")
+
+        this.store = props.ordersGridRootStore.ordersGridStore;
     }
 
     public async componentDidMount(): Promise<void>{
@@ -108,5 +111,5 @@ export default class OrdersGrid extends React.Component<OrdersGridProps> {
 }
 
 interface OrdersGridProps{
-    ordersGridStore?: OrdersGridStore;
+    ordersGridRootStore?: OrdersGridRootStore;
 }

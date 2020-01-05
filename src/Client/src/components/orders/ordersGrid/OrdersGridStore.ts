@@ -1,6 +1,6 @@
 import { observable, action } from "mobx";
 import OrdersGridModel from "./OrderGridModel";
-import OrdersGridRootStore from "../OrdersRootStore";
+import OrdersGridRootStore from "./OrdersGridRootStore";
 import OrderGridRowModel from "./OrderGridModelRow";
 import { OrderService } from "../../../services/OrderService";
 
