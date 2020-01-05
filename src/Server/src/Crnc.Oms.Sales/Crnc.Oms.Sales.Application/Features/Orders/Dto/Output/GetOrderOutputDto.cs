@@ -12,6 +12,14 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Dto.Output
         public string DateCreated { get; set; }
         public JobType JobType { get; set; }
         public List<TextValueOutputDto<int, string>> JobTypes { get; set; }
+        
+        public MaterialSource? MaterialSource { get; set; }
+        
+        public List<TextValueOutputDto<int, string>> MaterialSources { get; set; }
+        
+        public SignoffType? SignoffType { get; set; }
+        
+        public List<TextValueOutputDto<int, string>> SignoffTypes { get; set; }
         public string JobDescription { get; set; }
         public string CustomerContactPersonFirstName { get; set; }
         public string CustomerContactPersonMiddleName { get; set; }

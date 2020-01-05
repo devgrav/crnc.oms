@@ -39,6 +39,7 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Queries
                     CustomerSignOffType = EnumHelper.GetDescription(x.SignOffType),
                     Status = EnumHelper.GetDescription(x.Status)
                 })
+                .OrderByDescending(x => x.CreatedDate)
                 .ToList();
 
             return new GetOrdersForTableOutputDto()

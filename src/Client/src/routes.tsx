@@ -8,7 +8,7 @@ import CurrentUserContext from "./auth/CurrentUserContext";
 import Layout from "./components/layout/Layout";
 import {Roles, CurrentUserRole} from "./auth/CurrentUserRole";
 import Forbidden from "./components/forbidden/Forbidden";
-import OrdersGridContainer from "./components/orders/OrdersContainer";
+import OrdersGridContainer from "./components/orders/ordersGrid/OrdersGridContainer";
 import OrderCardContainer from "./components/orders/orderCard/OrderCardContainer";
 
 const Routes: React.StatelessComponent = () => {

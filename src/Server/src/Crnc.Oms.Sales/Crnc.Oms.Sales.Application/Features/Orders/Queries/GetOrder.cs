@@ -42,13 +42,25 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Queries
                 DateCreated = order.DateCreated.ToString(),
                 JobDescription = order.JobDescription,
                 JobType = order.JobType,
-                JobTypes = EnumHelper.ToDictionaryWithKeysAndDescriptions(order.JobType).Select(x => new TextValueOutputDto<int, string>()
+                JobTypes = EnumHelper.ToDictionaryWithKeysAndDescriptions(JobType.New).Select(x => new TextValueOutputDto<int, string>()
                 {
                     Text = x.Value,
                     Value = x.Key
                 }).ToList(),
                 Status = order.Status,
-                Statuses = EnumHelper.ToDictionaryWithKeysAndDescriptions(order.Status).Select(x => new TextValueOutputDto<int, string>()
+                Statuses = EnumHelper.ToDictionaryWithKeysAndDescriptions(OrderStatus.NotSent).Select(x => new TextValueOutputDto<int, string>()
+                {
+                    Text = x.Value,
+                    Value = x.Key
+                }).ToList(),
+                MaterialSource = order.MaterialSource,
+                MaterialSources = EnumHelper.ToDictionaryWithKeysAndDescriptions(MaterialSource.Stock).Select(x => new TextValueOutputDto<int, string>()
+                {
+                    Text = x.Value,
+                    Value = x.Key
+                }).ToList(),
+                SignoffType = order.SignOffType,
+                SignoffTypes = EnumHelper.ToDictionaryWithKeysAndDescriptions(SignoffType.Email).Select(x => new TextValueOutputDto<int, string>()
                 {
                     Text = x.Value,
                     Value = x.Key
