@@ -83,7 +83,8 @@ namespace Crnc.Oms.Security.WebApi.Controllers
             var claims = new List<Claim>
             {
                 new Claim(ClaimsIdentity.DefaultNameClaimType, user.Login),
-                new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role.Title)
+                new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role.Title),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             };
             ClaimsIdentity claimsIdentity =
             new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Crnc.Oms.Notification.Gateway.WebApi.Authorization;
 using Crnc.Oms.Notification.Push.Application.Services;
 using Crnc.Oms.Notification.Push.Application.Services.Abstractions;
@@ -49,8 +50,6 @@ namespace Crnc.Oms.Notification.Push.WebApi
                 options.SerializerSettings.Converters.Add(new StringEnumConverter());
             });
 
-            services.AddScoped<IPushNotificationService, PushNotificationService>();
-
             services.AddLogging();
 
             services.AddSignalR();
@@ -73,6 +72,24 @@ namespace Crnc.Oms.Notification.Push.WebApi
                         ValidIssuer = authSettings.JwtIssuer,
                         ValidAudience = authSettings.JwtAudience,
                         IssuerSigningKey = authSettings.SymmetricSecurityKey
+                    };
+                    
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+
+                            // If the request is for our hub...
+                            var path = context.HttpContext.Request.Path;
+                            if (!string.IsNullOrEmpty(accessToken) &&
+                                (path.StartsWithSegments("/hubs/push")))
+                            {
+                                // Read the token out of the query string
+                                context.Token = accessToken;
+                            }
+                            return Task.CompletedTask;
+                        }
                     };
                 });
 
