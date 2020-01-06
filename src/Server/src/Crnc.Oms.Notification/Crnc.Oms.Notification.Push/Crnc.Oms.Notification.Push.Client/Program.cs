@@ -47,7 +47,7 @@ namespace Crnc.Oms.Notification.Push.Client
         }
 
         private static async void OpenConnection(){
-            var pauseBetweenFailures = TimeSpan.FromSeconds(20);
+            var pauseBetweenFailures = TimeSpan.FromSeconds(5);
             var retryPolicy = Policy
                 .Handle<Exception>()
                 .WaitAndRetryForeverAsync(i => pauseBetweenFailures

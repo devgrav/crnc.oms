@@ -8,6 +8,7 @@ using Crnc.Oms.Notification.Push.Application.Services;
 using Crnc.Oms.Notification.Push.Application.Services.Abstractions;
 using Crnc.Oms.Notification.Push.Integration.Gateways;
 using Crnc.Oms.Notification.Push.Integration.Gateways.Abstractions;
+using Crnc.Oms.Notification.Push.Integration.Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -53,7 +54,8 @@ namespace Crnc.Oms.Notification.Push.WebApi
             services.AddLogging();
 
             services.AddSignalR();
-            services.AddScoped<IPushGateway, PushGateway>();
+            services.AddScoped<IPushGateway, SignalRPushGateway>();
+            services.AddScoped<IPushNotificationService, PushNotificationService>();
             
             services.Configure<AuthSettings>(Configuration.GetSection("Auth"));
 
@@ -127,7 +129,7 @@ namespace Crnc.Oms.Notification.Push.WebApi
             app.UseAuthorization();
             app.UseEndpoints(e =>
             {
-                e.MapHub<SignalRPushGateway>("/hubs/push");
+                e.MapHub<PushHub>("/hubs/push");
                 e.MapControllers();
             });
             
