@@ -22,11 +22,12 @@ namespace Crnc.Oms.Notification.Push.WebApi.Controllers
     [AllowAnonymous]
     public class PushNotificationsController : ControllerBase
     {
-        private readonly IHubContext<SignalRPushGateway, IPushNotificationClient> _pushHubContext;
+        private readonly IPushNotificationService _pushNotificationService;
 
-        public PushNotificationsController(IHubContext<SignalRPushGateway, IPushNotificationClient> pushHubContext)
+
+        public PushNotificationsController(IPushNotificationService pushNotificationService)
         {
-            _pushHubContext = pushHubContext;
+            _pushNotificationService = pushNotificationService;
         }
 
         /// <summary>
@@ -42,14 +43,9 @@ namespace Crnc.Oms.Notification.Push.WebApi.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            
-            await _pushHubContext.Clients.User(inputDto.ReceiverUserId.ToString())
-                .ReceivePushMessageAsync(inputDto.ReceiverUserId.ToString(),inputDto.Message);
 
-            var sendResult = new SendPushMessageOutputDto()
-            {
-                MessageId = inputDto.MessageId ?? new Guid()
-            };
+            var sendResult = await _pushNotificationService.SendAsync(inputDto, cancellationToken);
+            
 
             return Ok(sendResult);
         }

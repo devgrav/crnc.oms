@@ -6,12 +6,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Crnc.Oms.Notification.Push.Integration.Gateways
 {
-    public class PushGateway
+    public class ConsolePushGateway
         : IPushGateway
     {
-        private readonly ILogger<PushGateway> _logger;
+        private readonly ILogger<ConsolePushGateway> _logger;
 
-        public PushGateway(ILogger<PushGateway> logger)
+        public ConsolePushGateway(ILogger<ConsolePushGateway> logger)
         {
             _logger = logger;
         }
