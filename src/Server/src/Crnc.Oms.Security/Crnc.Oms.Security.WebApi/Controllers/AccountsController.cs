@@ -71,6 +71,7 @@ namespace Crnc.Oms.Security.WebApi.Controllers
             var jwt = GetToken(identity);
 
             return Ok(new CurrentUserDto(){
+                Id = user.Id,
                 Login = user.Login,
                 FullName = user.FullName,
                 Role = user.Role.Title,

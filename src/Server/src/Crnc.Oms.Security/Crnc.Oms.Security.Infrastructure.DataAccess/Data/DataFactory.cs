@@ -35,7 +35,7 @@ namespace Crnc.Oms.Security.Infrastructure.DataAccess.Data
                 {
                     User.CreateNew("admin",password.Hash, password.Salt,"John","Admin","admin@crnc.com",null, roles.First(r=> r.Title.Equals("Admin")),null, Guid.Parse("2a89985f-f013-4f2a-9545-395efb43a142")),
                     User.CreateNew("jack_richer",password.Hash, password.Salt,"Jack","Richer","jack_richer@crnc.com",null, roles.First(r=> r.Title.Equals("Admin")),photos[0]),
-                    User.CreateNew("shon_bean",password.Hash, password.Salt,"Shon","Bean","shon_bean@crnc.com",null,roles.First(r=> r.Title.Equals("Main manager")),photos[1]),
+                    User.CreateNew("shon_bean",password.Hash, password.Salt,"Shon","Bean","shon_bean@crnc.com",null,roles.First(r=> r.Title.Equals("Main manager")),photos[1], Guid.Parse("b6ba35b2-adff-43a6-9cd7-b408240a6d6f")),
                     User.CreateNew("helen_smith",password.Hash, password.Salt,"Helen","Smith","helen_smith@crnc.com",null,roles.First(r=> r.Title.Equals("Manager")),photos[2]),
                     User.CreateNew("agness_stuart",password.Hash, password.Salt,"Agness","Stuart","agness_stuart@crnc.com",null,roles.First(r=> r.Title.Equals("Manager")),photos[3]),
                     User.CreateNew("darius_larson",password.Hash, password.Salt,"Darius","Larson","darius_larson@crnc.com",null,roles.First(r=> r.Title.Equals("Manager")),null),

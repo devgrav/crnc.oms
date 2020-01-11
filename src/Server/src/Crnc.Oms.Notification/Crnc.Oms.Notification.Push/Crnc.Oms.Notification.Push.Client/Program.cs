@@ -1,7 +1,14 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Crnc.Oms.Notification.Gateway.Integration.Settings;
+using Crnc.Oms.Notification.Push.Client.Auth;
+using Crnc.Oms.Notification.Push.Client.Push;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using Polly;
@@ -10,71 +17,28 @@ namespace Crnc.Oms.Notification.Push.Client
 {
     class Program
     {
-        private static HubConnection _connection;
-
-        private static string MyAccessToken =
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWRtaW4iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWVpZGVudGlmaWVyIjoiMmE4OTk4NWYtZjAxMy00ZjJhLTk1NDUtMzk1ZWZiNDNhMTQyIiwiZXhwIjoxNTc4MjcyNzgxLCJpc3MiOiJPbXNDcm5jQXV0aFNlcnZlciIsImF1ZCI6Ik9tc0NybmNBcGlzIn0.MSFwSRMqDG2BTKZWcyY304C2NtFfVfvF5yQRkddRo_Y";
-        
-        static void Main(string[] args)
-        {
-            CreateConnection();
-            
-            OpenConnection();
-                
-            Console.ReadLine();
+        public static void Main(string[] args)
+        { 
+            CreateHostBuilder(args).Build().Run();
         }
 
-        private static void CreateConnection()
-        {
-            _connection = new HubConnectionBuilder()
-                .WithUrl("http://localhost:8107/hubs/push",options =>
-                { 
-                    options.AccessTokenProvider = () => Task.FromResult(MyAccessToken);
-                })
-                .ConfigureLogging(logging =>{
-                    logging.AddConsole();
-                    logging.SetMinimumLevel(LogLevel.Information);
-                })
-                .Build();
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureServices((hostContext, services) =>
+                {
+                    var builder = new ConfigurationBuilder()
+                        .SetBasePath(Directory.GetCurrentDirectory())
+                        .AddJsonFile("appsettings.json");
 
-            _connection.Closed += Connection_Closed;
-            
-            _connection.On<string, string>("ReceivePushMessageAsync", (user, message) =>
-            {
-                var newMessage = $"UserId: {user}, Message: {message}";
-                Console.WriteLine(newMessage);
-            });
-        }
+                    var config = builder.Build();
 
-        private static async void OpenConnection(){
-            var pauseBetweenFailures = TimeSpan.FromSeconds(5);
-            var retryPolicy = Policy
-                .Handle<Exception>()
-                .WaitAndRetryForeverAsync(i => pauseBetweenFailures
-                    , (exception, timeSpan) => {
-                        Console.WriteLine(exception.ToString());
-                    });
-
-            await retryPolicy.ExecuteAsync(async () =>
-            {
-                Console.WriteLine("Trying to connect to server...");
-                await TryOpenConnection();
-            });
-        }
-        
-        private static async Task<bool> TryOpenConnection(){
-            Console.WriteLine("Starting connection...");
-            await _connection.StartAsync();
-            Console.WriteLine("Connection is successful...");
-            return true;
-        }
-        
-        
-        private static async Task Connection_Closed(Exception arg){
-            Console.WriteLine("Connection is closed");
-            await _connection.StopAsync();
-            _connection.Closed -= Connection_Closed;
-            OpenConnection();
-        }
+                    services.AddHostedService<PushConnectorWorker>();
+                    services.AddSingleton<IPushConnector, PushConnector>();
+                    services.AddSingleton<IAuthClient, AuthClient>();
+                    
+                    services.AddOptions();
+                    services.Configure<AuthSettings>(config.GetSection("Auth"));
+                    services.Configure<IntegrationEndpointSettings>(config.GetSection("IntegrationEndpoints"));
+                });
     }
 }

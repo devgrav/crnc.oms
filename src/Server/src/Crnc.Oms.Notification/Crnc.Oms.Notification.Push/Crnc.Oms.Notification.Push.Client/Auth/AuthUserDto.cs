@@ -1,11 +1,9 @@
 using System;
 
-namespace Crnc.Oms.Security.WebApi.DTO
+namespace Crnc.Oms.Notification.Push.Client.Auth
 {
-    public class CurrentUserDto
+    public class AuthUserDto
     {
-        public Guid Id { get; set; }
-        
         public string Login { get; set; }
 
         public string FullName { get; set; }    
