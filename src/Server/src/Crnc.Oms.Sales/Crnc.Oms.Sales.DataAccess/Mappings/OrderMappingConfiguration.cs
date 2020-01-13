@@ -32,7 +32,6 @@ namespace Crnc.Oms.Sales.DataAccess.Mappings
                             e =>
                             {
                                 e.Property(x => x.FirstName).HasMaxLength(300);
-                                e.Property(x => x.MiddleName).HasMaxLength(300);
                                 e.Property(x => x.LastName).HasMaxLength(300);
                             });
                     });

@@ -11,7 +11,6 @@ export default class NewOrderModel
     @observable customerTitle: string;
     @observable customerAbbreviation: string;
     @observable customerContactPersonFirstName: string;
-    @observable customerContactPersonMiddleName: string;
     @observable customerContactPersonLastName: string;
     @observable customerContactPersonEmail: string;
     @observable customerContactPersonPhone: string;        
@@ -22,7 +21,6 @@ export default class NewOrderModel
         this.jobType = 0;
         this.jobDescription = "";
         this.customerContactPersonFirstName = "";
-        this.customerContactPersonMiddleName = "";
         this.customerContactPersonLastName = "";
         this.customerTitle = "";
         this.customerAbbreviation = "";

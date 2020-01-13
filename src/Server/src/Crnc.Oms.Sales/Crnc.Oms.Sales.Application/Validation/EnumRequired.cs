@@ -7,8 +7,6 @@ namespace Crnc.Oms.Sales.Application.Validation
     [AttributeUsage(AttributeTargets.Property)]
         public sealed class EnumRequiredAttribute : ValidationAttribute
         {
-            public string ErrorMessage { get; set; }
-            
             protected override ValidationResult IsValid(object value, ValidationContext validationContext)
             {
                 var errorMessage = !string.IsNullOrWhiteSpace(ErrorMessage) 

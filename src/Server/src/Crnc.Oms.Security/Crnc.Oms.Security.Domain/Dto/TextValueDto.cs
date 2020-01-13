@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace Crnc.Oms.Security.WebApi.DTO
+namespace Crnc.Oms.Security.Domain.Dto
 {
     public class TextValueDto
     {

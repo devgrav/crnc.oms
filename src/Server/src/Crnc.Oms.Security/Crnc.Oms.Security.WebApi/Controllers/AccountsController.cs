@@ -4,11 +4,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Crnc.Oms.Security.Domain.Aggregates.Users;
+using Crnc.Oms.Security.Domain.Dto;
 using Crnc.Oms.Security.Domain.Repositories;
 using Crnc.Oms.Security.Infrastructure.CrossCutting;
 using Crnc.Oms.Security.Infrastructure.DataAccess.Exceptions;
 using Crnc.Oms.Security.WebApi.Authorization;
-using Crnc.Oms.Security.WebApi.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -85,7 +85,9 @@ namespace Crnc.Oms.Security.WebApi.Controllers
             {
                 new Claim(ClaimsIdentity.DefaultNameClaimType, user.Login),
                 new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role.Title),
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.GivenName, user.FirstName),
+                new Claim(ClaimTypes.Surname,user.LastName)
             };
             ClaimsIdentity claimsIdentity =
             new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,

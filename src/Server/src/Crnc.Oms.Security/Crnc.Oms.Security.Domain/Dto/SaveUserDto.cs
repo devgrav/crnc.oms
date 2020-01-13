@@ -1,8 +1,8 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using Crnc.Oms.Security.WebApi.Validation;
+using Crnc.Oms.Security.Domain.Validation;
 
-namespace Crnc.Oms.Security.WebApi.DTO
+namespace Crnc.Oms.Security.Domain.Dto
 {
     ///<summary>
     /// User data

@@ -39,10 +39,13 @@ namespace Crnc.Oms.Notification.Push.WebApi
         {
             services.AddCors(options =>
             {
-                options.AddPolicy("AllOrigins", builder => builder
-                    .AllowAnyOrigin()
+                var allowedOrigin = Configuration.GetSection("IntegrationEndpoints:UiEndpoint").Value;
+                
+                options.AddPolicy("CorsPolicy", builder => builder
+                    .WithOrigins(allowedOrigin)
                     .AllowAnyHeader()
-                    .AllowAnyMethod());
+                    .AllowAnyMethod()
+                    .AllowCredentials());
             });
 
             services.AddControllers().AddNewtonsoftJson(options =>
@@ -124,7 +127,7 @@ namespace Crnc.Oms.Notification.Push.WebApi
             CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
             app.UseRouting();
-            app.UseCors("AllOrigins");
+            app.UseCors("CorsPolicy");
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(e =>

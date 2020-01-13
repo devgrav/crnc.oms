@@ -15,13 +15,6 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Queries
     public class GetNewOrder
         : IUseCaseQueryHandler<GetNewOrderInputDto,GetNewOrderOutputDto>
     {
-        private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
-
-        public GetNewOrder(ICurrentDateTimeProvider currentDateTimeProvider)
-        {
-            _currentDateTimeProvider = currentDateTimeProvider;
-        }
-        
         public async Task<GetNewOrderOutputDto> HandleAsync(GetNewOrderInputDto queryData, CancellationToken cancellationToken = default)
         {
             var allJobTypes = new List<TextValueOutputDto<int, string>>()
@@ -49,7 +42,6 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Queries
                 CustomerAbbreviation = "",
                 CustomerTitle = "",
                 CustomerContactPersonFirstName = "",
-                CustomerContactPersonMiddleName = "",
                 CustomerContactPersonLastName = "",
                 CustomerContactPersonEmail = "",
                 CustomerContactPersonPhone = "",

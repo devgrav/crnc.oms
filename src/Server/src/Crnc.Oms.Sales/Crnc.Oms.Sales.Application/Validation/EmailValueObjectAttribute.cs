@@ -7,7 +7,11 @@ namespace Crnc.Oms.Sales.Application.Validation
     [AttributeUsage(AttributeTargets.Property)]
     public sealed class EmailValueObjectAttribute : ValidationAttribute
     {
-        public string ErrorMessage { get; set; } = "Email is not valid";
+        public EmailValueObjectAttribute()
+            : base("Email is not valid")
+        {
+            
+        }
         
         public string EmptyErrorMessage { get; set; } = "Email is required";
         

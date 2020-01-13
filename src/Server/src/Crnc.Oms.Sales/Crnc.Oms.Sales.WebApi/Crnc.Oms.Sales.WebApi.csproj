@@ -9,6 +9,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Crnc.Oms.Sales.Application\Crnc.Oms.Sales.Application.csproj" />
       <ProjectReference Include="..\Crnc.Oms.Sales.DataAccess\Crnc.Oms.Sales.DataAccess.csproj" />
+      <ProjectReference Include="..\Crnc.Oms.Sales.Integration\Crnc.Oms.Sales.Integration.csproj" />
     </ItemGroup>
 
     <ItemGroup>

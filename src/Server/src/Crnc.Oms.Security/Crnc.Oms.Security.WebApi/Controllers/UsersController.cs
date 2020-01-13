@@ -7,10 +7,10 @@ using Crnc.Oms.Security.Domain.Repositories;
 using Crnc.Oms.Security.Domain.Aggregates.Users;
 using UserEntity = Crnc.Oms.Security.Domain.Aggregates.Users.User;
 using System.ComponentModel.DataAnnotations;
+using Crnc.Oms.Security.Domain.Dto;
 using Crnc.Oms.Security.Infrastructure.CrossCutting;
 using Crnc.Oms.Security.Infrastructure.DataAccess.Exceptions;
 using Crnc.Oms.Security.WebApi.Authorization;
-using Crnc.Oms.Security.WebApi.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -23,7 +23,7 @@ namespace Crnc.Oms.Security.WebApi.Controllers
     /// </summary>
     [Produces("application/json")]
     [Route("api/[controller]")]
-    [Authorize(Roles = Roles.Admin)]
+    [Authorize]
     public class UsersController 
         : ControllerBase
     {
@@ -35,31 +35,26 @@ namespace Crnc.Oms.Security.WebApi.Controllers
         }
 
         /// <summary>
-        /// Get all users
+        /// Get all users or by filter
         /// </summary>
         /// <remarks>Requires admin role</remarks>
         /// <response code="200">Returns users.</response>
         [HttpGet]
-        [ProducesResponseType(typeof(List<UserItemDto>),StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<UserItemDto>>> Get()
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> Get([FromQuery]UserFilterDto dto)
         {
-            var users = await _userRepository.FindAllAsync();
-            return Ok(users.Select(u => new UserItemDto()
+            if (dto.IsShortInfo)
             {
-                Id = u.Id,
-                FirstName = u.FirstName,
-                LastName = u.LastName,
-                FullName = u.FullName,
-                Email = u.Email,
-                Password = u.PasswordHash,
-                Login = u.Login,
-                Phone = u.Phone,
-                RoleId = u.Role.Id,
-                Role = u.Role.Title,
-                PhotoBase64 = u.Photo?.ContentBase64,
-                PhotoMimeType = u.Photo?.MimeType,
-                IsActive = u.IsActive
-            }).ToList());           
+                var users = await _userRepository.FindByFilterShortInfoAsync(dto);
+
+                return Ok(users);
+            }
+            else
+            {
+                var users = await _userRepository.FindByFilterAsync(dto);
+
+                return Ok(users);
+            }
         }
 
         /// <summary>
@@ -108,6 +103,7 @@ namespace Crnc.Oms.Security.WebApi.Controllers
         /// <response code="200">User has created</response>
         /// <response code="400">User is not valid.</response>
         [HttpPost]
+        [Authorize(Roles = Roles.Admin)]
         [OpenApiOperation("Create user", "Create new user", "Requires admin role")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ModelStateDictionary), StatusCodes.Status400BadRequest)]
@@ -150,6 +146,7 @@ namespace Crnc.Oms.Security.WebApi.Controllers
         /// <response code="400">User is not valid.</response>
         /// <response code="404">User has not found.</response>
         [HttpPut("{id}")]
+        [Authorize(Roles = Roles.Admin)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ModelStateDictionary), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -192,6 +189,7 @@ namespace Crnc.Oms.Security.WebApi.Controllers
         /// <response code="200">User has deleted</response>
         /// <response code="404">User has not found.</response>
         [HttpDelete("{id}")]
+        [Authorize(Roles = Roles.Admin)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(Guid id)

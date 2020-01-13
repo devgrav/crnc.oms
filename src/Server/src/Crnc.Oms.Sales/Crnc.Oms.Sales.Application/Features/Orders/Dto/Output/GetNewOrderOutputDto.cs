@@ -12,9 +12,7 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Dto.Output
         public string JobDescription { get; set; }
         
         public string CustomerContactPersonFirstName { get; set; }
-        
-        public string CustomerContactPersonMiddleName { get; set; }
-        
+
         public string CustomerContactPersonLastName { get; set; }
         
         public string CustomerTitle { get; set; }

@@ -14,7 +14,7 @@ import OrderCardContainer from "./components/orders/orderCard/OrderCardContainer
 const Routes: React.StatelessComponent = () => {
     return (
         <Switch>
-            <PrivateRoute roles={[Roles.Admin]} exact path="/" component={UserCards}/>
+            <PrivateRoute roles={[Roles.MainManager, Roles.Manager]} exact path="/" component={OrdersGridContainer}/>
             <PrivateRoute roles={[Roles.Admin]} path="/users/:id" component={UserCards}/>
             <PrivateRoute roles={[Roles.Admin]} path="/users" component={UserCards}/>            
             <PrivateRoute roles={[Roles.MainManager, Roles.Manager]} path="/orders/:id" component={OrderCardContainer}/>

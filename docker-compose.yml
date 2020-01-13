@@ -29,10 +29,13 @@ services:
     ports:
       - "8091:80"
     environment:
-      - "ConnectionStrings:OmsSalesDb=Host=sales-db;Database=crnc_oms_sales_db;Username=postgres;Password=docker"
+      - "ConnectionStrings:OmsSalesDb=Host=sales-db;Database=crnc_oms_sales_db;Username=postgres;Password=docker"          
+      - "IntegrationEndpoints:NotificationServiceEndpoint=notification-gateway-api"      
+      - "IntegrationEndpoints:SecurityServiceEndpoint=http://security-api"
     depends_on: 
       - sales-db
       - security-api
+      - notification-gateway-api
 
   # Notification context
   notification-email-api:
@@ -44,6 +47,8 @@ services:
   notification-push-api:
     build: src/Server/src/Crnc.Oms.Notification/Crnc.Oms.Notification.Push/
     restart: always
+    environment:
+      - "IntegrationEndpoints:UiEndpoint=http://localhost:8092"
     ports:
       - "8107:80"
   
@@ -60,16 +65,28 @@ services:
       - notification-email-api
       - notification-push-api
 
+  notification-push-client:
+    build: src/Server/src/Crnc.Oms.Notification/Crnc.Oms.Notification.Push.Client/
+    restart: always
+    environment:
+      - "IntegrationEndpoints:SecurityServiceEndpoint=http://security-api"
+      - "IntegrationEndpoints:PushNotificationServiceEndpoint=http://notification-push-api"      
+    depends_on:      
+      - notification-push-api
+      - security-api
+
   # UI
-  #crnc-oms-ui:
-  #  build:
-  #    context: "src/Client/"
-  #    args:
-  #      SECURITY_API_URL: "http://localhost:8090/api"
-  #      SALES_API_URL: "http://localhost:8091/api"
-  #  restart: always
-  #  ports:
-  #    - "8092:80"      
-  #  depends_on: 
-  #    - security-api
-  #    - sales-api       
+  crnc-oms-ui:
+    build:
+      context: "src/Client/"
+      args:
+        SECURITY_API_URL: "http://localhost:8090/api"
+        SALES_API_URL: "http://localhost:8091/api"
+        PUSH_HUBS_URL: "http://localhost:8107/api"
+    restart: always
+    ports:
+      - "8092:80"      
+    depends_on: 
+      - security-api
+      - sales-api       
+      - notification-gateway-api

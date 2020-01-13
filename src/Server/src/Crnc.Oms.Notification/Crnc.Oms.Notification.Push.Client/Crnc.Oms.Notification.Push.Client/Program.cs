@@ -17,20 +17,27 @@ namespace Crnc.Oms.Notification.Push.Client
 {
     class Program
     {
-        public static void Main(string[] args)
-        { 
-            CreateHostBuilder(args).Build().Run();
+        public static async Task Main(string[] args)
+        {
+            await CreateHostBuilder(args).RunConsoleAsync();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((hostContext, configBuilder) =>
+                {
+                    configBuilder.SetBasePath(Directory.GetCurrentDirectory());
+                    configBuilder.AddJsonFile("appsettings.json", optional: true);
+                    configBuilder.AddEnvironmentVariables();
+                })
+                .ConfigureLogging((hostContext, configLogging) =>
+                {
+                    configLogging.AddConfiguration(hostContext.Configuration.GetSection("Logging"));
+                    configLogging.AddConsole();
+                })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    var builder = new ConfigurationBuilder()
-                        .SetBasePath(Directory.GetCurrentDirectory())
-                        .AddJsonFile("appsettings.json");
-
-                    var config = builder.Build();
+                    var config = hostContext.Configuration;
 
                     services.AddHostedService<PushConnectorWorker>();
                     services.AddSingleton<IPushConnector, PushConnector>();

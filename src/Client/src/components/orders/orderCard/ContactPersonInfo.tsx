@@ -27,14 +27,6 @@ export default class ContactPersonInfo extends React.Component<ContactPersonInfo
                     autoComplete="off"
                 />
                 <Form.Input
-                    name={nameof<BaseOrderModel>(x => x.customerContactPersonMiddleName)}                                     
-                    onChange={onChange}                                            
-                    label="Middle name"
-                    value={model.customerContactPersonMiddleName || ""}
-                    error={validationInfo.hasFieldValidationError(nameof<BaseOrderModel>(x => x.customerContactPersonMiddleName))}
-                    autoComplete="off"
-                />
-                <Form.Input
                     name={nameof<BaseOrderModel>(x => x.customerContactPersonLastName)}                            
                     className="required"
                     onChange={onChange}                                                                        

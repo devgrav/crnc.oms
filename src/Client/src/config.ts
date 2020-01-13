@@ -1,18 +1,21 @@
-if(!process.env.REACT_APP_SECURITY_API_URL || !process.env.REACT_APP_SALES_API_URL)
+if(!process.env.REACT_APP_SECURITY_API_URL || !process.env.REACT_APP_SALES_API_URL || !process.env.REACT_APP_NOTIFICATION_PUSH_HUBS_URL)
     throw Error("Not found api urls in configuration of enviroment variabels")
 
 console.log("REACT_APP_SECURITY_API_URL: "+process.env.REACT_APP_SECURITY_API_URL)
 console.log("REACT_APP_SALES_API_URL: "+process.env.REACT_APP_SALES_API_URL)
+console.log("REACT_APP_NOTIFICATION_PUSH_HUBS_URL: "+process.env.REACT_APP_NOTIFICATION_PUSH_HUBS_URL)
 console.log("NODE_ENV: "+process.env.NODE_ENV)
 
 const securityApiUrl: string = process.env.REACT_APP_SECURITY_API_URL;
 const salesApiUrl: string = process.env.REACT_APP_SALES_API_URL; 
+const pushHubsUrl: string = process.env.REACT_APP_NOTIFICATION_PUSH_HUBS_URL; 
 
 const APP_CONFIG: ApplicationConfiguration = {
     usersUrl: `${securityApiUrl}/users`,
     rolesUrl: `${securityApiUrl}/roles`,
     accountsUrl: `${securityApiUrl}/accounts`,
-    ordersUrl: `${salesApiUrl}/orders`
+    ordersUrl: `${salesApiUrl}/orders`,
+    pushUrl: `${pushHubsUrl}/push`
 };
 
 interface ApplicationConfiguration{
@@ -20,6 +23,7 @@ interface ApplicationConfiguration{
     rolesUrl: string;
     accountsUrl: string;
     ordersUrl: string;
+    pushUrl: string;
 }
 
 export default APP_CONFIG;
