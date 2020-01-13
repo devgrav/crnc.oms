@@ -8,13 +8,11 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Order
     {
         public string FirstName { get; private set; }
 
-        public string MiddleName { get; private set; }
-
         public string LastName { get; private set; }
 
-        public string Value => $"{LastName} {FirstName}{(string.IsNullOrWhiteSpace(MiddleName) ? "" : " " + MiddleName)}";
+        public string Value => $"{FirstName} {LastName}";
 
-        public FullName(string firstName, string lastName, string middleName = null)
+        public FullName(string firstName, string lastName)
         {
             if(string.IsNullOrWhiteSpace(firstName))
                 throw new ArgumentNullException(nameof(firstName));;
@@ -24,7 +22,6 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Order
 
             FirstName = firstName;
             LastName = lastName;
-            MiddleName =  middleName;
         }
 
         protected FullName()

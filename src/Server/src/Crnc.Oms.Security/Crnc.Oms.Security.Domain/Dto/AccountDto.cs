@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Crnc.Oms.Security.WebApi.DTO
+namespace Crnc.Oms.Security.Domain.Dto
 {
     ///<summary>
     /// Auth users data

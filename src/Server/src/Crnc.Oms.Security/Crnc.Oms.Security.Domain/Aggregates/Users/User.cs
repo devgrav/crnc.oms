@@ -25,6 +25,11 @@ namespace Crnc.Oms.Security.Domain.Aggregates.Users
         /// <param name="passwordSalt">Salt of password</param>
         /// <param name="firstName">FirstName</param>
         /// <param name="lastName">LastName</param>
+        /// <param name="email">Email</param>
+        /// <param name="phone">Phone</param>
+        /// <param name="role">Role</param>
+        /// <param name="photo">Photo</param>
+        /// <param name="id">Id</param>
         /// <returns></returns>
         public static User CreateNew(string login, string passwordHash, string passwordSalt,
             string firstName, string lastName, string email, string phone=null, Role role=null, UserPhoto photo = null, Guid? id = null)
@@ -145,6 +150,7 @@ namespace Crnc.Oms.Security.Domain.Aggregates.Users
         /// Change password (hash of password)
         /// </summary>
         /// <param name="passwordHash">password's hash</param>
+        /// <param name="passwordSalt">password's salt</param>
         public void ChangePassword(string passwordHash, string passwordSalt)
         {
             if (string.IsNullOrWhiteSpace(passwordHash) || string.IsNullOrWhiteSpace(passwordSalt))

@@ -5,8 +5,6 @@ VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Notification.Push.WebApi", "Crnc.Oms.Notification.Push.WebApi\Crnc.Oms.Notification.Push.WebApi.csproj", "{BD37F926-D92A-4CC6-8781-1C7478097816}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Notification.Push.Client", "Crnc.Oms.Notification.Push.Client\Crnc.Oms.Notification.Push.Client.csproj", "{988DE324-987A-42C2-BFFE-1F1383133F5B}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Notification.Push.Application", "Crnc.Oms.Notification.Push.Application\Crnc.Oms.Notification.Push.Application.csproj", "{BB9605B0-3B51-491D-95B5-C5C7DBA4C487}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Notification.Push.Integration", "Crnc.Oms.Notification.Push.Integration\Crnc.Oms.Notification.Push.Integration.csproj", "{CE77330F-1C74-4D44-9EFA-77696C8170E5}"
@@ -36,18 +34,6 @@ Global
 		{BD37F926-D92A-4CC6-8781-1C7478097816}.Release|x64.Build.0 = Release|Any CPU
 		{BD37F926-D92A-4CC6-8781-1C7478097816}.Release|x86.ActiveCfg = Release|Any CPU
 		{BD37F926-D92A-4CC6-8781-1C7478097816}.Release|x86.Build.0 = Release|Any CPU
-		{988DE324-987A-42C2-BFFE-1F1383133F5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{988DE324-987A-42C2-BFFE-1F1383133F5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{988DE324-987A-42C2-BFFE-1F1383133F5B}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{988DE324-987A-42C2-BFFE-1F1383133F5B}.Debug|x64.Build.0 = Debug|Any CPU
-		{988DE324-987A-42C2-BFFE-1F1383133F5B}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{988DE324-987A-42C2-BFFE-1F1383133F5B}.Debug|x86.Build.0 = Debug|Any CPU
-		{988DE324-987A-42C2-BFFE-1F1383133F5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{988DE324-987A-42C2-BFFE-1F1383133F5B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{988DE324-987A-42C2-BFFE-1F1383133F5B}.Release|x64.ActiveCfg = Release|Any CPU
-		{988DE324-987A-42C2-BFFE-1F1383133F5B}.Release|x64.Build.0 = Release|Any CPU
-		{988DE324-987A-42C2-BFFE-1F1383133F5B}.Release|x86.ActiveCfg = Release|Any CPU
-		{988DE324-987A-42C2-BFFE-1F1383133F5B}.Release|x86.Build.0 = Release|Any CPU
 		{BB9605B0-3B51-491D-95B5-C5C7DBA4C487}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BB9605B0-3B51-491D-95B5-C5C7DBA4C487}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB9605B0-3B51-491D-95B5-C5C7DBA4C487}.Debug|x64.ActiveCfg = Debug|Any CPU

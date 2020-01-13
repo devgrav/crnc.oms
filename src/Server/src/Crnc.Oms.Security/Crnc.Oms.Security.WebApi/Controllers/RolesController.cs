@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Crnc.Oms.Security.Domain.Dto;
 using Crnc.Oms.Security.Domain.Repositories;
 using Crnc.Oms.Security.WebApi.Authorization;
-using Crnc.Oms.Security.WebApi.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

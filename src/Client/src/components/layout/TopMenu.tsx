@@ -1,8 +1,9 @@
 import * as React from "react";
 import { Link, NavLink, withRouter } from "react-router-dom";
-import { Menu, MenuItemProps } from "semantic-ui-react";
+import { Menu, MenuItemProps, Label, Icon } from "semantic-ui-react";
 import * as Logo from "../../assets/images/logo.png";
 import UserInfo from "./UserInfo";
+import Notifications from "./Notifications";
 
 export default class TopMenu
     extends React.Component<any,{}> {
@@ -24,22 +25,27 @@ export default class TopMenu
 
     public render(){
         return (
-            <Menu>
-                <Menu.Item as={Link} to="/">
-                   <img src={Logo}/>
-                </Menu.Item>
-                <Menu.Item as={NavLink} isActive={this.isActiveForDefault} to="/users" name="users" link>
-                    Users
-                </Menu.Item>
-                <Menu.Item as={NavLink} to="/orders" name="orders" link>
-                    Orders
-                </Menu.Item>
-                <Menu.Menu position="right">
-                    <Menu.Item>
-                        <UserInfo/>
+            <React.Fragment>
+                <Menu>
+                    <Menu.Item as={Link} to="/">
+                        <img src={Logo}/>
                     </Menu.Item>
-                </Menu.Menu>
-            </Menu>
+                    <Menu.Item as={NavLink} to="/users" name="users" link>
+                        Users
+                    </Menu.Item>
+                    <Menu.Item as={NavLink} isActive={this.isActiveForDefault} to="/orders" name="orders" link>
+                        Orders
+                    </Menu.Item>
+                    <Menu.Menu position="right">
+                        <Menu.Item header>
+                            <Notifications/>                         
+                        </Menu.Item>                    
+                        <Menu.Item>
+                            <UserInfo/>
+                        </Menu.Item>
+                    </Menu.Menu>
+                </Menu>
+        </React.Fragment>
         );
     }
 }

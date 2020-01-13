@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Crnc.Oms.Notification.Gateway.Integration.Settings;
 using Crnc.Oms.Sales.Domain.SeedWork;
 using Crnc.Oms.Sales.Application;
 using Crnc.Oms.Sales.Application.Features.Orders.Commands;
@@ -12,16 +13,20 @@ using Crnc.Oms.Sales.Application.Features.Orders.Dto.Output;
 using Crnc.Oms.Sales.Application.Features.Orders.Queries;
 using Crnc.Oms.Sales.DataAccess;
 using Crnc.Oms.Sales.DataAccess.Repositories;
+using Crnc.Oms.Sales.Domain.Gateways;
 using Crnc.Oms.Sales.Domain.Repositories;
+using Crnc.Oms.Sales.Integration.Gateways;
 using Crnc.Oms.Sales.WebApi.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -59,6 +64,10 @@ namespace Crnc.Oms.Sales.WebApi
                 options.UseNpgsql(Configuration.GetConnectionString("OmsSalesDb"));
             });
             
+            services.Configure<IntegrationEndpointSettings>(Configuration.GetSection("IntegrationEndpoints"));
+            
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            
             services.AddScoped<IUseCaseQueryHandler<GetOrdersForTableInputDto, GetOrdersForTableOutputDto>,GetOrdersForTable>();
             services.AddScoped<IUseCaseQueryHandler<GetNewOrderInputDto, GetNewOrderOutputDto>,GetNewOrder>();
             
@@ -67,6 +76,10 @@ namespace Crnc.Oms.Sales.WebApi
             services.AddScoped<IUseCaseCommandHandler<EditOrderInputDto, EmptyOutputDto> ,EditOrder>();
 
             services.AddScoped<IOrderRepository, OrderRepository>();
+            
+            services.AddScoped<IUserGateway, UserGateway>();
+            services.AddScoped<INotificationGateway, NotificationGateway>();
+            services.AddScoped<ICurrentUserContext, CurrentUserContext>();
 
             services.AddSingleton<ICurrentDateTimeProvider, CurrentDateTimeProvider>();
             

@@ -1,6 +1,6 @@
 using System;
 
-namespace Crnc.Oms.Security.WebApi.DTO
+namespace Crnc.Oms.Security.Domain.Dto
 {
     public class CurrentUserDto
     {

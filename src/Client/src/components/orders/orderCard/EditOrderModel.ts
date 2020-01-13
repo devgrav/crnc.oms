@@ -18,7 +18,6 @@ export default class EditOrderModel
     @observable customerTitle: string;
     @observable customerAbbreviation: string;
     @observable customerContactPersonFirstName: string;
-    @observable customerContactPersonMiddleName: string;
     @observable customerContactPersonLastName: string;
     @observable customerContactPersonEmail: string;
     @observable customerContactPersonPhone: string;        
@@ -35,7 +34,6 @@ export default class EditOrderModel
         this.status = 0;
         this.signoffType = 0;
         this.customerContactPersonFirstName = "";
-        this.customerContactPersonMiddleName = "";
         this.customerContactPersonLastName = "";
         this.customerTitle = "";
         this.customerAbbreviation = "";

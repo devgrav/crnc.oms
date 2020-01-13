@@ -7,7 +7,7 @@ namespace Crnc.Oms.Sales.Application.Validation
     [AttributeUsage(AttributeTargets.Property)]
     public sealed class NameAbbreviationValueObjectAttribute : ValidationAttribute
     {
-        public string ErrorMessage { get; set; } = "Name Abbreviation is not valid";
+        public new string ErrorMessage { get; set; } = "Name Abbreviation is not valid";
         
         public string EmptyErrorMessage { get; set; } = "Name Abbreviation is required";
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)

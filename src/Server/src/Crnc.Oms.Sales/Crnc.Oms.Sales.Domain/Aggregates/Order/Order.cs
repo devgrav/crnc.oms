@@ -38,6 +38,11 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Order
         /// Current status of order
         /// </summary>
         public OrderStatus Status { get; private set; }
+        
+        /// <summary>
+        /// Date of change status of order
+        /// </summary>
+        public DateTime StatusDate { get; private set; }
 
         /// <summary>
         /// Source of material
@@ -65,6 +70,7 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Order
             JobType = jobType;
             JobDescription = jobDescription;
             Status = OrderStatus.NotSent;
+            StatusDate = dateCreated;
             Number = Id.ToString(); //TODO: add different algoritm
         }
 
@@ -78,9 +84,10 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Order
             Customer = customer;
         }
         
-        public void ChangeStatus(OrderStatus status)
+        public void ChangeStatus(OrderStatus status, DateTime date)
         {
             Status = status;
+            StatusDate = date;
         }
 
         protected Order()

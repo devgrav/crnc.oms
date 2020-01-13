@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Crnc.Oms.Security.WebApi.Validation
+namespace Crnc.Oms.Security.Domain.Validation
 {
     [AttributeUsage(
         AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter, 

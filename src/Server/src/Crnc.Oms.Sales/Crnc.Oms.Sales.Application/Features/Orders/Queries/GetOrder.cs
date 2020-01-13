@@ -35,7 +35,6 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Queries
                 CustomerAbbreviation = order.Customer.Title.NameAbbreviation.Value,
                 CustomerTitle = order.Customer.Title.Value,
                 CustomerContactPersonFirstName = order.Customer.ContactPerson.FullName.FirstName,
-                CustomerContactPersonMiddleName = order.Customer.ContactPerson.FullName.MiddleName,
                 CustomerContactPersonLastName = order.Customer.ContactPerson.FullName.LastName,
                 CustomerContactPersonEmail = order.Customer.ContactPerson.Email.Value,
                 CustomerContactPersonPhone = order.Customer.ContactPerson.Phone.Value,

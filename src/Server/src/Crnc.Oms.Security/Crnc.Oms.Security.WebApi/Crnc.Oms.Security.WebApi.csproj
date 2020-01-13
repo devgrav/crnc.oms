@@ -18,4 +18,8 @@
     <PackageReference Include="NSwag.AspNetCore" Version="13.2.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Validation" />
+  </ItemGroup>
+
 </Project>

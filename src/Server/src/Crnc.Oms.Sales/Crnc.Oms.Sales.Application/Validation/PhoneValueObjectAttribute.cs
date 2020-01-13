@@ -8,7 +8,11 @@ namespace Crnc.Oms.Sales.Application.Validation
     [AttributeUsage(AttributeTargets.Property)]
     public sealed class PhoneValueObjectAttribute : ValidationAttribute
     {
-        public string ErrorMessage { get; set; } = "Phone is not valid";
+        public PhoneValueObjectAttribute()
+            : base("Phone is not valid")
+        {
+            
+        }
         
         public string EmptyErrorMessage { get; set; } = "Phone is required";
         
