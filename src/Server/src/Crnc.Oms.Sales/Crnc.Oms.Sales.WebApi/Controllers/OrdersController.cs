@@ -99,7 +99,7 @@ namespace Crnc.Oms.Sales.WebApi.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<CreateOrderOutputDto> Create(CreateOrderInputDto dto, CancellationToken  cancellationToken = default)
+        public async Task<CreateOrderOutputDto> Create([FromBody]CreateOrderInputDto dto, CancellationToken  cancellationToken = default)
         {
             return await _createOrderCommandHandler.HandleAsync(dto, cancellationToken);
         }
@@ -115,7 +115,7 @@ namespace Crnc.Oms.Sales.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Edit(EditOrderInputDto dto, CancellationToken  cancellationToken = default)
+        public async Task<IActionResult> Edit([FromBody]EditOrderInputDto dto, CancellationToken  cancellationToken = default)
         {
             try
             {

@@ -6,6 +6,21 @@ using Crnc.Oms.Sales.Application.Validation;
 
 namespace Crnc.Oms.Sales.Application.Features.Orders.Dto.Input
 {
+    ///<summary>
+    /// Create order data
+    /// </summary>
+    /// <example>
+    ///{
+    ///    "jobType": 1,
+    ///    "jobDescription": "Some new job",
+    ///    "customerTitle": "Some company",
+    ///    "customerAbbreviation": "SC",
+    ///    "customerContactPersonFirstName": "John",
+    ///    "customerContactPersonLastName": "Bork",
+    ///    "customerContactPersonEmail": "john_bork@somecompany.ru",
+    ///    "customerContactPersonPhone": "+79151211112"
+    ///}
+    /// </example>
     public class CreateOrderInputDto
         : IUseCaseCommand<CreateOrderOutputDto>
     {
@@ -23,9 +38,7 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Dto.Input
         
         [Required(ErrorMessage = "Contact Person First name is required")]
         public string CustomerContactPersonFirstName { get; set; }
-        
-        public string CustomerContactPersonMiddleName { get; set; }
-        
+
         [Required(ErrorMessage = "Contact Person Last name is required")]
         public string CustomerContactPersonLastName { get; set; }
         

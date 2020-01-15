@@ -30,7 +30,7 @@ services:
       - "8091:80"
     environment:
       - "ConnectionStrings:OmsSalesDb=Host=sales-db;Database=crnc_oms_sales_db;Username=postgres;Password=docker"          
-      - "IntegrationEndpoints:NotificationServiceEndpoint=notification-gateway-api"      
+      - "IntegrationEndpoints:NotificationServiceEndpoint=http://notification-gateway-api"      
       - "IntegrationEndpoints:SecurityServiceEndpoint=http://security-api"
     depends_on: 
       - sales-db
@@ -76,17 +76,17 @@ services:
       - security-api
 
   # UI
-  crnc-oms-ui:
-    build:
-      context: "src/Client/"
-      args:
-        SECURITY_API_URL: "http://localhost:8090/api"
-        SALES_API_URL: "http://localhost:8091/api"
-        PUSH_HUBS_URL: "http://localhost:8107/api"
-    restart: always
-    ports:
-      - "8092:80"      
-    depends_on: 
-      - security-api
-      - sales-api       
-      - notification-gateway-api
+  #crnc-oms-ui:
+  #  build:
+  #    context: "src/Client/"
+  #    args:
+  #      SECURITY_API_URL: "http://localhost:8090/api"
+  #      SALES_API_URL: "http://localhost:8091/api"
+  #      PUSH_HUBS_URL: "http://localhost:8107/api"
+  #  restart: always
+  #  ports:
+  #    - "8092:80"      
+  #  depends_on: 
+  #    - security-api
+  #    - sales-api       
+  #    - notification-gateway-api

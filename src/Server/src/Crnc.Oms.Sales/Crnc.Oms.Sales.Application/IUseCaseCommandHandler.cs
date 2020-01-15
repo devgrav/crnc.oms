@@ -7,6 +7,7 @@ namespace Crnc.Oms.Sales.Application
     /// Handler of command for user scenario
     /// </summary>
     /// <typeparam name="TIn"></typeparam>
+    /// <typeparam name="TOut"></typeparam>
     public interface IUseCaseCommandHandler<TIn, TOut>
         where TIn: IUseCaseCommand<TOut>
 
