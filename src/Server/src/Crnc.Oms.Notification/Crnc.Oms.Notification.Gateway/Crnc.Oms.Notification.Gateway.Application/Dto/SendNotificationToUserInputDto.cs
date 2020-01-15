@@ -8,7 +8,7 @@ namespace Crnc.Oms.Notification.Gateway.Application.Dto
     /// </summary>
     /// <example>
     ///{
-    ///     "userId": "2a89985f-f013-4f2a-9545-395efb43a142",
+    ///     "userId": "b6ba35b2-adff-43a6-9cd7-b408240a6d6f",
     ///     "message": "Some message"
     ///}
     /// </example>

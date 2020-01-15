@@ -14,7 +14,7 @@ namespace Crnc.Oms.Security.Domain.Dto
     ///     "email": "adamsmith@crnc.com",
     ///     "login": "adamsmith",
     ///     "password": 1111112,
-    ///     "phone": 9151242312,
+    ///     "phone": "+79151211111",
     ///     "roleId": "f1ba72d8-5ebc-4cc4-8b31-eaa0baa87293",
     ///     "role": "Main manager",
     ///     "isActive": true
