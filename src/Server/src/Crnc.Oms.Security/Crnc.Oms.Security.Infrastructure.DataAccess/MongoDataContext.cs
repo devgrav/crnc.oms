@@ -30,5 +30,7 @@ namespace Crnc.Oms.Security.Infrastructure.DataAccess
         public IMongoCollection<User> Users => Database.GetCollection<User>("users");
 
         public IMongoCollection<Role> Roles => Database.GetCollection<Role>("roles");
+        
+        public IMongoCollection<T> Collection<T>(string collectionName) => Database.GetCollection<T>(collectionName);
     }
 }

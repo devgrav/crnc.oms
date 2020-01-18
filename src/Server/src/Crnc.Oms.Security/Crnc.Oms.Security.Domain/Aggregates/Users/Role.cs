@@ -12,6 +12,7 @@ namespace Crnc.Oms.Security.Domain.Aggregates.Users
     /// <summary>
     /// Role of user
     /// </summary>
+    /// 
     public class Role
         : DomainEntity
     {

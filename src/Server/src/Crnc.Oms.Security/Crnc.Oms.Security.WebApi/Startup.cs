@@ -16,7 +16,9 @@ using Newtonsoft.Json.Serialization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
+using Crnc.Oms.Security.Domain.Aggregates.Users;
 using Crnc.Oms.Security.Domain.SeedWork;
+using Crnc.Oms.Security.Infrastructure.DataAccess.Cache;
 using Crnc.Oms.Security.WebApi.Authorization;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json.Converters;
@@ -50,6 +52,8 @@ namespace Crnc.Oms.Security.WebApi
             services.Configure<MongoDbSettings>(Configuration.GetSection("ConnectionStrings:OmsSecurityDb"));
             services.Configure<AuthSettings>(Configuration.GetSection("Auth"));
 
+            services.AddDistributedMemoryCache();
+            
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -89,8 +93,10 @@ namespace Crnc.Oms.Security.WebApi
                 options.SerializerSettings.Converters.Add(new StringEnumConverter());
             });
             
-            services.AddScoped<IUserRepository, MongoDbUserRepository>();
+            services.AddScoped<IUserRepository, CachedMongoDbUserRepository>();
             services.AddSingleton<ICurrentDateTimeProvider, CurrentDateTimeProvider>();
+            services.AddScoped<IEntityCollectionCacheProvider<User>, MongoEntityCollectionCacheProvider<User>>();
+            services.AddScoped<IEntityCollectionCacheProvider<Role>, MongoEntityCollectionCacheProvider<Role>>();
             services.AddSingleton<MongoDataContext>();     
         }
 
