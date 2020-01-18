@@ -11,6 +11,7 @@ namespace Crnc.Oms.Security.Domain.Aggregates.Users
     /// <summary>
     /// Photo of user
     /// </summary>
+    /// 
     public class UserPhoto
     {
         /// <summary>
