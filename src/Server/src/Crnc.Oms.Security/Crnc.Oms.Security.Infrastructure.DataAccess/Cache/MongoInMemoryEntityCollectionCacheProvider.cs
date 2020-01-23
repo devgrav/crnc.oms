@@ -6,21 +6,25 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Crnc.Oms.Security.Domain.Aggregates.Users;
 using Crnc.Oms.Security.Domain.SeedWork;
 using Crnc.Oms.Security.Infrastructure.DataAccess.Cache;
 using Crnc.Oms.Security.Infrastructure.DataAccess.Exceptions;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 
 namespace Crnc.Oms.Security.Infrastructure.DataAccess.Cache
 {
-    public class MongoEntityCollectionCacheProvider<T>
+    public class MongoInMemoryEntityCollectionCacheProvider<T>
         : IEntityCollectionCacheProvider<T>
     {
-        private readonly IDistributedCache _cache;
+        private readonly IMemoryCache _cache;
         private readonly MongoDataContext _mongoDataContext;
 
-        public MongoEntityCollectionCacheProvider(IDistributedCache cache, MongoDataContext mongoDataContext)
+        public MongoInMemoryEntityCollectionCacheProvider(IMemoryCache cache, MongoDataContext mongoDataContext)
         {
             _cache = cache;
             _mongoDataContext = mongoDataContext;
@@ -28,12 +32,11 @@ namespace Crnc.Oms.Security.Infrastructure.DataAccess.Cache
         
         public async Task<IEnumerable<T>> GetAsync(string key)
         {
-            var entityData =  await _cache.GetAsync(key);
+            var entities = _cache.Get<IEnumerable<T>>(key);
             IEnumerable<T> collection = null;
-            if (entityData != null && entityData.Any())
+            if (entities != null && entities.Any())
             {
-                collection = JsonSerializer.Deserialize<IEnumerable<T>>(entityData);
-                return collection;
+                return entities;
             }
 
             await RefreshAsync(key);
@@ -47,14 +50,7 @@ namespace Crnc.Oms.Security.Infrastructure.DataAccess.Cache
         {
             var collection = await _mongoDataContext.Collection<T>(key).AsQueryable().ToListAsync();
 
-            await SetAsync(collection, key);
-        }
-
-        private async Task SetAsync(IEnumerable<T> entities, string key)
-        {
-            var json = JsonSerializer.Serialize(entities);
-
-            await _cache.SetAsync(key, Encoding.UTF8.GetBytes(json));
+            _cache.Set(key, collection);
         }
     }
 }

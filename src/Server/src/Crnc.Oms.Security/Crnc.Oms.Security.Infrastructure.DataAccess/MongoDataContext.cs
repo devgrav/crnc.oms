@@ -27,7 +27,7 @@ namespace Crnc.Oms.Security.Infrastructure.DataAccess
             Database = Client.GetDatabase(settings.Value.Database);
         }
 
-        public IMongoCollection<User> Users => Database.GetCollection<User>("users");
+        public IMongoCollection<User> Users => Database.GetCollection<User>("users", new MongoCollectionSettings());
 
         public IMongoCollection<Role> Roles => Database.GetCollection<Role>("roles");
         

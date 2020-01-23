@@ -2,6 +2,7 @@ using Crnc.Oms.Security.Domain.Aggregates.Users;
 using Crnc.Oms.Security.Infrastructure.CrossCutting;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -9,6 +10,8 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Bogus;
+using Crnc.Oms.Security.Domain.Dto;
 
 namespace Crnc.Oms.Security.Infrastructure.DataAccess.Data
 {
@@ -48,7 +51,43 @@ namespace Crnc.Oms.Security.Infrastructure.DataAccess.Data
 
                 };
 
-            return users;
+                var roleIds = roles.Select(x => x.Id).ToList();
+
+                var faker = new Faker<UserItemDto>()
+                    .CustomInstantiator(x => new UserItemDto())
+                    .RuleFor(x => x.FirstName, (f, u) => f.Name.FirstName())
+                    .RuleFor(x => x.LastName, (f, u) => f.Name.LastName())
+                    .RuleFor(x => x.Login, (f, u) => $"{u.FirstName}_{u.LastName}".ToLower())
+                    .RuleFor(x => x.Email, (f, u) => $"{u.Login}@crmc.ru")
+                    .RuleFor(x => x.Phone, (f, u) => f.Phone.PhoneNumber("1-###-###-####"))
+                    .RuleFor(x => x.RoleId, (f, u) => f.PickRandom(roleIds))
+                    .RuleFor(x => x.Id, (f, u) => Guid.NewGuid());
+
+                var counter = 1;
+                var maxCount = 10000;
+                foreach (var userItemDto in faker.GenerateForever())
+                {
+                    if(counter == maxCount)
+                        break;
+
+                    users.Add(
+                        User.CreateNew(
+                            userItemDto.Login, 
+                            password.Hash, 
+                            password.Salt, 
+                            userItemDto.FirstName, 
+                            userItemDto.LastName, 
+                            userItemDto.Email, 
+                            userItemDto.Phone, 
+                            roles.First(r=> r.Id.Equals(userItemDto.RoleId)),
+                            null, 
+                            userItemDto.Id)
+                        );
+
+                    counter++;
+                }
+
+                return users;
         }
 
         private static List<UserPhoto> GetUserPhotos()

@@ -8,6 +8,7 @@ using Crnc.Oms.Security.Domain.Aggregates.Users;
 using UserEntity = Crnc.Oms.Security.Domain.Aggregates.Users.User;
 using System.ComponentModel.DataAnnotations;
 using Crnc.Oms.Security.Domain.Dto;
+using Crnc.Oms.Security.Domain.Validation;
 using Crnc.Oms.Security.Infrastructure.CrossCutting;
 using Crnc.Oms.Security.Infrastructure.DataAccess.Exceptions;
 using Crnc.Oms.Security.WebApi.Authorization;
@@ -64,7 +65,7 @@ namespace Crnc.Oms.Security.WebApi.Controllers
         /// <remarks>Requires admin role</remarks>
         /// <response code="200">Returns users.</response>
         /// <response code="404">Not found user.</response>
-        [HttpGet("{id}")]
+        [HttpGet("{id:Guid}")]
         [ProducesResponseType(typeof(UserItemDto),StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Get(Guid id)
@@ -145,7 +146,7 @@ namespace Crnc.Oms.Security.WebApi.Controllers
         /// <response code="200">User has updated</response>
         /// <response code="400">User is not valid.</response>
         /// <response code="404">User has not found.</response>
-        [HttpPut("{id}")]
+        [HttpPut("{id:Guid}")]
         [Authorize(Roles = Roles.Admin)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ModelStateDictionary), StatusCodes.Status400BadRequest)]

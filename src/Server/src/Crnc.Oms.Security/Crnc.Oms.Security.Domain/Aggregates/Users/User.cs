@@ -69,7 +69,7 @@ namespace Crnc.Oms.Security.Domain.Aggregates.Users
             };               
         }
 
-        protected User()
+        private User()
         {
 
         } 
