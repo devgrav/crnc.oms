@@ -51,8 +51,7 @@ namespace Crnc.Oms.Security.WebApi
             services.AddOptions();
             services.Configure<MongoDbSettings>(Configuration.GetSection("ConnectionStrings:OmsSecurityDb"));
             services.Configure<AuthSettings>(Configuration.GetSection("Auth"));
-
-            services.AddDistributedMemoryCache();
+            services.Configure<AuthSettings>(Configuration.GetSection("Cache"));
             
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -93,10 +92,22 @@ namespace Crnc.Oms.Security.WebApi
                 options.SerializerSettings.Converters.Add(new StringEnumConverter());
             });
             
-            services.AddScoped<IUserRepository, CachedMongoDbUserRepository>();
+            var cacheSettings = new CacheSettings();
+            Configuration.GetSection("Cache").Bind(cacheSettings);
+
+            if (cacheSettings.IsUse)
+            {
+                services.AddScoped<IEntityCollectionCacheProvider<User>, MongoInMemoryEntityCollectionCacheProvider<User>>();
+                services.AddScoped<IEntityCollectionCacheProvider<Role>, MongoInMemoryEntityCollectionCacheProvider<Role>>();
+                services.AddScoped<IUserRepository, CachedMongoDbUserRepository>();
+                services.AddMemoryCache();
+            }
+            else
+            {
+                services.AddScoped<IUserRepository, MongoDbUserRepository>();
+            }
+            
             services.AddSingleton<ICurrentDateTimeProvider, CurrentDateTimeProvider>();
-            services.AddScoped<IEntityCollectionCacheProvider<User>, MongoEntityCollectionCacheProvider<User>>();
-            services.AddScoped<IEntityCollectionCacheProvider<Role>, MongoEntityCollectionCacheProvider<Role>>();
             services.AddSingleton<MongoDataContext>();     
         }
 
