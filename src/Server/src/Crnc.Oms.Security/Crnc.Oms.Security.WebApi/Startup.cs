@@ -51,7 +51,7 @@ namespace Crnc.Oms.Security.WebApi
             services.AddOptions();
             services.Configure<MongoDbSettings>(Configuration.GetSection("ConnectionStrings:OmsSecurityDb"));
             services.Configure<AuthSettings>(Configuration.GetSection("Auth"));
-            services.Configure<AuthSettings>(Configuration.GetSection("Cache"));
+            services.Configure<CacheSettings>(Configuration.GetSection("Cache"));
             
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -94,7 +94,7 @@ namespace Crnc.Oms.Security.WebApi
             
             var cacheSettings = new CacheSettings();
             Configuration.GetSection("Cache").Bind(cacheSettings);
-
+            
             if (cacheSettings.IsUse)
             {
                 services.AddScoped<IEntityCollectionCacheProvider<User>, MongoInMemoryEntityCollectionCacheProvider<User>>();
@@ -108,7 +108,7 @@ namespace Crnc.Oms.Security.WebApi
             }
             
             services.AddSingleton<ICurrentDateTimeProvider, CurrentDateTimeProvider>();
-            services.AddSingleton<MongoDataContext>();     
+            services.AddSingleton<MongoDataContext>();
         }
 
         /// <summary>
@@ -116,7 +116,6 @@ namespace Crnc.Oms.Security.WebApi
         /// </summary>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, MongoDataContext mongoDataContext)
         {
-
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
 
