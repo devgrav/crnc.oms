@@ -86,8 +86,12 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Order
         
         public void ChangeStatus(OrderStatus status, DateTime date)
         {
+            var oldStatus = Status;
+            
             Status = status;
             StatusDate = date;
+            
+            AddDomainEvent(new StatusChanged(oldStatus, Status));
         }
 
         protected Order()
