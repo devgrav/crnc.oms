@@ -11,4 +11,8 @@
       <ProjectReference Include="..\Crnc.Oms.Sales.Domain\Crnc.Oms.Sales.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="MediatR" Version="8.0.0" />
+    </ItemGroup>
+
 </Project>

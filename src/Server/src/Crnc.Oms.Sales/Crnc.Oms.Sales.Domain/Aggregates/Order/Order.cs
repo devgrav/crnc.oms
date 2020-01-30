@@ -59,11 +59,19 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Order
         /// </summary>
         public Customer Customer { get; private set; }
 
-        public Order(Guid id, DateTime dateCreated, JobType jobType, string jobDescription, Customer customer)
+        /// <summary>
+        /// Manager of order
+        /// </summary>
+        public Manager Manager { get; set; }
+
+        public Order(Guid id, DateTime dateCreated, JobType jobType, string jobDescription, Customer customer, Manager manager)
             : base(id)
         {
             if(string.IsNullOrWhiteSpace(jobDescription))
                 throw new ArgumentNullException(nameof(jobDescription));
+            
+            if(manager == null)
+                throw new ArgumentNullException(nameof(manager));
 
             Customer = customer ?? throw new ArgumentNullException(nameof(customer));
             DateCreated = dateCreated;
@@ -72,6 +80,7 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Order
             Status = OrderStatus.NotSent;
             StatusDate = dateCreated;
             Number = Id.ToString(); //TODO: add different algoritm
+            Manager = manager;
         }
 
         public void Edit(JobType jobType, string jobDescription, MaterialSource? materialSource,
@@ -84,14 +93,14 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Order
             Customer = customer;
         }
         
-        public void ChangeStatus(OrderStatus status, DateTime date)
+        public void ChangeStatus(OrderStatus status, DateTime currentDate, Manager changedManager)
         {
             var oldStatus = Status;
             
             Status = status;
-            StatusDate = date;
+            StatusDate = currentDate;
             
-            AddDomainEvent(new StatusChanged(oldStatus, Status));
+            AddDomainEvent(new OrderStatusChanged(oldStatus, Status, changedManager, currentDate));
         }
 
         protected Order()

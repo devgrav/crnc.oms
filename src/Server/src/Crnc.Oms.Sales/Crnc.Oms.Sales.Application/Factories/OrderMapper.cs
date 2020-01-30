@@ -7,7 +7,7 @@ namespace Crnc.Oms.Sales.Application.Factories
 {
     public static class OrderMapper
     {
-        public static Order MapNewOrder(CreateOrderInputDto dto, ICurrentDateTimeProvider currentDateTimeProvider)
+        public static Order MapNewOrder(CreateOrderInputDto dto, ICurrentDateTimeProvider currentDateTimeProvider, Manager manager)
         {
             var customer = new Customer(
                 new Title(dto.CustomerTitle, 
@@ -23,7 +23,8 @@ namespace Crnc.Oms.Sales.Application.Factories
                 currentDateTimeProvider.GetNow(), 
                 dto.JobType, 
                 dto.JobDescription,
-                customer);
+                customer,
+                manager);
 
             return order;
         }

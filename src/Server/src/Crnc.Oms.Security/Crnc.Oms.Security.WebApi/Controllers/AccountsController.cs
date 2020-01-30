@@ -87,7 +87,8 @@ namespace Crnc.Oms.Security.WebApi.Controllers
                 new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role.Title),
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.GivenName, user.FirstName),
-                new Claim(ClaimTypes.Surname,user.LastName)
+                new Claim(ClaimTypes.Surname,user.LastName),
+                new Claim(ClaimTypes.Email,user.Email)
             };
             ClaimsIdentity claimsIdentity =
             new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,

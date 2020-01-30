@@ -12,7 +12,7 @@ using Crnc.Oms.Sales.Domain.Repositories;
 
 namespace Crnc.Oms.Sales.Application.Features.Orders.Queries
 {
-    public class GetNewOrder
+    public class GetNewOrderHandler
         : IUseCaseQueryHandler<GetNewOrderInputDto,GetNewOrderOutputDto>
     {
         public async Task<GetNewOrderOutputDto> HandleAsync(GetNewOrderInputDto queryData, CancellationToken cancellationToken = default)

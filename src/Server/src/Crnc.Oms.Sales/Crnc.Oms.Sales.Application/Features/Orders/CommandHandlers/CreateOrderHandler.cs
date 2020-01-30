@@ -11,24 +11,27 @@ using Crnc.Oms.Sales.Domain.SeedWork;
 
 namespace Crnc.Oms.Sales.Application.Features.Orders.Commands
 {
-    public class CreateOrder
+    public class CreateOrderHandler
         : IUseCaseCommandHandler<CreateOrderInputDto, CreateOrderOutputDto>
     {
         private readonly IOrderRepository _orderRepository;
         private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
+        private readonly ICurrentUserContext _currentUserContext;
 
-        public CreateOrder(IOrderRepository orderRepository, ICurrentDateTimeProvider currentDateTimeProvider)
+        public CreateOrderHandler(IOrderRepository orderRepository, ICurrentDateTimeProvider currentDateTimeProvider, ICurrentUserContext currentUserContext)
         {
             _orderRepository = orderRepository;
             _currentDateTimeProvider = currentDateTimeProvider;
+            _currentUserContext = currentUserContext;
         }
         
         public async Task<CreateOrderOutputDto> HandleAsync(CreateOrderInputDto command, CancellationToken cancellationToken = default)
         {
             if(command == null)
                 throw new ArgumentNullException(nameof(command));
-
-            var order = OrderMapper.MapNewOrder(command, _currentDateTimeProvider);
+            
+            var manager = ManagerFactory.GetCurrentUserAsManager(_currentUserContext);
+            var order = OrderMapper.MapNewOrder(command, _currentDateTimeProvider, manager);
             
             _orderRepository.Add(order);
 

@@ -10,7 +10,7 @@ namespace Crnc.Oms.Sales.Domain.Repositories
     /// Base interface of repository
     /// </summary>
     public interface IRepository<TEntity>
-        where TEntity: IAggregateRoot
+        where TEntity: class, IAggregateRoot
     {
         /// <summary>
         /// Find all aggregate root entities
