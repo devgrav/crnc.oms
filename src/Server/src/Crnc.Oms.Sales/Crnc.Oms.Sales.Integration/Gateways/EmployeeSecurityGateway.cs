@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Crnc.Oms.Notification.Gateway.Integration.Settings;
-using Crnc.Oms.Sales.Domain.Dto;
+using Crnc.Oms.Sales.Domain.Aggregates.Order;
 using Crnc.Oms.Sales.Domain.Gateways;
 using Crnc.Oms.Sales.Domain.SeedWork;
+using Crnc.Oms.Sales.Integration.Dto;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RestSharp;
@@ -13,13 +15,13 @@ using RestSharp.Authenticators;
 
 namespace Crnc.Oms.Sales.Integration.Gateways
 {
-    public class UserGateway
-        : IUserGateway
+    public class EmployeeSecurityGateway
+        : IEmployeeGateway
     {
-        private readonly ILogger<UserGateway> _logger;
+        private readonly ILogger<EmployeeSecurityGateway> _logger;
         private readonly RestClient _client;
 
-        public UserGateway(IOptions<IntegrationEndpointSettings> settings, ILogger<UserGateway> logger,  ICurrentUserContext currentUserContext)
+        public EmployeeSecurityGateway(IOptions<IntegrationEndpointSettings> settings, ILogger<EmployeeSecurityGateway> logger,  ICurrentUserContext currentUserContext)
         {
             _logger = logger;
             _client = new RestClient(settings.Value.SecurityServiceEndpoint)
@@ -28,15 +30,36 @@ namespace Crnc.Oms.Sales.Integration.Gateways
             };
         }
         
-        public async Task<UsersByRolesOutputDto> GetUsersByRolesAsync(UsersByRolesInputDto dto, CancellationToken cancellationToken = default)
+        public async Task<List<Manager>> GetMainManagersAsync(CancellationToken cancellationToken = default)
         {
-            _logger.LogInformation($"Getting users by roles {string.Join(",", dto.Roles)} from Security service");
+            var roles = new List<string>()
+            {
+                UserRoles.MainManager
+            };
+            
+            var users = await GetUsersByRolesAsync(roles, cancellationToken);
+            
+            return users.Select(x =>
+                new Manager(new FullName(
+                    x.FirstName, 
+                    x.LastName), 
+                        new Email(x.Email), 
+                        x.Login, 
+                        x.Id))
+                .ToList();
+        }
+
+        private async Task<List<UserItemDto>> GetUsersByRolesAsync(List<string> roles,
+            CancellationToken cancellationToken = default)
+        {
+            _logger.LogInformation($"Getting users by roles {string.Join(",", roles)} from Security service");
 
             var request = new RestRequest("/api/users", DataFormat.Json)
             {
                 Method = Method.GET
             };
-            dto.Roles.ForEach(x => request.AddParameter("roles", x, ParameterType.GetOrPost));
+            
+            roles.ForEach(x => request.AddParameter("roles", x, ParameterType.GetOrPost));
             
             var response = await _client.ExecuteAsync<List<UserItemDto>>(request, cancellationToken);
 
@@ -57,12 +80,9 @@ namespace Crnc.Oms.Sales.Integration.Gateways
                 throw exception;
             }
             
-            _logger.LogInformation($"Got users by roles {string.Join(",", dto.Roles)} from Sales service");
+            _logger.LogInformation($"Got users by roles {string.Join(",", roles)} from Sales service");
 
-            return new UsersByRolesOutputDto()
-            {
-                Items = response.Data
-            };
+            return response.Data;
         }
     }
 }

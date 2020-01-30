@@ -1,7 +1,13 @@
 using System;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using Crnc.Oms.Sales.DataAccess.Mappings;
 using Crnc.Oms.Sales.Domain.Aggregates.Order;
+using Crnc.Oms.Sales.Domain.SeedWork;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Crnc.Oms.Sales.DataAccess
 {
@@ -15,11 +21,13 @@ namespace Crnc.Oms.Sales.DataAccess
         /// Orders aggregates set
         /// </summary>
         public DbSet<Order> Orders { get; set; }
-
+        
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfiguration(new OrderMappingConfiguration());
+            modelBuilder.ApplyConfiguration(new ManagerMappingConfiguration());
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

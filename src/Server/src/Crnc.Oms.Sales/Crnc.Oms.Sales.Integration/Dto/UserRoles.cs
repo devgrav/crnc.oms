@@ -1,4 +1,4 @@
-﻿namespace Crnc.Oms.Sales.Domain.Dto
+﻿namespace Crnc.Oms.Sales.Integration.Dto
 {
     public class UserRoles
     {

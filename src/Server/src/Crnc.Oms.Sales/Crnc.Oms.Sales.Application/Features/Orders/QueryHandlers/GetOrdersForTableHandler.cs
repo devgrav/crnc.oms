@@ -13,12 +13,12 @@ using Crnc.Oms.Sales.Domain.Repositories;
 
 namespace Crnc.Oms.Sales.Application.Features.Orders.Queries
 {
-    public class GetOrdersForTable
+    public class GetOrdersForTableHandler
         : IUseCaseQueryHandler<GetOrdersForTableInputDto, GetOrdersForTableOutputDto>
     {
         private readonly IOrderRepository _orderRepository;
 
-        public GetOrdersForTable(IOrderRepository orderRepository)
+        public GetOrdersForTableHandler(IOrderRepository orderRepository)
         {
             _orderRepository = orderRepository;
         }

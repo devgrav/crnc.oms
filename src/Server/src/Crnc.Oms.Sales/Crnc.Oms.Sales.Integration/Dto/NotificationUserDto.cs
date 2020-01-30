@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Crnc.Oms.Sales.Domain.Dto
+namespace Crnc.Oms.Sales.Integration.Dto
 {
-    public class NotifyUserInputDto
+    public class NotificationUserDto
     {
         public Guid UserId { get; set; }
         

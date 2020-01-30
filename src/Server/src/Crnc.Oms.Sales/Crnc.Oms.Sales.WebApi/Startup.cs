@@ -17,6 +17,7 @@ using Crnc.Oms.Sales.Domain.Gateways;
 using Crnc.Oms.Sales.Domain.Repositories;
 using Crnc.Oms.Sales.Integration.Gateways;
 using Crnc.Oms.Sales.WebApi.Authorization;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -68,16 +69,19 @@ namespace Crnc.Oms.Sales.WebApi
             
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             
-            services.AddScoped<IUseCaseQueryHandler<GetOrdersForTableInputDto, GetOrdersForTableOutputDto>,GetOrdersForTable>();
-            services.AddScoped<IUseCaseQueryHandler<GetNewOrderInputDto, GetNewOrderOutputDto>,GetNewOrder>();
+            services.AddScoped<IUseCaseQueryHandler<GetOrdersForTableInputDto, GetOrdersForTableOutputDto>,GetOrdersForTableHandler>();
+            services.AddScoped<IUseCaseQueryHandler<GetNewOrderInputDto, GetNewOrderOutputDto>,GetNewOrderHandler>();
             
-            services.AddScoped<IUseCaseQueryHandler<GetOrderInputDto, GetOrderOutputDto>,GetOrder>();
-            services.AddScoped<IUseCaseCommandHandler<CreateOrderInputDto, CreateOrderOutputDto>,CreateOrder>();
-            services.AddScoped<IUseCaseCommandHandler<EditOrderInputDto, EmptyOutputDto> ,EditOrder>();
+            services.AddScoped<IUseCaseQueryHandler<GetOrderInputDto, GetOrderOutputDto>,GetOrderHandler>();
+            services.AddScoped<IUseCaseCommandHandler<CreateOrderInputDto, CreateOrderOutputDto>,CreateOrderHandler>();
+            services.AddScoped<IUseCaseCommandHandler<EditOrderInputDto, EmptyOutputDto> ,EditOrderHandler>();
 
+            services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
+            services.AddMediatR(typeof(IDomainEventNotificationHandler<>).Assembly);
+            
             services.AddScoped<IOrderRepository, OrderRepository>();
             
-            services.AddScoped<IUserGateway, UserGateway>();
+            services.AddScoped<IEmployeeGateway, EmployeeSecurityGateway>();
             services.AddScoped<INotificationGateway, NotificationGateway>();
             services.AddScoped<ICurrentUserContext, CurrentUserContext>();
 

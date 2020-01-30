@@ -6,6 +6,7 @@
 
     <ItemGroup>
       <Folder Include="Aggregates" />
+      <Folder Include="Dto" />
     </ItemGroup>
 
 </Project>

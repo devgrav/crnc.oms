@@ -1,10 +1,14 @@
 ﻿using System;
 
-namespace Crnc.Oms.Sales.Domain.Dto
+namespace Crnc.Oms.Sales.Integration.Dto
 {
     public class UserItemDto
     {
         public Guid Id { get; set; }
+
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
         
         public string FullName { get; set; }
 

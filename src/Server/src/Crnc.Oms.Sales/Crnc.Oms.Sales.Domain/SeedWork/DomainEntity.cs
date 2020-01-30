@@ -68,12 +68,12 @@ namespace Crnc.Oms.Sales.Domain.SeedWork
         }
         #endregion
 
-        protected void AddDomainEvent(DomainEvent domainEvent)
+        public void AddDomainEvent(DomainEvent domainEvent)
         {
             _domainEvents.Add(domainEvent);
         }
         
-        protected void RemoveDomainEvent(DomainEvent domainEvent)
+        public void RemoveDomainEvent(DomainEvent domainEvent)
         {
             _domainEvents.Remove(domainEvent);
         }
