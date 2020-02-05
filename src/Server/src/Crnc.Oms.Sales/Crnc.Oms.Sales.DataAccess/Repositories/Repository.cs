@@ -11,7 +11,7 @@ namespace Crnc.Oms.Sales.DataAccess.Repositories
 {
     public abstract class Repository<TEntity>
         : IRepository<TEntity>
-        where TEntity: class, IAggregateRoot
+        where TEntity: DomainEntity, IAggregateRoot
     {
         protected readonly SalesDataContext _dataContext;
         protected readonly IDomainEventDispatcher _domainEventDispatcher;
@@ -29,7 +29,7 @@ namespace Crnc.Oms.Sales.DataAccess.Repositories
 
         public async Task<TEntity> FindByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            return await _dataContext.Set<TEntity>().SingleOrDefaultAsync(cancellationToken);
+            return await _dataContext.Set<TEntity>().SingleOrDefaultAsync(x=> x.Id == id,cancellationToken);
         }
 
         public void Add(TEntity entity)
