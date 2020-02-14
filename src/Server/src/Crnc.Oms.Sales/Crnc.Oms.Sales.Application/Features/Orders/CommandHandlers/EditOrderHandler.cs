@@ -28,22 +28,22 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Commands
             _currentDateTimeProvider = currentDateTimeProvider;
             _userContext = userContext;
         }
-        
-        public async Task<EmptyOutputDto> HandleAsync(EditOrderInputDto command, CancellationToken cancellationToken = default)
+
+        public async Task<EmptyOutputDto> Handle(EditOrderInputDto request, CancellationToken cancellationToken)
         {
-            if(command == null)
-                throw new ArgumentNullException(nameof(command));
+            if(request == null)
+                throw new ArgumentNullException(nameof(request));
 
             var manager = ManagerFactory.GetCurrentUserAsManager(_userContext);
             
-            var order = await _orderRepository.FindByIdAsync(command.Id, cancellationToken);
+            var order = await _orderRepository.FindByIdAsync(request.Id, cancellationToken);
             
             if(order == null)
                 throw new MissingEntityException("Order not found");
 
-            order = OrderMapper.MapExistedOrder(order, command);
+            order = OrderMapper.MapExistedOrder(order, request);
 
-            order.ChangeStatus(command.Status,_currentDateTimeProvider.GetNow(), manager);
+            order.ChangeStatus(request.Status,_currentDateTimeProvider.GetNow(), manager);
 
             await _orderRepository.SaveChangesAsync(cancellationToken);
             

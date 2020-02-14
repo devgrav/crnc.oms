@@ -15,24 +15,24 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Queries
     public class GetNewOrderHandler
         : IUseCaseQueryHandler<GetNewOrderInputDto,GetNewOrderOutputDto>
     {
-        public async Task<GetNewOrderOutputDto> HandleAsync(GetNewOrderInputDto queryData, CancellationToken cancellationToken = default)
+        public async Task<GetNewOrderOutputDto> Handle(GetNewOrderInputDto request, CancellationToken cancellationToken)
         {
             var allJobTypes = new List<TextValueOutputDto<int, string>>()
+            {
+                new TextValueOutputDto<int, string>()
                 {
-                    new TextValueOutputDto<int, string>()
-                    {
-                        Value = 0,
-                        Text = "Not chosen"
-                    }
-                };
+                    Value = 0,
+                    Text = "Not chosen"
+                }
+            };
             
             var jobTypes =
                 EnumHelper.ToDictionaryWithKeysAndDescriptions(JobType.New).Select(x =>
-                    new TextValueOutputDto<int, string>()
-                    {
-                        Text = x.Value,
-                        Value = x.Key
-                    })
+                        new TextValueOutputDto<int, string>()
+                        {
+                            Text = x.Value,
+                            Value = x.Key
+                        })
                     .ToList();
             
             allJobTypes.AddRange(jobTypes);

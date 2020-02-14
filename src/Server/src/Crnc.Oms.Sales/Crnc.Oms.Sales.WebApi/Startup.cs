@@ -77,7 +77,7 @@ namespace Crnc.Oms.Sales.WebApi
             services.AddScoped<IUseCaseCommandHandler<EditOrderInputDto, EmptyOutputDto> ,EditOrderHandler>();
 
             services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
-            services.AddMediatR(typeof(IDomainEventNotificationHandler<>).Assembly);
+            services.AddMediatR(typeof(IDomainEventNotificationHandler).Assembly);
             
             services.AddScoped<IOrderRepository, OrderRepository>();
             
@@ -86,6 +86,7 @@ namespace Crnc.Oms.Sales.WebApi
             services.AddScoped<ICurrentUserContext, CurrentUserContext>();
 
             services.AddSingleton<ICurrentDateTimeProvider, CurrentDateTimeProvider>();
+            services.AddScoped<ICommandQueryDispatcher, CommandQueryDispatcher>();
             
             services.Configure<AuthSettings>(Configuration.GetSection("Auth"));
             
