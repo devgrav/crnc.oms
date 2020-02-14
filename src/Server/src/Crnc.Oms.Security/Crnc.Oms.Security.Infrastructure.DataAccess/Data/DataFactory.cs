@@ -33,25 +33,29 @@ namespace Crnc.Oms.Security.Infrastructure.DataAccess.Data
         {
                 var password = PasswordHelper.GetHash("111111");
                 var photos = GetUserPhotos();
+                
+                var adminRole = roles.First(r => r.Title.Equals("Admin"));
+                var managerRole = roles.First(r => r.Title.Equals("Manager"));
+                var mainManagerRole = roles.First(r => r.Title.Equals("Main manager"));
 
                 var users = new List<User>()
                 {
-                    User.CreateNew("admin",password.Hash, password.Salt,"John","Admin","admin@crnc.com",null, roles.First(r=> r.Title.Equals("Admin")),null, Guid.Parse("2a89985f-f013-4f2a-9545-395efb43a142")),
-                    User.CreateNew("jack_richer",password.Hash, password.Salt,"Jack","Richer","jack_richer@crnc.com",null, roles.First(r=> r.Title.Equals("Admin")),photos[0]),
-                    User.CreateNew("shon_bean",password.Hash, password.Salt,"Shon","Bean","shon_bean@crnc.com",null,roles.First(r=> r.Title.Equals("Main manager")),photos[1], Guid.Parse("b6ba35b2-adff-43a6-9cd7-b408240a6d6f")),
-                    User.CreateNew("helen_smith",password.Hash, password.Salt,"Helen","Smith","helen_smith@crnc.com",null,roles.First(r=> r.Title.Equals("Main manager")),photos[2]),
-                    User.CreateNew("agness_stuart",password.Hash, password.Salt,"Agness","Stuart","agness_stuart@crnc.com",null,roles.First(r=> r.Title.Equals("Manager")),photos[3]),
-                    User.CreateNew("darius_larson",password.Hash, password.Salt,"Darius","Larson","darius_larson@crnc.com",null,roles.First(r=> r.Title.Equals("Manager")),null),
-                    User.CreateNew("gillian_labadie",password.Hash, password.Salt,"Gillian","Labadie","darius_larson@crnc.com",null,roles.First(r=> r.Title.Equals("Manager")),null),
-                    User.CreateNew("jonas_nolan",password.Hash, password.Salt,"Jonas","Nolan","jonas_nolan@crnc.com",null,roles.First(r=> r.Title.Equals("Manager")),null),
-                    User.CreateNew("harvey_denesik",password.Hash, password.Salt,"Harvey","Denesik","harvey_denesik@crnc.com",null,roles.First(r=> r.Title.Equals("Manager")),null),
-                    User.CreateNew("jordon_ortiz",password.Hash, password.Salt,"Jordon","Ortiz","jordon_ortiz@crnc.com",null,roles.First(r=> r.Title.Equals("Manager")),null),
-                    User.CreateNew("brook_dach",password.Hash, password.Salt,"Brook","Dack","brook_dach@crnc.com",null,roles.First(r=> r.Title.Equals("Manager")),null),
-                    User.CreateNew("kiel_jones",password.Hash, password.Salt,"Kiel","Jones","kiel_jones@crnc.com",null,roles.First(r=> r.Title.Equals("Manager")),null)
+                    User.CreateNew("admin",password.Hash, password.Salt,"John","Admin","admin@crnc.com",null, adminRole,null, Guid.Parse("2a89985f-f013-4f2a-9545-395efb43a142")),
+                    User.CreateNew("jack_richer",password.Hash, password.Salt,"Jack","Richer","jack_richer@crnc.com",null, adminRole,photos[0]),
+                    User.CreateNew("shon_bean",password.Hash, password.Salt,"Shon","Bean","shon_bean@crnc.com",null,mainManagerRole,photos[1], Guid.Parse("b6ba35b2-adff-43a6-9cd7-b408240a6d6f")),
+                    User.CreateNew("helen_smith",password.Hash, password.Salt,"Helen","Smith","helen_smith@crnc.com",null,mainManagerRole,photos[2]),
+                    User.CreateNew("agness_stuart",password.Hash, password.Salt,"Agness","Stuart","agness_stuart@crnc.com",null,managerRole,photos[3]),
+                    User.CreateNew("darius_larson",password.Hash, password.Salt,"Darius","Larson","darius_larson@crnc.com",null,managerRole,null),
+                    User.CreateNew("gillian_labadie",password.Hash, password.Salt,"Gillian","Labadie","darius_larson@crnc.com",null,managerRole,null),
+                    User.CreateNew("jonas_nolan",password.Hash, password.Salt,"Jonas","Nolan","jonas_nolan@crnc.com",null,managerRole,null),
+                    User.CreateNew("harvey_denesik",password.Hash, password.Salt,"Harvey","Denesik","harvey_denesik@crnc.com",null,managerRole,null),
+                    User.CreateNew("jordon_ortiz",password.Hash, password.Salt,"Jordon","Ortiz","jordon_ortiz@crnc.com",null,managerRole,null),
+                    User.CreateNew("brook_dach",password.Hash, password.Salt,"Brook","Dack","brook_dach@crnc.com",null,managerRole,null),
+                    User.CreateNew("kiel_jones",password.Hash, password.Salt,"Kiel","Jones","kiel_jones@crnc.com",null,managerRole,null)
 
                 };
 
-                var roleIds = roles.Select(x => x.Id).ToList();
+                var roleIdsForGenerating = roles.Select(x => x.Id).Where(x=> x != mainManagerRole.Id).ToList();
 
                 var faker = new Faker<UserItemDto>()
                     .CustomInstantiator(x => new UserItemDto())
@@ -60,7 +64,7 @@ namespace Crnc.Oms.Security.Infrastructure.DataAccess.Data
                     .RuleFor(x => x.Login, (f, u) => $"{u.FirstName}_{u.LastName}".ToLower())
                     .RuleFor(x => x.Email, (f, u) => $"{u.Login}@crmc.ru")
                     .RuleFor(x => x.Phone, (f, u) => f.Phone.PhoneNumber("1-###-###-####"))
-                    .RuleFor(x => x.RoleId, (f, u) => f.PickRandom(roleIds))
+                    .RuleFor(x => x.RoleId, (f, u) => f.PickRandom(roleIdsForGenerating))
                     .RuleFor(x => x.Id, (f, u) => Guid.NewGuid());
 
                 var counter = 1;
