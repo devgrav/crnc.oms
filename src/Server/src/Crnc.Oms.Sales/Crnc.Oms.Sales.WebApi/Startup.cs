@@ -49,6 +49,8 @@ namespace Crnc.Oms.Sales.WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHealthChecks();
+            
             services.AddCors(options => {
                 options.AddPolicy("AllOrigins", builder => builder
                     .AllowAnyOrigin()
@@ -68,13 +70,6 @@ namespace Crnc.Oms.Sales.WebApi
             services.Configure<IntegrationEndpointSettings>(Configuration.GetSection("IntegrationEndpoints"));
             
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            
-            services.AddScoped<IUseCaseQueryHandler<GetOrdersForTableInputDto, GetOrdersForTableOutputDto>,GetOrdersForTableHandler>();
-            services.AddScoped<IUseCaseQueryHandler<GetNewOrderInputDto, GetNewOrderOutputDto>,GetNewOrderHandler>();
-            
-            services.AddScoped<IUseCaseQueryHandler<GetOrderInputDto, GetOrderOutputDto>,GetOrderHandler>();
-            services.AddScoped<IUseCaseCommandHandler<CreateOrderInputDto, CreateOrderOutputDto>,CreateOrderHandler>();
-            services.AddScoped<IUseCaseCommandHandler<EditOrderInputDto, EmptyOutputDto> ,EditOrderHandler>();
 
             services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
             services.AddMediatR(typeof(IDomainEventNotificationHandler).Assembly);
