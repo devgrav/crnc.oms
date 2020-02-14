@@ -4,5 +4,7 @@
     {
         public string NotificationServiceEndpoint { get; set; }
         public string SecurityServiceEndpoint { get; set; }
+        
+        public string MessageBrokerEndpoint { get; set; }
     }
 }

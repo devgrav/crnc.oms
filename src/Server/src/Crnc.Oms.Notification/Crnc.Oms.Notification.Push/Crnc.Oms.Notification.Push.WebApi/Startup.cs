@@ -37,6 +37,8 @@ namespace Crnc.Oms.Notification.Push.WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHealthChecks();
+            
             services.AddCors(options =>
             {
                 var allowedOrigin = Configuration.GetSection("IntegrationEndpoints:UiEndpoint").Value;
