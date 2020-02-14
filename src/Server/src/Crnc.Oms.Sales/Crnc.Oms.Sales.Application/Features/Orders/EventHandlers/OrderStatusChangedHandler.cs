@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 namespace Crnc.Oms.Sales.Application.Features.Orders.Events
 {
     public class OrderStatusChangedHandler
-        : IDomainEventNotificationHandler<DomainEventNotification<OrderStatusChanged>>
+        : INotificationHandler<OrderStatusChanged>, IDomainEventNotificationHandler
     {
         private readonly INotificationGateway _notificationGateway;
         private readonly IEmployeeGateway _employeeGateway;
@@ -25,9 +25,9 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Events
             _logger = logger;
         }
         
-        public async Task Handle(DomainEventNotification<OrderStatusChanged> notification, CancellationToken cancellationToken)
+        public async Task Handle(OrderStatusChanged notification, CancellationToken cancellationToken)
         {
-            var domainEvent = notification.DomainEvent;
+            var domainEvent = notification;
             var changedManager = domainEvent.ChangedManager;
             
             List<Manager> mainManagers = null;

@@ -25,13 +25,13 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Commands
             _currentUserContext = currentUserContext;
         }
         
-        public async Task<CreateOrderOutputDto> HandleAsync(CreateOrderInputDto command, CancellationToken cancellationToken = default)
+        public async Task<CreateOrderOutputDto> Handle(CreateOrderInputDto request, CancellationToken cancellationToken)
         {
-            if(command == null)
-                throw new ArgumentNullException(nameof(command));
+            if(request == null)
+                throw new ArgumentNullException(nameof(request));
             
             var manager = ManagerFactory.GetCurrentUserAsManager(_currentUserContext);
-            var order = OrderMapper.MapNewOrder(command, _currentDateTimeProvider, manager);
+            var order = OrderMapper.MapNewOrder(request, _currentDateTimeProvider, manager);
             
             _orderRepository.Add(order);
 

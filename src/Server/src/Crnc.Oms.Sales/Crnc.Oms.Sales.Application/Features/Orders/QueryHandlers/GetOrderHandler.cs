@@ -22,9 +22,10 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Queries
             _orderRepository = orderRepository;
         }
         
-        public async Task<GetOrderOutputDto> HandleAsync(GetOrderInputDto queryData, CancellationToken cancellationToken = default)
+  
+        public async Task<GetOrderOutputDto> Handle(GetOrderInputDto request, CancellationToken cancellationToken)
         {
-            var order = await _orderRepository.FindByIdAsync(queryData.Id,cancellationToken);
+            var order = await _orderRepository.FindByIdAsync(request.Id,cancellationToken);
             
             if(order == null)
                 throw new MissingEntityException("Order not found");

@@ -23,7 +23,8 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Queries
             _orderRepository = orderRepository;
         }
 
-        public async Task<GetOrdersForTableOutputDto> HandleAsync(GetOrdersForTableInputDto queryData, CancellationToken cancellationToken = default)
+
+        public async Task<GetOrdersForTableOutputDto> Handle(GetOrdersForTableInputDto request, CancellationToken cancellationToken)
         {
             var items = (await _orderRepository.FindAllAsync(cancellationToken))
                 .Select(x => new GetOrdersForTableItemOutputDto()
