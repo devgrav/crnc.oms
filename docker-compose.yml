@@ -42,6 +42,7 @@ services:
       - "ConnectionStrings:OmsSalesDb=Host=sales-db;Database=crnc_oms_sales_db;Username=postgres;Password=docker"          
       - "IntegrationEndpoints:NotificationServiceEndpoint=http://notification-gateway-api"      
       - "IntegrationEndpoints:SecurityServiceEndpoint=http://security-api"
+      - "IntegrationEndpoints:MessageBrokerEndpoint=rabbitmq://message-broker"
     depends_on: 
       - sales-db
       - security-api
@@ -72,6 +73,7 @@ services:
       - "IntegrationEndpoints:EmailNotificationServiceEndpoint=http://notification-email-api"
       - "IntegrationEndpoints:PushNotificationServiceEndpoint=http://notification-push-api"
       - "IntegrationEndpoints:SecurityServiceEndpoint=http://security-api"
+      - "IntegrationEndpoints:MessageBrokerEndpoint=rabbitmq://message-broker"
     depends_on: 
       - notification-email-api
       - notification-push-api

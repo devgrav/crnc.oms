@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Crnc.Oms.Notification.Gateway.Integration.Settings;
 using Crnc.Oms.Sales.Domain.Aggregates.Order;
 using Crnc.Oms.Sales.Domain.Gateways;
 using Crnc.Oms.Sales.Domain.SeedWork;
 using Crnc.Oms.Sales.Integration.Dto;
+using Crnc.Oms.Sales.Integration.Settings;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RestSharp;
@@ -13,13 +13,13 @@ using RestSharp.Authenticators;
 
 namespace Crnc.Oms.Sales.Integration.Gateways
 {
-    public class NotificationGateway
+    public class HttpNotificationGateway
         : INotificationGateway
     {
-        private readonly ILogger<NotificationGateway> _logger;
+        private readonly ILogger<HttpNotificationGateway> _logger;
         private readonly RestClient _client;
 
-        public NotificationGateway(IOptions<IntegrationEndpointSettings> settings, ILogger<NotificationGateway> logger,  ICurrentUserContext currentUserContext)
+        public HttpNotificationGateway(IOptions<IntegrationEndpointSettings> settings, ILogger<HttpNotificationGateway> logger,  ICurrentUserContext currentUserContext)
         {
             _logger = logger;
             _client = new RestClient(settings.Value.NotificationServiceEndpoint)

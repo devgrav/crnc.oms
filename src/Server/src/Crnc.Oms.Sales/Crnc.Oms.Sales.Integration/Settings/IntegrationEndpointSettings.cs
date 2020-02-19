@@ -1,4 +1,4 @@
-﻿﻿namespace Crnc.Oms.Notification.Gateway.Integration.Settings
+﻿﻿namespace Crnc.Oms.Sales.Integration.Settings
 {
     public class IntegrationEndpointSettings
     {
