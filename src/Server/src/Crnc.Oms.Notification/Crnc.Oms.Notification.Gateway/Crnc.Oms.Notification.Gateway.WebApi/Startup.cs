@@ -11,6 +11,10 @@ using Crnc.Oms.Notification.Gateway.Application.Services;
 using Crnc.Oms.Notification.Gateway.Application.Services.Abstractions;
 using Crnc.Oms.Notification.Gateway.Integration;
 using Crnc.Oms.Notification.Gateway.Integration.Settings;
+using Crnc.Oms.Notification.Gateway.WebApi.Consumers;
+using MassTransit;
+using MassTransit.AspNetCoreIntegration;
+using MassTransit.ExtensionsDependencyInjectionIntegration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,12 +35,15 @@ namespace Crnc.Oms.Notification.Gateway.WebApi
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, ILoggerFactory loggerFactory)
         {
             Configuration = configuration;
+            LoggerFactory = loggerFactory;
         }
 
         public IConfiguration Configuration { get; }
+        
+        public ILoggerFactory LoggerFactory { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -61,7 +68,6 @@ namespace Crnc.Oms.Notification.Gateway.WebApi
             services.AddScoped<IEmailGateway, EmailGateway>();
             services.AddScoped<IPushGateway, PushGateway>();
             services.AddScoped<IUserInfoGateway, UserInfoGateway>();
-            services.AddScoped<ICurrentUserContext, CurrentUserContext>();
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             
@@ -86,6 +92,29 @@ namespace Crnc.Oms.Notification.Gateway.WebApi
                         IssuerSigningKey = authSettings.SymmetricSecurityKey
                     };
                 });
+            
+            IBusControl CreateBus(IServiceProvider serviceProvider)
+            {
+                return Bus.Factory.CreateUsingRabbitMq(cfg =>
+                {
+                    var integrationSettings = new IntegrationEndpointSettings();
+                    Configuration.GetSection("IntegrationEndpoints").Bind(integrationSettings);
+            
+                    cfg.Host(integrationSettings.MessageBrokerEndpoint);
+            
+                    cfg.ReceiveEndpoint("notifyUser", e =>
+                    {
+                        e.ConfigureConsumer<NotifyUserConsumer>(serviceProvider);
+                    });
+                });
+            }
+            
+            void ConfigureMassTransit(IServiceCollectionConfigurator configurator)
+            {
+                configurator.AddConsumer<NotifyUserConsumer>();
+            }
+            
+            services.AddMassTransit(CreateBus, ConfigureMassTransit);
 
             services.AddOpenApiDocument(options =>
             {
@@ -102,6 +131,7 @@ namespace Crnc.Oms.Notification.Gateway.WebApi
                 });
             });
         }
+        
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

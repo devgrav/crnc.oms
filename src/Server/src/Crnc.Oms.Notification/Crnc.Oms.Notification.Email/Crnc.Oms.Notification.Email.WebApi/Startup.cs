@@ -59,37 +59,12 @@ namespace Crnc.Oms.Notification.Email.WebApi
             
             services.Configure<AuthSettings>(Configuration.GetSection("Auth"));
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    var authSettings = new AuthSettings();
-                    Configuration.GetSection("Auth").Bind(authSettings);
-
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = authSettings.JwtIssuer,
-                        ValidAudience = authSettings.JwtAudience,
-                        IssuerSigningKey = authSettings.SymmetricSecurityKey
-                    };
-                });
-
             services.AddOpenApiDocument(options =>
             {
                 //Title in header of api
                 options.Title = "Crnc Oms Email Notification API Doc";
                 //Version in header of api
                 options.Version = "1.0";
-                options.AddSecurity("JWT", Enumerable.Empty<string>(), new OpenApiSecurityScheme
-                {
-                    Type = OpenApiSecuritySchemeType.ApiKey,
-                    Name = "Authorization",
-                    In = OpenApiSecurityApiKeyLocation.Header,
-                    Description = "Please insert JWT with Bearer into field"
-                });
             });
         }
 

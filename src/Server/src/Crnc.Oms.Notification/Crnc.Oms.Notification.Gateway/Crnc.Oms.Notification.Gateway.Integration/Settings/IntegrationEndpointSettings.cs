@@ -5,5 +5,6 @@
         public string EmailNotificationServiceEndpoint { get; set; }
         public string PushNotificationServiceEndpoint { get; set; }
         public string SecurityServiceEndpoint { get; set; }
+        public string MessageBrokerEndpoint { get; set; }
     }
 }

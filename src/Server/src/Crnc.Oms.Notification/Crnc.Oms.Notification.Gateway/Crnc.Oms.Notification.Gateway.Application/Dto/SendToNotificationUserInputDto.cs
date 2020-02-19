@@ -12,7 +12,7 @@ namespace Crnc.Oms.Notification.Gateway.Application.Dto
     ///     "message": "Some message"
     ///}
     /// </example>
-    public class SendNotificationToUserInputDto
+    public class SendToNotificationUserInputDto
     {
         public Guid UserId { get; set; }
 

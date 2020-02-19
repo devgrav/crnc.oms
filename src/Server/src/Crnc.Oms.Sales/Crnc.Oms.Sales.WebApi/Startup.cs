@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using Crnc.Oms.Notification.Gateway.Integration.Settings;
+using Crnc.Oms.Notification.Contract;
 using Crnc.Oms.Sales.Domain.SeedWork;
 using Crnc.Oms.Sales.Application;
 using Crnc.Oms.Sales.Application.Features.Orders.Commands;
@@ -15,11 +15,17 @@ using Crnc.Oms.Sales.DataAccess;
 using Crnc.Oms.Sales.DataAccess.Repositories;
 using Crnc.Oms.Sales.Domain.Gateways;
 using Crnc.Oms.Sales.Domain.Repositories;
+using Crnc.Oms.Sales.Integration.Dto;
 using Crnc.Oms.Sales.Integration.Gateways;
+using Crnc.Oms.Sales.Integration.Settings;
 using Crnc.Oms.Sales.WebApi.Authorization;
+using GreenPipes;
+using MassTransit;
+using MassTransit.AspNetCoreIntegration;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -39,12 +45,14 @@ namespace Crnc.Oms.Sales.WebApi
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public ILoggerFactory LoggerFactory { get; }
+        public IConfiguration Configuration { get; }
+        
+        public Startup(IConfiguration configuration, ILoggerFactory loggerFactory)
         {
+            LoggerFactory = loggerFactory;
             Configuration = configuration;
         }
-
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -69,6 +77,8 @@ namespace Crnc.Oms.Sales.WebApi
             
             services.Configure<IntegrationEndpointSettings>(Configuration.GetSection("IntegrationEndpoints"));
             
+            services.AddMassTransit(ConfigureBus(), LoggerFactory);
+
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
@@ -77,7 +87,7 @@ namespace Crnc.Oms.Sales.WebApi
             services.AddScoped<IOrderRepository, OrderRepository>();
             
             services.AddScoped<IEmployeeGateway, EmployeeSecurityGateway>();
-            services.AddScoped<INotificationGateway, NotificationGateway>();
+            services.AddScoped<INotificationGateway, MessageBrokerNotificationGateway>();
             services.AddScoped<ICurrentUserContext, CurrentUserContext>();
 
             services.AddSingleton<ICurrentDateTimeProvider, CurrentDateTimeProvider>();
@@ -118,7 +128,17 @@ namespace Crnc.Oms.Sales.WebApi
                 });
             });
         }
+        
+        IBusControl ConfigureBus() => Bus.Factory.CreateUsingRabbitMq(cfg =>
+        {
+            var integrationSettings = new Crnc.Oms.Sales.Integration.Settings.IntegrationEndpointSettings();
+            Configuration.GetSection("IntegrationEndpoints").Bind(integrationSettings);
+            
+            cfg.Host(integrationSettings.MessageBrokerEndpoint);
 
+            EndpointConvention.Map<NotificationUser>(new Uri($"{integrationSettings.MessageBrokerEndpoint}/notifyUser"));
+        });
+        
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, SalesDataContext dbContext)
         {
@@ -126,6 +146,8 @@ namespace Crnc.Oms.Sales.WebApi
             {
                 app.UseDeveloperExceptionPage();
             }
+            
+            app.UseHealthChecks("/health", new HealthCheckOptions {Predicate = check => check.Tags.Contains("ready")});
             
             var cultureInfo = new CultureInfo("en-US");
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;

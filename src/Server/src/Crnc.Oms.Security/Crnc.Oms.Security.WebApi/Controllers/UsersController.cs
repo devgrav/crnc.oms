@@ -24,7 +24,7 @@ namespace Crnc.Oms.Security.WebApi.Controllers
     /// </summary>
     [Produces("application/json")]
     [Route("api/[controller]")]
-    [Authorize]
+    [AllowAnonymous]
     public class UsersController 
         : ControllerBase
     {
