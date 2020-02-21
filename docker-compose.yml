@@ -11,7 +11,7 @@ services:
 
 # Security context
   security-db:
-    image: "mongo:latest"
+    image: "mongo:4.2.3"
     restart: always
     ports:
       - "27021:27017" 
@@ -29,10 +29,12 @@ services:
 
   # Sales context
   sales-db:
-    image: "postgres:latest"
+    image: "postgres:9.6.17"
     restart: always 
     ports:
       - 5433:5432
+    environment: 
+      - POSTGRES_PASSWORD=docker
   sales-api:
     build: src/Server/src/Crnc.Oms.Sales/
     restart: always
