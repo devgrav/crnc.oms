@@ -20,9 +20,11 @@ using Crnc.Oms.Security.Domain.Aggregates.Users;
 using Crnc.Oms.Security.Domain.SeedWork;
 using Crnc.Oms.Security.Infrastructure.DataAccess.Cache;
 using Crnc.Oms.Security.WebApi.Authorization;
+using Crnc.Oms.Security.WebApi.Middlewares;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json.Converters;
 using NSwag;
+using Prometheus;
 
 namespace Crnc.Oms.Security.WebApi
 {
@@ -118,6 +120,9 @@ namespace Crnc.Oms.Security.WebApi
         {
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
+            
+            app.UseMetricServer();  
+            app.UseRequestMiddleware();  
 
             var cultureInfo = new CultureInfo("en-US");
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
@@ -132,7 +137,7 @@ namespace Crnc.Oms.Security.WebApi
 
             app.UseOpenApi();
             app.UseSwaggerUi3();
-            
+
             new MongoDbInitializer(mongoDataContext).Initialize();
         }
     }

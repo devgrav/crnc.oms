@@ -78,6 +78,12 @@ services:
       - notification-push-api
       - security-api
 
+  monitoring:
+    build: prometheus/
+    restart: always
+    ports:
+      - "9090:9090"
+    
   # UI
   #crnc-oms-ui:
   #  build:
