@@ -82,4 +82,6 @@ Backend для всей системы можно запустить через 
 
 Уведомления push: [CRNC Oms Push Notification API](http://localhost:8107/swagger).
 
+UI Rabbit Mq: [RabbitMq UI](http://localhost:15673). 
+
 Тестовый push-клиент `notification-push-client` не имеет api и просто пишет сообщения в консоль контейнера.
