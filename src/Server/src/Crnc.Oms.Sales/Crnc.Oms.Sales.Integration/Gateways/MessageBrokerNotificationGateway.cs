@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Crnc.Oms.Notification.Contract;
+using Crnc.Oms.Messaging.Contract.Commands;
 using Crnc.Oms.Sales.Domain.Aggregates.Order;
 using Crnc.Oms.Sales.Domain.Gateways;
 using Crnc.Oms.Sales.Domain.SeedWork;
@@ -31,7 +31,7 @@ namespace Crnc.Oms.Sales.Integration.Gateways
         {
             _logger.LogInformation($"Notification is sending from Sales service to message broker with id, user id : {manager.Id}, message: {notification}");
 
-            await _sendEndpointProvider.Send<NotificationUser>(new NotificationUserDto()
+            await _sendEndpointProvider.Send<SendNotificationToUserCommand>(new SendNotificationToUserCommandDto()
             {
                 Message = notification,
                 UserId = manager.Id

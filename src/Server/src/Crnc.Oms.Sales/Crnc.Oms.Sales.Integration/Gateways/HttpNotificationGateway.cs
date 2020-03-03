@@ -37,7 +37,7 @@ namespace Crnc.Oms.Sales.Integration.Gateways
             {
                 Method = Method.POST
             };
-            request.AddJsonBody(new NotificationUserDto()
+            request.AddJsonBody(new SendNotificationToUserCommandDto()
             {
                 Message = notification,
                 UserId = manager.Id

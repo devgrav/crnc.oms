@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Crnc.Oms.Notification.Contract
+namespace Crnc.Oms.Messaging.Contract.Commands
 {
-    public interface NotificationUser
+    public interface SendNotificationToUserCommand
     {
         Guid UserId { get; set; }
         
