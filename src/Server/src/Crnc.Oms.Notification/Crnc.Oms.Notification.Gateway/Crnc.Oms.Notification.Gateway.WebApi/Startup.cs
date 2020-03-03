@@ -102,16 +102,16 @@ namespace Crnc.Oms.Notification.Gateway.WebApi
             
                     cfg.Host(integrationSettings.MessageBrokerEndpoint);
             
-                    cfg.ReceiveEndpoint("notifyUser", e =>
+                    cfg.ReceiveEndpoint("sendNotificationToUser", e =>
                     {
-                        e.ConfigureConsumer<NotifyUserConsumer>(serviceProvider);
+                        e.ConfigureConsumer<SendNotificationToUser>(serviceProvider);
                     });
                 });
             }
             
             void ConfigureMassTransit(IServiceCollectionConfigurator configurator)
             {
-                configurator.AddConsumer<NotifyUserConsumer>();
+                configurator.AddConsumer<SendNotificationToUser>();
             }
             
             services.AddMassTransit(CreateBus, ConfigureMassTransit);

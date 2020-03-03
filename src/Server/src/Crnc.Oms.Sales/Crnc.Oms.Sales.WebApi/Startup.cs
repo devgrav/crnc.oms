@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using Crnc.Oms.Notification.Contract;
+using Crnc.Oms.Messaging.Contract.Commands;
 using Crnc.Oms.Sales.Domain.SeedWork;
 using Crnc.Oms.Sales.Application;
 using Crnc.Oms.Sales.Application.Features.Orders.Commands;
@@ -136,7 +136,7 @@ namespace Crnc.Oms.Sales.WebApi
             
             cfg.Host(integrationSettings.MessageBrokerEndpoint);
 
-            EndpointConvention.Map<NotificationUser>(new Uri($"{integrationSettings.MessageBrokerEndpoint}/notifyUser"));
+            EndpointConvention.Map<SendNotificationToUserCommand>(new Uri($"{integrationSettings.MessageBrokerEndpoint}/commands/sendNotificationToUser"));
         });
         
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

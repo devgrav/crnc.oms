@@ -1,10 +1,10 @@
 ﻿using System;
-using Crnc.Oms.Notification.Contract;
+using Crnc.Oms.Messaging.Contract.Commands;
 
 namespace Crnc.Oms.Sales.Integration.Dto
 {
-    public class NotificationUserDto
-        : NotificationUser
+    public class SendNotificationToUserCommandDto
+        : SendNotificationToUserCommand
     {
         public Guid UserId { get; set; }
         

@@ -9,8 +9,8 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Crnc.Oms.Notification.Gateway.Application\Crnc.Oms.Notification.Gateway.Application.csproj" />
-      <ProjectReference Include="..\Crnc.Oms.Notification.Gateway.Contract\Crnc.Oms.Notification.Gateway.Contract.csproj" />
       <ProjectReference Include="..\Crnc.Oms.Notification.Gateway.Integration\Crnc.Oms.Notification.Gateway.Integration.csproj" />
+      <ProjectReference Include="..\Crnc.Oms.Notification.Gateway.Messaging.Contract\Crnc.Oms.Notification.Gateway.Messaging.Contract.csproj" />
     </ItemGroup>
 
     <ItemGroup>

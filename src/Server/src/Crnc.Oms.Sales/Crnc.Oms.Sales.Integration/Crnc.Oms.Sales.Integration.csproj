@@ -5,8 +5,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Crnc.Oms.Sales.Contract\Crnc.Oms.Sales.Contract.csproj" />
       <ProjectReference Include="..\Crnc.Oms.Sales.Domain\Crnc.Oms.Sales.Domain.csproj" />
+      <ProjectReference Include="..\Crnc.Oms.Sales.Messaging.Contract\Crnc.Oms.Sales.Messaging.Contract.csproj" />
     </ItemGroup>
 
     <ItemGroup>

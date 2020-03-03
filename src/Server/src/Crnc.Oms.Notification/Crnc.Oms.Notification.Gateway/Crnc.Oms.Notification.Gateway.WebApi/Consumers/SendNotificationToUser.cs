@@ -1,23 +1,23 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Crnc.Oms.Notification.Contract;
+using Crnc.Oms.Messaging.Contract.Commands;
 using Crnc.Oms.Notification.Gateway.Application.Dto;
 using Crnc.Oms.Notification.Gateway.Application.Services.Abstractions;
 using MassTransit;
 
 namespace Crnc.Oms.Notification.Gateway.WebApi.Consumers
 {
-    public class NotifyUserConsumer :
-            IConsumer<NotificationUser>
+    public class SendNotificationToUser:
+            IConsumer<SendNotificationToUserCommand>
         {
             private readonly INotificationService _notificationService;
 
-            public NotifyUserConsumer(INotificationService notificationService)
+            public SendNotificationToUser(INotificationService notificationService)
             {
                 _notificationService = notificationService;
             }
 
-            public async Task Consume(ConsumeContext<NotificationUser> context)
+            public async Task Consume(ConsumeContext<SendNotificationToUserCommand> context)
             {
                 var notification = context.Message;
                 
