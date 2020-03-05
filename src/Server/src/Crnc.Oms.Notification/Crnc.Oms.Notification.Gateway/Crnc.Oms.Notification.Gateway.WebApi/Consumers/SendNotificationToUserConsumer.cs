@@ -7,12 +7,12 @@ using MassTransit;
 
 namespace Crnc.Oms.Notification.Gateway.WebApi.Consumers
 {
-    public class SendNotificationToUser:
+    public class SendNotificationToUserConsumer:
             IConsumer<SendNotificationToUserCommand>
         {
             private readonly INotificationService _notificationService;
 
-            public SendNotificationToUser(INotificationService notificationService)
+            public SendNotificationToUserConsumer(INotificationService notificationService)
             {
                 _notificationService = notificationService;
             }

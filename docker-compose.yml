@@ -57,12 +57,15 @@ services:
     restart: always
     ports:
       - "8104:80"
+    environment:
+      - "IntegrationEndpoints:MessageBrokerEndpoint=rabbitmq://message-broker"
 
   notification-push-api:
     build: src/Server/src/Crnc.Oms.Notification/Crnc.Oms.Notification.Push/
     restart: always
     environment:
       - "IntegrationEndpoints:UiEndpoint=http://localhost:8092"
+      - "IntegrationEndpoints:MessageBrokerEndpoint=rabbitmq://message-broker"
     ports:
       - "8107:80"
   

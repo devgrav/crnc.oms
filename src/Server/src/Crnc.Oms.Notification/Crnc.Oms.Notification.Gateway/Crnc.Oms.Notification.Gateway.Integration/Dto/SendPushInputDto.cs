@@ -1,9 +1,11 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Crnc.Oms.Messaging.Contract.Commands;
 
 namespace Crnc.Oms.Notification.Gateway.Integration.Dto
 {
     public class SendPushInputDto
+        : SendPushNotificationToUserCommand
     { 
         public Guid MessageId { get; set; }
 
