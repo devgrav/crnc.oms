@@ -9,9 +9,14 @@
     <ItemGroup>
       <ProjectReference Include="..\Crnc.Oms.Notification.Push.Application\Crnc.Oms.Notification.Push.Application.csproj" />
       <ProjectReference Include="..\Crnc.Oms.Notification.Push.Integration\Crnc.Oms.Notification.Push.Integration.csproj" />
+      <ProjectReference Include="..\Crnc.Oms.Notification.Push.Messaging.Contract\Crnc.Oms.Notification.Push.Messaging.Contract.csproj" />
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="MassTransit.AspNetCore" Version="6.2.1" />
+      <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="6.2.1" />
+      <PackageReference Include="MassTransit.Extensions.Logging" Version="5.5.6" />
+      <PackageReference Include="MassTransit.RabbitMQ" Version="6.2.1" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.0" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.0" />
       <PackageReference Include="NSwag.AspNetCore" Version="13.2.0" />

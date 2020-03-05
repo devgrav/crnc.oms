@@ -30,6 +30,7 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using NSwag;
+using Crnc.Oms.Messaging.Contract.Commands;
 
 namespace Crnc.Oms.Notification.Gateway.WebApi
 {
@@ -65,8 +66,8 @@ namespace Crnc.Oms.Notification.Gateway.WebApi
             });
 
             services.AddScoped<INotificationService, NotificationService>();
-            services.AddScoped<IEmailGateway, EmailGateway>();
-            services.AddScoped<IPushGateway, PushGateway>();
+            services.AddScoped<IEmailGateway, MessageBrokerEmailGateway>();
+            services.AddScoped<IPushGateway, MessageBrokerPushGateway>();
             services.AddScoped<IUserInfoGateway, UserInfoGateway>();
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -104,14 +105,18 @@ namespace Crnc.Oms.Notification.Gateway.WebApi
             
                     cfg.ReceiveEndpoint("sendNotificationToUser", e =>
                     {
-                        e.ConfigureConsumer<SendNotificationToUser>(serviceProvider);
+                        e.ConfigureConsumer<SendNotificationToUserConsumer>(serviceProvider);
                     });
+                    
+                    EndpointConvention.Map<SendNotificationToUserCommand>(new Uri($"{integrationSettings.MessageBrokerEndpoint}/commands/sendNotificationToUser"));
+                    EndpointConvention.Map<SendPushNotificationToUserCommand>(new Uri($"{integrationSettings.MessageBrokerEndpoint}/commands/sendPushNotificationToUser"));
+                    EndpointConvention.Map<SendEmailNotificationToUserCommand>(new Uri($"{integrationSettings.MessageBrokerEndpoint}/commands/sendEmailNotificationToUser"));
                 });
             }
             
             void ConfigureMassTransit(IServiceCollectionConfigurator configurator)
             {
-                configurator.AddConsumer<SendNotificationToUser>();
+                configurator.AddConsumer<SendNotificationToUserConsumer>();
             }
             
             services.AddMassTransit(CreateBus, ConfigureMassTransit);

@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Crnc.Oms.Messaging.Contract.Commands;
 using Crnc.Oms.Notification.Gateway.Integration.Gateways;
 using Crnc.Oms.Notification.Gateway.Integration.Gateways.Abstractions;
 using Crnc.Oms.Notification.Gateway.WebApi.Authorization;
 using Crnc.Oms.Notification.Email.Application.Services;
 using Crnc.Oms.Notification.Email.Application.Services.Abstractions;
+using Crnc.Oms.Notification.Email.Integration.Settings;
+using Crnc.Oms.Notification.Email.WebApi.Consumers;
+using MassTransit;
+using MassTransit.AspNetCoreIntegration;
+using MassTransit.ExtensionsDependencyInjectionIntegration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -51,6 +57,29 @@ namespace Crnc.Oms.Notification.Email.WebApi
                 options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                 options.SerializerSettings.Converters.Add(new StringEnumConverter());
             });
+            
+            IBusControl CreateBus(IServiceProvider serviceProvider)
+            {
+                return Bus.Factory.CreateUsingRabbitMq(cfg =>
+                {
+                    var integrationSettings = new IntegrationEndpointSettings();
+                    Configuration.GetSection("IntegrationEndpoints").Bind(integrationSettings);
+            
+                    cfg.Host(integrationSettings.MessageBrokerEndpoint);
+            
+                    cfg.ReceiveEndpoint("sendEmailNotificationToUser", e =>
+                    {
+                        e.ConfigureConsumer<SendEmailNotificationToUserConsumer>(serviceProvider);
+                    });
+                });
+            }
+            
+            void ConfigureMassTransit(IServiceCollectionConfigurator configurator)
+            {
+                configurator.AddConsumer<SendEmailNotificationToUserConsumer>();
+            }
+            
+            services.AddMassTransit(CreateBus, ConfigureMassTransit);
 
             services.AddScoped<IEmailNotificationService, EmailNotificationService>();
             services.AddScoped<IEmailGateway, EmailGateway>();
