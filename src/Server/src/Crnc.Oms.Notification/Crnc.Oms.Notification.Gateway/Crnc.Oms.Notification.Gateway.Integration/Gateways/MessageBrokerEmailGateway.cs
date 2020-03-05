@@ -30,7 +30,7 @@ namespace Crnc.Oms.Notification.Gateway.Integration.Gateways
         {
             _logger.LogInformation($"Email is sending from gateway to broker with id {dto.MessageId}; senderEmail : {dto.SenderEmail}; receiverEmail: {dto.ReceiverEmail}");
             
-            await _sendEndpointProvider.Send<SendEmailNotificationToUserCommand>(dto, cancellationToken);
+            await _sendEndpointProvider.Send<SendEmailNotificationToReceiverCommand>(dto, cancellationToken);
             
             _logger.LogInformation($"Email sent from gateway to broker with id {dto.MessageId}; senderEmail : {dto.SenderEmail}; receiverEmail: {dto.ReceiverEmail}");
 

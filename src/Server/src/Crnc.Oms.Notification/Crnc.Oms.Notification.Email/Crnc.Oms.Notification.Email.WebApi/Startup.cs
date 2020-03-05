@@ -4,11 +4,11 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Crnc.Oms.Messaging.Contract.Commands;
-using Crnc.Oms.Notification.Gateway.Integration.Gateways;
-using Crnc.Oms.Notification.Gateway.Integration.Gateways.Abstractions;
 using Crnc.Oms.Notification.Gateway.WebApi.Authorization;
 using Crnc.Oms.Notification.Email.Application.Services;
 using Crnc.Oms.Notification.Email.Application.Services.Abstractions;
+using Crnc.Oms.Notification.Email.Integration.Gateways;
+using Crnc.Oms.Notification.Email.Integration.Gateways.Abstractions;
 using Crnc.Oms.Notification.Email.Integration.Settings;
 using Crnc.Oms.Notification.Email.WebApi.Consumers;
 using MassTransit;
@@ -67,16 +67,16 @@ namespace Crnc.Oms.Notification.Email.WebApi
             
                     cfg.Host(integrationSettings.MessageBrokerEndpoint);
             
-                    cfg.ReceiveEndpoint("sendEmailNotificationToUser", e =>
+                    cfg.ReceiveEndpoint("sendEmailNotificationToReceiver", e =>
                     {
-                        e.ConfigureConsumer<SendEmailNotificationToUserConsumer>(serviceProvider);
+                        e.ConfigureConsumer<SendEmailNotificationToReceiverConsumer>(serviceProvider);
                     });
                 });
             }
             
             void ConfigureMassTransit(IServiceCollectionConfigurator configurator)
             {
-                configurator.AddConsumer<SendEmailNotificationToUserConsumer>();
+                configurator.AddConsumer<SendEmailNotificationToReceiverConsumer>();
             }
             
             services.AddMassTransit(CreateBus, ConfigureMassTransit);
