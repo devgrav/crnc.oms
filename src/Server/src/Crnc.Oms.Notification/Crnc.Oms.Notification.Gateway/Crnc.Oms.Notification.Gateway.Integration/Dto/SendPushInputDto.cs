@@ -5,7 +5,7 @@ using Crnc.Oms.Messaging.Contract.Commands;
 namespace Crnc.Oms.Notification.Gateway.Integration.Dto
 {
     public class SendPushInputDto
-        : SendPushNotificationToUserCommand
+        : SendPushNotificationToReceiverCommand
     { 
         public Guid MessageId { get; set; }
 

@@ -71,16 +71,16 @@ namespace Crnc.Oms.Notification.Push.WebApi
             
                     cfg.Host(integrationSettings.MessageBrokerEndpoint);
             
-                    cfg.ReceiveEndpoint("sendPushNotificationToUser", e =>
+                    cfg.ReceiveEndpoint("sendPushNotificationToReceiver", e =>
                     {
-                        e.ConfigureConsumer<SendPushNotificationToUserCommandConsumer>(serviceProvider);
+                        e.ConfigureConsumer<SendPushNotificationToUserReceiverConsumer>(serviceProvider);
                     });
                 });
             }
             
             void ConfigureMassTransit(IServiceCollectionConfigurator configurator)
             {
-                configurator.AddConsumer<SendPushNotificationToUserCommandConsumer>();
+                configurator.AddConsumer<SendPushNotificationToUserReceiverConsumer>();
             }
             
             services.AddMassTransit(CreateBus, ConfigureMassTransit);

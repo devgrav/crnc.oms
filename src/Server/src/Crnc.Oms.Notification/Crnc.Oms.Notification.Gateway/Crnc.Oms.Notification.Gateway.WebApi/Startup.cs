@@ -109,8 +109,8 @@ namespace Crnc.Oms.Notification.Gateway.WebApi
                     });
                     
                     EndpointConvention.Map<SendNotificationToUserCommand>(new Uri($"{integrationSettings.MessageBrokerEndpoint}/commands/sendNotificationToUser"));
-                    EndpointConvention.Map<SendPushNotificationToUserCommand>(new Uri($"{integrationSettings.MessageBrokerEndpoint}/commands/sendPushNotificationToUser"));
-                    EndpointConvention.Map<SendEmailNotificationToUserCommand>(new Uri($"{integrationSettings.MessageBrokerEndpoint}/commands/sendEmailNotificationToUser"));
+                    EndpointConvention.Map<SendPushNotificationToReceiverCommand>(new Uri($"{integrationSettings.MessageBrokerEndpoint}/commands/sendPushNotificationToReceiver"));
+                    EndpointConvention.Map<SendEmailNotificationToReceiverCommand>(new Uri($"{integrationSettings.MessageBrokerEndpoint}/commands/sendEmailNotificationToReceiver"));
                 });
             }
             

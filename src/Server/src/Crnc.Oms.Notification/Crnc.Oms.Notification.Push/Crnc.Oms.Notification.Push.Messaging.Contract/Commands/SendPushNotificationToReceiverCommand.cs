@@ -2,7 +2,7 @@
 
 namespace Crnc.Oms.Messaging.Contract.Commands
 {
-    public interface SendPushNotificationToUserCommand
+    public interface SendPushNotificationToReceiverCommand
     {
         Guid MessageId { get; set; }
         

@@ -30,7 +30,7 @@ namespace Crnc.Oms.Notification.Gateway.Integration.Gateways
         {
             _logger.LogInformation($"Push is sending from gateway to broker with id {dto.MessageId}, receiver id : {dto.ReceiverUserId}");
             
-            await _sendEndpointProvider.Send<SendPushNotificationToUserCommand>(dto, cancellationToken);
+            await _sendEndpointProvider.Send<SendPushNotificationToReceiverCommand>(dto, cancellationToken);
             
             _logger.LogInformation($"Push sent from gateway to broker with id {dto.MessageId}, receiver id : {dto.ReceiverUserId}");
 

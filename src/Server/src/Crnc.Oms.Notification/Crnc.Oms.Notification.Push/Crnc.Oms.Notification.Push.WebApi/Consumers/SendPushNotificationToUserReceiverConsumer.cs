@@ -7,17 +7,17 @@ using MassTransit;
 
 namespace Crnc.Oms.Notification.Push.WebApi.Consumers
 {
-    public class SendPushNotificationToUserCommandConsumer:
-            IConsumer<SendPushNotificationToUserCommand>
+    public class SendPushNotificationToUserReceiverConsumer:
+            IConsumer<SendPushNotificationToReceiverCommand>
         {
             private readonly IPushNotificationService _notificationService;
 
-            public SendPushNotificationToUserCommandConsumer(IPushNotificationService notificationService)
+            public SendPushNotificationToUserReceiverConsumer(IPushNotificationService notificationService)
             {
                 _notificationService = notificationService;
             }
 
-            public async Task Consume(ConsumeContext<SendPushNotificationToUserCommand> context)
+            public async Task Consume(ConsumeContext<SendPushNotificationToReceiverCommand> context)
             {
                 var notification = context.Message;
                 

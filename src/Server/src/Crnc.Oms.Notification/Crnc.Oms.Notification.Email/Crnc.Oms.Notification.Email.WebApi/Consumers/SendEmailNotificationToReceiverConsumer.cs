@@ -7,17 +7,17 @@ using MassTransit;
 
 namespace Crnc.Oms.Notification.Email.WebApi.Consumers
 {
-    public class SendEmailNotificationToUserConsumer:
-            IConsumer<SendEmailNotificationToUserCommand>
+    public class SendEmailNotificationToReceiverConsumer:
+            IConsumer<SendEmailNotificationToReceiverCommand>
         {
             private readonly IEmailNotificationService _notificationService;
 
-            public SendEmailNotificationToUserConsumer(IEmailNotificationService notificationService)
+            public SendEmailNotificationToReceiverConsumer(IEmailNotificationService notificationService)
             {
                 _notificationService = notificationService;
             }
 
-            public async Task Consume(ConsumeContext<SendEmailNotificationToUserCommand> context)
+            public async Task Consume(ConsumeContext<SendEmailNotificationToReceiverCommand> context)
             {
                 var notification = context.Message;
                 
