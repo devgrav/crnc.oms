@@ -43,6 +43,8 @@ namespace Crnc.Oms.Security.WebApi
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHealthChecks();
+            
             services.AddCors(options =>
             {
                 options.AddPolicy("AllOrigins", builder => builder

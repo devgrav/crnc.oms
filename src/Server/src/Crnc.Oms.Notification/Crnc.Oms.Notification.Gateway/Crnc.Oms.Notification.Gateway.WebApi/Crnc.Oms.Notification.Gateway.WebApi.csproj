@@ -4,14 +4,21 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>$(NoWarn);1591</NoWarn>
+        <RootNamespace>Crnc.Oms.Notification.Gateway.WebApi</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Crnc.Oms.Notification.Gateway.Application\Crnc.Oms.Notification.Gateway.Application.csproj" />
       <ProjectReference Include="..\Crnc.Oms.Notification.Gateway.Integration\Crnc.Oms.Notification.Gateway.Integration.csproj" />
+      <ProjectReference Include="..\Crnc.Oms.Notification.Gateway.Messaging.Contract\Crnc.Oms.Notification.Gateway.Messaging.Contract.csproj" />
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="MassTransit" Version="6.2.1" />
+      <PackageReference Include="MassTransit.AspNetCore" Version="6.2.1" />
+      <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="6.2.1" />
+      <PackageReference Include="MassTransit.Extensions.Logging" Version="5.5.6" />
+      <PackageReference Include="MassTransit.RabbitMQ" Version="6.2.1" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.0" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.0" />
       <PackageReference Include="NSwag.AspNetCore" Version="13.2.0" />

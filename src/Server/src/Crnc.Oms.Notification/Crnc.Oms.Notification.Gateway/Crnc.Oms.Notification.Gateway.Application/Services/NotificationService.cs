@@ -28,7 +28,7 @@ namespace Crnc.Oms.Notification.Gateway.Application.Services
             _userInfoGateway = userInfoGateway;
         }
 
-        public async Task<SendNotificationToUserOutputDto> SendNotificationToUserAsync(SendNotificationToUserInputDto dto, CancellationToken cancellationToken = default)
+        public async Task<SendNotificationToUserOutputDto> SendNotificationToUserAsync(SendToNotificationUserInputDto dto, CancellationToken cancellationToken = default)
         {
             var messageId = Guid.NewGuid();
             

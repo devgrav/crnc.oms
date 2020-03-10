@@ -37,7 +37,7 @@ namespace Crnc.Oms.Notification.Gateway.WebApi.Controllers
         [HttpPost("user")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ModelStateDictionary), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> SendToUser([FromBody]SendNotificationToUserInputDto inputDto)
+        public async Task<IActionResult> SendToUser([FromBody]SendToNotificationUserInputDto inputDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

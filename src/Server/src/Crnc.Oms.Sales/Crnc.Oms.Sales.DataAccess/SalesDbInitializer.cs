@@ -23,8 +23,11 @@ namespace Crnc.Oms.Sales.DataAccess
                 DateTime.Now, 
                 JobType.New, 
                 "Develop new wall", 
-                customer)
-            );
+                customer,
+                new Manager(new FullName("Shon", "Bean"), new Email("shon_bean@crnc.com"), 
+                    "shon_bean",
+                    Guid.Parse("b6ba35b2-adff-43a6-9cd7-b408240a6d6f"))
+            ));
 
             dbContext.SaveChanges();
         }

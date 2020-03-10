@@ -1,6 +1,7 @@
 ﻿﻿using System;
 using System.Linq;
  using System.Security.Claims;
+ using Crnc.Oms.Sales.Domain.Aggregates.Order;
  using Crnc.Oms.Sales.Domain.SeedWork;
  using Microsoft.AspNetCore.Http;
 
@@ -25,16 +26,23 @@ namespace Crnc.Oms.Sales.WebApi.Authorization
                 if (claims != null && claims.Any())
                 {
                     Login = claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
-                    FirstName = claims.FirstOrDefault(x => x.Type == ClaimTypes.GivenName)?.Value;
-                    LastName = claims.FirstOrDefault(x => x.Type == ClaimTypes.Surname)?.Value;
+                    var firstName = claims.FirstOrDefault(x => x.Type == ClaimTypes.GivenName)?.Value;
+                    var lastName = claims.FirstOrDefault(x => x.Type == ClaimTypes.Surname)?.Value;
+                    FullName = new FullName(firstName, lastName);
+                    Id = Guid.Parse(claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value);
+                    Email = new Email(claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value);
                 }
             }
         }
 
+        public Guid Id { get; set; }
+
         public string AuthToken { get; }
-        public string FirstName { get; }
-        public string LastName { get; }
-        public string FullName => $"{FirstName} {LastName}";
+        
+        public Email Email { get; }
+
+        public FullName FullName { get; }
+
         public string Login { get; }
         public bool IsAnonymous { get; }
     }

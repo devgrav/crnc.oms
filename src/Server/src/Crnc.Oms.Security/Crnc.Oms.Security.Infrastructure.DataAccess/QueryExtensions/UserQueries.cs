@@ -59,6 +59,8 @@ namespace Crnc.Oms.Security.Infrastructure.DataAccess.QueryExtensions
             return u => new UserShortInfoItemDto()
             {
                 Id = u.Id,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
                 FullName = u.FullName,
                 Email = u.Email,
                 Password = u.PasswordHash,

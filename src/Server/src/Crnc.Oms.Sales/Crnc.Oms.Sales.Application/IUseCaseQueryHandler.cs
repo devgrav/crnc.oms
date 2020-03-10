@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using MediatR;
 
 namespace Crnc.Oms.Sales.Application
 {
@@ -10,14 +11,8 @@ namespace Crnc.Oms.Sales.Application
     /// <typeparam name="TQuery">Type for query data</typeparam>
     /// <typeparam name="TOut">Type for query result</typeparam>
     public interface IUseCaseQueryHandler<TQuery, TOut>
+        : IRequestHandler<TQuery, TOut>
      where TQuery: IUseCaseQuery<TOut>
     {
-        /// <summary>
-        /// Async handle query
-        /// </summary>
-        /// <param name="queryData">Data of query</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns></returns>
-        Task<TOut> HandleAsync(TQuery queryData, CancellationToken cancellationToken=default);
     }
 }

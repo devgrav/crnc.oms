@@ -12,6 +12,8 @@ namespace Crnc.Oms.Sales.DataAccess.Mappings
             builder.Property(x => x.Number).HasMaxLength(100);
             builder.Property(x => x.JobDescription).HasMaxLength(4000);
 
+            builder.Ignore(x => x.DomainEvents);
+            
             builder.OwnsOne(x => x.Customer, e =>
             {
                 e.OwnsOne(x => x.Title,

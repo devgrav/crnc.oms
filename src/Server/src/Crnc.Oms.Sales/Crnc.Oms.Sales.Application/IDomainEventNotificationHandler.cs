@@ -1,0 +1,7 @@
+﻿namespace Crnc.Oms.Sales.Application
+{
+    public interface IDomainEventNotificationHandler
+    {
+        
+    }
+}

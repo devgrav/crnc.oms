@@ -3,12 +3,18 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Crnc.Oms.Messaging.Contract.Commands;
 using Crnc.Oms.Notification.Gateway.WebApi.Authorization;
 using Crnc.Oms.Notification.Push.Application.Services;
 using Crnc.Oms.Notification.Push.Application.Services.Abstractions;
 using Crnc.Oms.Notification.Push.Integration.Gateways;
 using Crnc.Oms.Notification.Push.Integration.Gateways.Abstractions;
 using Crnc.Oms.Notification.Push.Integration.Hubs;
+using Crnc.Oms.Notification.Push.Integration.Settings;
+using Crnc.Oms.Notification.Push.WebApi.Consumers;
+using MassTransit;
+using MassTransit.AspNetCoreIntegration;
+using MassTransit.ExtensionsDependencyInjectionIntegration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -37,6 +43,8 @@ namespace Crnc.Oms.Notification.Push.WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHealthChecks();
+            
             services.AddCors(options =>
             {
                 var allowedOrigin = Configuration.GetSection("IntegrationEndpoints:UiEndpoint").Value;
@@ -53,6 +61,29 @@ namespace Crnc.Oms.Notification.Push.WebApi
                 options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                 options.SerializerSettings.Converters.Add(new StringEnumConverter());
             });
+            
+            IBusControl CreateBus(IServiceProvider serviceProvider)
+            {
+                return Bus.Factory.CreateUsingRabbitMq(cfg =>
+                {
+                    var integrationSettings = new IntegrationEndpointSettings();
+                    Configuration.GetSection("IntegrationEndpoints").Bind(integrationSettings);
+            
+                    cfg.Host(integrationSettings.MessageBrokerEndpoint);
+            
+                    cfg.ReceiveEndpoint("sendPushNotificationToReceiver", e =>
+                    {
+                        e.ConfigureConsumer<SendPushNotificationToUserReceiverConsumer>(serviceProvider);
+                    });
+                });
+            }
+            
+            void ConfigureMassTransit(IServiceCollectionConfigurator configurator)
+            {
+                configurator.AddConsumer<SendPushNotificationToUserReceiverConsumer>();
+            }
+            
+            services.AddMassTransit(CreateBus, ConfigureMassTransit);
 
             services.AddLogging();
 
@@ -104,15 +135,10 @@ namespace Crnc.Oms.Notification.Push.WebApi
                 options.Title = "Crnc Oms Push Notification API Doc";
                 //Version in header of api
                 options.Version = "1.0";
-                options.AddSecurity("JWT", Enumerable.Empty<string>(), new OpenApiSecurityScheme
-                {
-                    Type = OpenApiSecuritySchemeType.ApiKey,
-                    Name = "Authorization",
-                    In = OpenApiSecurityApiKeyLocation.Header,
-                    Description = "Please insert JWT with Bearer into field"
-                });
             });
         }
+        
+        
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

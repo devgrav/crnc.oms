@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Crnc.Oms.Notification.Gateway.Integration.Dto;
 
-namespace Crnc.Oms.Notification.Gateway.Integration.Gateways.Abstractions
+namespace Crnc.Oms.Notification.Email.Integration.Gateways.Abstractions
 {
     public interface IEmailGateway
     {

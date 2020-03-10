@@ -18,14 +18,13 @@ namespace Crnc.Oms.Notification.Gateway.Integration.Gateways
     public class PushGateway
         : IPushGateway
     {
-        private readonly ILogger<EmailGateway> _logger;
+        private readonly ILogger<PushGateway> _logger;
         private readonly RestClient _client;
 
-        public PushGateway(IOptions<IntegrationEndpointSettings> settings, ILogger<EmailGateway> logger,  ICurrentUserContext currentUserContext)
+        public PushGateway(IOptions<IntegrationEndpointSettings> settings, ILogger<PushGateway> logger)
         {
             _logger = logger;
             _client = new RestClient(settings.Value.PushNotificationServiceEndpoint);
-            _client.Authenticator = new JwtAuthenticator(currentUserContext.AuthToken);
         }
 
 
