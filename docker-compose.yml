@@ -4,6 +4,7 @@ services:
 # Message broker
   message-broker:
     image: rabbitmq:3-management
+    container_name: 'crnc-oms-message-broker'
     restart: always
     ports:
       - "15673:15672" 
@@ -12,11 +13,13 @@ services:
 # Security context
   security-db:
     image: "mongo:4.2.3"
+    container_name: 'crnc-oms-security-db'
     restart: always
     ports:
       - "27021:27017" 
   security-api:
     build: src/Server/src/Crnc.Oms.Security/
+    container_name: 'crnc-oms-security-api'
     restart: always
     ports:
       - "8090:80"
@@ -29,6 +32,7 @@ services:
   # Sales context
   sales-db:
     image: "postgres:9.6.17"
+    container_name: 'crnc-oms-sales-db'
     restart: always 
     ports:
       - 5433:5432
@@ -36,6 +40,7 @@ services:
       - POSTGRES_PASSWORD=docker
   sales-api:
     build: src/Server/src/Crnc.Oms.Sales/
+    container_name: 'crnc-oms-sales-api'
     restart: always
     ports:
       - "8091:80"
@@ -53,6 +58,7 @@ services:
   # Notification context
   notification-email-api:
     build: src/Server/src/Crnc.Oms.Notification/Crnc.Oms.Notification.Email/
+    container_name: 'crnc-oms-notification-email-api'
     restart: always
     ports:
       - "8104:80"
@@ -61,6 +67,7 @@ services:
 
   notification-push-api:
     build: src/Server/src/Crnc.Oms.Notification/Crnc.Oms.Notification.Push/
+    container_name: 'crnc-oms-notification-push-api'
     restart: always
     environment:
       - "IntegrationEndpoints:UiEndpoint=http://localhost:8092"
@@ -70,6 +77,7 @@ services:
   
   notification-gateway-api:
     build: src/Server/src/Crnc.Oms.Notification/Crnc.Oms.Notification.Gateway/
+    container_name: 'crnc-oms-notification-gateway-api'
     restart: always
     ports:
       - "8100:80"
@@ -85,6 +93,7 @@ services:
 
   notification-push-client:
     build: src/Server/src/Crnc.Oms.Notification/Crnc.Oms.Notification.Push.Client/
+    container_name: 'crnc-oms-notification-push-client'
     restart: always
     environment:
       - "IntegrationEndpoints:SecurityServiceEndpoint=http://security-api"
@@ -94,11 +103,19 @@ services:
       - security-api
       - message-broker
 
-  monitoring:
+  prometheus:
     build: prometheus/
     restart: always
     ports:
       - "9090:9090"
+
+  grafana:
+    build: './grafana'
+    container_name: 'crnc-oms-grafana'
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=p@ssw0rd
+    ports:
+      - '3000:3000'
     
   # UI
   #crnc-oms-ui:
