@@ -123,19 +123,22 @@ namespace Crnc.Oms.Security.WebApi
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
             
-            app.UseMetricServer();  
-            app.UseRequestMiddleware();  
+            app.UseMonitoringRequestMiddleware();  
 
             var cultureInfo = new CultureInfo("en-US");
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
             CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
             app.UseRouting();
+            app.UseHttpMetrics();
             app.UseCors("AllOrigins");
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseEndpoints(e => 
-                e.MapControllers());
+            app.UseEndpoints(e =>
+            {
+                e.MapControllers();
+                e.MapMetrics();
+            });
 
             app.UseOpenApi();
             app.UseSwaggerUi3();

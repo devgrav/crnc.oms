@@ -31,6 +31,7 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using NSwag;
 using Crnc.Oms.Messaging.Contract.Commands;
+using Prometheus;
 
 namespace Crnc.Oms.Notification.Gateway.WebApi
 {
@@ -151,11 +152,15 @@ namespace Crnc.Oms.Notification.Gateway.WebApi
             CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
             app.UseRouting();
+            app.UseHttpMetrics();
             app.UseCors("AllOrigins");
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(e =>
-                e.MapControllers());
+            {
+                e.MapControllers();
+                e.MapMetrics();
+            });
 
             app.UseOpenApi();
             app.UseSwaggerUi3();

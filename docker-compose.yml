@@ -24,8 +24,7 @@ services:
       - "ConnectionStrings:OmsSecurityDb:Server=mongodb://security-db"
       - "Cache:IsUse=true"
     depends_on: 
-      - security-db
-      - message-broker
+      - security-db      
 
   # Sales context
   sales-db:

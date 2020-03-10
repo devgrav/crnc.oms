@@ -27,6 +27,7 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using NSwag;
+using Prometheus;
 
 namespace Crnc.Oms.Notification.Email.WebApi
 {
@@ -109,12 +110,16 @@ namespace Crnc.Oms.Notification.Email.WebApi
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
             CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
+            app.UseHttpMetrics();
             app.UseRouting();
             app.UseCors("AllOrigins");
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(e =>
-                e.MapControllers());
+            {
+                e.MapControllers();
+                e.MapMetrics();
+            });
 
             app.UseOpenApi();
             app.UseSwaggerUi3();

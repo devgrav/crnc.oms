@@ -28,6 +28,7 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using NSwag;
+using Prometheus;
 
 namespace Crnc.Oms.Notification.Push.WebApi
 {
@@ -153,6 +154,7 @@ namespace Crnc.Oms.Notification.Push.WebApi
             CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
             app.UseRouting();
+            app.UseHttpMetrics();
             app.UseCors("CorsPolicy");
             app.UseAuthentication();
             app.UseAuthorization();
@@ -160,6 +162,7 @@ namespace Crnc.Oms.Notification.Push.WebApi
             {
                 e.MapHub<PushHub>("/hubs/push");
                 e.MapControllers();
+                e.MapMetrics();
             });
             
             app.UseOpenApi();

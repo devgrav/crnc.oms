@@ -5,20 +5,20 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Prometheus;
 
-namespace Crnc.Oms.Security.WebApi.Middlewares
+namespace Crnc.Oms.Notification.Email.WebApi.Middlewares
 {
-    public class RequestMiddleware
+    public class MonitoringRequestMiddleware
     {
         private readonly RequestDelegate _next;
         private readonly ILogger _logger;
 
-        public RequestMiddleware(
+        public MonitoringRequestMiddleware(
             RequestDelegate next
             , ILoggerFactory loggerFactory
         )
         {
             this._next = next;
-            this._logger = loggerFactory.CreateLogger<RequestMiddleware>();
+            this._logger = loggerFactory.CreateLogger<MonitoringRequestMiddleware>();
         }
 
         public async Task Invoke(HttpContext httpContext)
@@ -46,7 +46,7 @@ namespace Crnc.Oms.Security.WebApi.Middlewares
                 throw;
             }
 
-            if (path != "/metrics")
+            if (path != "/metrics" && path != "/favicon.ico")
             {
                 statusCode = httpContext.Response.StatusCode;
                 counter.Labels(path, method, statusCode.ToString()).Inc();  
@@ -54,11 +54,11 @@ namespace Crnc.Oms.Security.WebApi.Middlewares
         }
     }
     
-    public static class RequestMiddlewareExtensions  
+    public static class MonitoringRequestMiddlewareExtensions  
     {          
-        public static IApplicationBuilder UseRequestMiddleware(this IApplicationBuilder builder)  
+        public static IApplicationBuilder UseMonitoringRequestMiddleware(this IApplicationBuilder builder)  
         {  
-            return builder.UseMiddleware<RequestMiddleware>();  
+            return builder.UseMiddleware<MonitoringRequestMiddleware>();  
         }  
     }  
 }
