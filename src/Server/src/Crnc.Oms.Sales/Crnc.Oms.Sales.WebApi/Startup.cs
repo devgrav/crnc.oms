@@ -19,6 +19,7 @@ using Crnc.Oms.Sales.Integration.Dto;
 using Crnc.Oms.Sales.Integration.Gateways;
 using Crnc.Oms.Sales.Integration.Settings;
 using Crnc.Oms.Sales.WebApi.Authorization;
+using Crnc.Oms.Sales.WebApi.Middlewares;
 using GreenPipes;
 using MassTransit;
 using MassTransit.AspNetCoreIntegration;
@@ -40,6 +41,7 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
 using NSwag;
 using Newtonsoft.Json.Converters;
+using Prometheus;
 
 namespace Crnc.Oms.Sales.WebApi
 {
@@ -153,13 +155,19 @@ namespace Crnc.Oms.Sales.WebApi
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
             CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
+            app.UseMonitoringRequestMiddleware();
+            
             app.UseRouting();
+            app.UseHttpMetrics();
             app.UseCors("AllOrigins");
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseEndpoints(e => 
-                e.MapControllers());
-            
+            app.UseEndpoints(e =>
+            {
+                e.MapControllers();
+                e.MapMetrics();
+            });
+
             app.UseOpenApi();
             app.UseSwaggerUi3();
 

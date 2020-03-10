@@ -1,9 +1,31 @@
 scrape_configs:  
-- job_name: mydemo  
-  scrape_interval: 15s  
-  scrape_timeout: 10s  
+- job_name: security_api_monitoring    
   metrics_path: /metrics  
   scheme: http  
   static_configs:  
   - targets:  
-    - security-api  
+    - security-api
+- job_name: sales_api_monitoring    
+  metrics_path: /metrics  
+  scheme: http  
+  static_configs:  
+  - targets:  
+    - sales-api
+- job_name: notification_gateway_api_monitoring
+  metrics_path: /metrics  
+  scheme: http  
+  static_configs:  
+  - targets:  
+    - notification-gateway-api
+- job_name: notification_email_api_monitoring    
+  metrics_path: /metrics  
+  scheme: http  
+  static_configs:  
+  - targets:  
+    - notification-email-api
+- job_name: notification_push_api_monitoring    
+  metrics_path: /metrics  
+  scheme: http  
+  static_configs:  
+  - targets:  
+    - notification-push-api
