@@ -1,5 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
+using MediatR;
 
 namespace Crnc.Oms.Sales.Application
 {
@@ -9,15 +10,10 @@ namespace Crnc.Oms.Sales.Application
     /// <typeparam name="TIn"></typeparam>
     /// <typeparam name="TOut"></typeparam>
     public interface IUseCaseCommandHandler<TIn, TOut>
+        : IRequestHandler<TIn, TOut>
         where TIn: IUseCaseCommand<TOut>
 
     {
-        /// <summary>
-        /// Handle command async
-        /// </summary>
-        /// <param name="command">Data of command</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns></returns>
-        Task<TOut> HandleAsync(TIn command, CancellationToken cancellationToken=default); 
+ 
     }
 }

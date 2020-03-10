@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Crnc.Oms.Sales.Domain.SeedWork
 {
@@ -11,6 +12,10 @@ namespace Crnc.Oms.Sales.Domain.SeedWork
         /// Id of entity
         /// </summary>
         public Guid Id { get; protected set; }
+
+        private readonly List<DomainEvent> _domainEvents = new List<DomainEvent>();
+        public IReadOnlyCollection<DomainEvent> DomainEvents => _domainEvents.AsReadOnly();
+
 
         public DomainEntity(Guid id)
         {
@@ -62,5 +67,15 @@ namespace Crnc.Oms.Sales.Domain.SeedWork
             return Id.GetHashCode();
         }
         #endregion
+
+        public void AddDomainEvent(DomainEvent domainEvent)
+        {
+            _domainEvents.Add(domainEvent);
+        }
+        
+        public void RemoveDomainEvent(DomainEvent domainEvent)
+        {
+            _domainEvents.Remove(domainEvent);
+        }
     }
 }

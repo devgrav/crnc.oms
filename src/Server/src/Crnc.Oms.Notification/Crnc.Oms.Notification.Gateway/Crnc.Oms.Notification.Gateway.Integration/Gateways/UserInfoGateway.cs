@@ -20,11 +20,10 @@ namespace Crnc.Oms.Notification.Gateway.Integration.Gateways
         private readonly ILogger<UserInfoGateway> _logger;
         private readonly RestClient _client;
 
-        public UserInfoGateway(IOptions<IntegrationEndpointSettings> settings, ILogger<UserInfoGateway> logger, ICurrentUserContext currentUserContext)
+        public UserInfoGateway(IOptions<IntegrationEndpointSettings> settings, ILogger<UserInfoGateway> logger)
         {
             _logger = logger;
             _client = new RestClient(settings.Value.SecurityServiceEndpoint);
-            _client.Authenticator = new JwtAuthenticator(currentUserContext.AuthToken);
         }
         
         public async Task<GetUserInfoOutputDto> GetUserInfoAsync(GetUserInfoInputDto inputDto, CancellationToken cancellationToken = default)

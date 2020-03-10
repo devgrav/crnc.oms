@@ -7,6 +7,6 @@ namespace Crnc.Oms.Notification.Gateway.Application.Services.Abstractions
 {
     public interface INotificationService
     {
-        Task<SendNotificationToUserOutputDto> SendNotificationToUserAsync(SendNotificationToUserInputDto dto, CancellationToken cancellationToken = default);
+        Task<SendNotificationToUserOutputDto> SendNotificationToUserAsync(SendToNotificationUserInputDto dto, CancellationToken cancellationToken = default);
     }
 }

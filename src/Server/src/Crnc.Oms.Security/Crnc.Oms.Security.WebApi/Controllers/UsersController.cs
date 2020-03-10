@@ -42,6 +42,7 @@ namespace Crnc.Oms.Security.WebApi.Controllers
         /// <response code="200">Returns users.</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [AllowAnonymous]
         public async Task<ActionResult> Get([FromQuery]UserFilterDto dto)
         {
             if (dto.IsShortInfo)
@@ -68,6 +69,7 @@ namespace Crnc.Oms.Security.WebApi.Controllers
         [HttpGet("{id:Guid}")]
         [ProducesResponseType(typeof(UserItemDto),StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [AllowAnonymous]
         public async Task<IActionResult> Get(Guid id)
         {
             try

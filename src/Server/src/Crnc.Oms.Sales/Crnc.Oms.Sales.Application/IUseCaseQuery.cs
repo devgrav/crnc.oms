@@ -1,3 +1,5 @@
+using MediatR;
+
 namespace Crnc.Oms.Sales.Application
 {
     /// <summary>
@@ -5,6 +7,7 @@ namespace Crnc.Oms.Sales.Application
     /// </summary>
     /// <typeparam name="TOut">Type of result data</typeparam>
     public interface IUseCaseQuery<TOut>
+        : IRequest<TOut>
     {
         
     }

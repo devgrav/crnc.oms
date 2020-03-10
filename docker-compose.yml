@@ -1,6 +1,14 @@
 version: '3'
 services:
 
+# Message broker
+  message-broker:
+    image: rabbitmq:3-management
+    restart: always
+    ports:
+      - "15673:15672" 
+      - "5673:5672"
+
 # Security context
   security-db:
     image: "mongo:4.2.3"
@@ -17,6 +25,7 @@ services:
       - "Cache:IsUse=true"
     depends_on: 
       - security-db
+      - message-broker
 
   # Sales context
   sales-db:
@@ -35,10 +44,12 @@ services:
       - "ConnectionStrings:OmsSalesDb=Host=sales-db;Database=crnc_oms_sales_db;Username=postgres;Password=docker"          
       - "IntegrationEndpoints:NotificationServiceEndpoint=http://notification-gateway-api"      
       - "IntegrationEndpoints:SecurityServiceEndpoint=http://security-api"
+      - "IntegrationEndpoints:MessageBrokerEndpoint=rabbitmq://message-broker"
     depends_on: 
       - sales-db
       - security-api
       - notification-gateway-api
+      - message-broker
 
   # Notification context
   notification-email-api:
@@ -46,12 +57,15 @@ services:
     restart: always
     ports:
       - "8104:80"
+    environment:
+      - "IntegrationEndpoints:MessageBrokerEndpoint=rabbitmq://message-broker"
 
   notification-push-api:
     build: src/Server/src/Crnc.Oms.Notification/Crnc.Oms.Notification.Push/
     restart: always
     environment:
       - "IntegrationEndpoints:UiEndpoint=http://localhost:8092"
+      - "IntegrationEndpoints:MessageBrokerEndpoint=rabbitmq://message-broker"
     ports:
       - "8107:80"
   
@@ -64,9 +78,11 @@ services:
       - "IntegrationEndpoints:EmailNotificationServiceEndpoint=http://notification-email-api"
       - "IntegrationEndpoints:PushNotificationServiceEndpoint=http://notification-push-api"
       - "IntegrationEndpoints:SecurityServiceEndpoint=http://security-api"
+      - "IntegrationEndpoints:MessageBrokerEndpoint=rabbitmq://message-broker"
     depends_on: 
       - notification-email-api
       - notification-push-api
+      - message-broker
 
   notification-push-client:
     build: src/Server/src/Crnc.Oms.Notification/Crnc.Oms.Notification.Push.Client/
@@ -77,6 +93,7 @@ services:
     depends_on:      
       - notification-push-api
       - security-api
+      - message-broker
 
   monitoring:
     build: prometheus/

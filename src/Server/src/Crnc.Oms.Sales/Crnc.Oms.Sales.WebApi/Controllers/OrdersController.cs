@@ -22,24 +22,11 @@ namespace Crnc.Oms.Sales.WebApi.Controllers
     [ApiController]
     public class OrdersController : ControllerBase
     {
-        private readonly IUseCaseQueryHandler<GetOrdersForTableInputDto, GetOrdersForTableOutputDto> _getOrdersQueryHandler;
-        private readonly IUseCaseQueryHandler<GetOrderInputDto, GetOrderOutputDto> _getOrderQueryHandler;
-        private readonly IUseCaseQueryHandler<GetNewOrderInputDto, GetNewOrderOutputDto> _getNewOrderQueryHandler;
-        private readonly IUseCaseCommandHandler<CreateOrderInputDto, CreateOrderOutputDto> _createOrderCommandHandler;
-        private readonly IUseCaseCommandHandler<EditOrderInputDto, EmptyOutputDto> _editOrderCommandHandler;
+        private readonly ICommandQueryDispatcher _dispatcher;
 
-        public OrdersController(
-            IUseCaseQueryHandler<GetOrdersForTableInputDto, GetOrdersForTableOutputDto> getOrdersQueryHandler, 
-            IUseCaseQueryHandler<GetNewOrderInputDto, GetNewOrderOutputDto> getNewOrderQueryHandler,
-            IUseCaseQueryHandler<GetOrderInputDto, GetOrderOutputDto> getOrderQueryHandler,
-            IUseCaseCommandHandler<CreateOrderInputDto, CreateOrderOutputDto> createOrderCommandHandler, 
-            IUseCaseCommandHandler<EditOrderInputDto, EmptyOutputDto> editOrderCommandHandler)
+        public OrdersController(ICommandQueryDispatcher dispatcher)
         {
-            _getOrdersQueryHandler = getOrdersQueryHandler;
-            _getNewOrderQueryHandler = getNewOrderQueryHandler;
-            _createOrderCommandHandler = createOrderCommandHandler;
-            _editOrderCommandHandler = editOrderCommandHandler;
-            _getOrderQueryHandler = getOrderQueryHandler;
+            _dispatcher = dispatcher;
         }
         
         /// <summary>
@@ -51,7 +38,7 @@ namespace Crnc.Oms.Sales.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<GetOrdersForTableOutputDto> Get(CancellationToken  cancellationToken = default)
         {
-            return await _getOrdersQueryHandler.HandleAsync(new GetOrdersForTableInputDto(),cancellationToken);
+            return await _dispatcher.Dispatch(new GetOrdersForTableInputDto(),cancellationToken);
         }
         
         /// <summary>
@@ -67,7 +54,7 @@ namespace Crnc.Oms.Sales.WebApi.Controllers
         {
             try
             {
-                return Ok(await _getOrderQueryHandler.HandleAsync(new GetOrderInputDto()
+                return Ok(await _dispatcher.Dispatch(new GetOrderInputDto()
                 {
                     Id =  id
                 },cancellationToken));
@@ -87,7 +74,7 @@ namespace Crnc.Oms.Sales.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<GetNewOrderOutputDto> GetNew(CancellationToken  cancellationToken = default)
         {
-            return await _getNewOrderQueryHandler.HandleAsync(new GetNewOrderInputDto(),cancellationToken);
+            return await _dispatcher.Dispatch(new GetNewOrderInputDto(), cancellationToken);
         }
         
         /// <summary>
@@ -101,7 +88,7 @@ namespace Crnc.Oms.Sales.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<CreateOrderOutputDto> Create([FromBody]CreateOrderInputDto dto, CancellationToken  cancellationToken = default)
         {
-            return await _createOrderCommandHandler.HandleAsync(dto, cancellationToken);
+            return await _dispatcher.Dispatch(dto, cancellationToken);
         }
         
         /// <summary>
@@ -119,7 +106,7 @@ namespace Crnc.Oms.Sales.WebApi.Controllers
         {
             try
             {
-                await _editOrderCommandHandler.HandleAsync(dto, cancellationToken);
+                await _dispatcher.Dispatch(dto, cancellationToken);
                 
                 return Ok();
             }

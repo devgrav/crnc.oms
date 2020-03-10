@@ -21,11 +21,10 @@ namespace Crnc.Oms.Notification.Gateway.Integration.Gateways
         private readonly ILogger<EmailGateway> _logger;
         private readonly RestClient _client;
 
-        public EmailGateway(IOptions<IntegrationEndpointSettings> settings, ILogger<EmailGateway> logger, ICurrentUserContext currentUserContext)
+        public EmailGateway(IOptions<IntegrationEndpointSettings> settings, ILogger<EmailGateway> logger)
         {
             _logger = logger;
             _client = new RestClient(settings.Value.EmailNotificationServiceEndpoint);
-            _client.Authenticator = new JwtAuthenticator(currentUserContext.AuthToken);
         }
 
         public async Task<SendEmailOutputDto> SendEmailAsync(SendEmailInputDto dto, CancellationToken cancellationToken = default)
