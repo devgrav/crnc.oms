@@ -229,16 +229,14 @@ export default class UserCards extends React.Component<any, UserCardsState>{
         })
 
         const {deletedUser} = this.state;
-        
+
         if(deletedUser){
             await this.DeleteUser(deletedUser.id)
             const users = await this.getUsers();
     
             this.setState({
-                users
-            })
-
-            this.setState({
+                users,
+                usersForShow: users,
                 deletedUser: undefined
             })
         }
