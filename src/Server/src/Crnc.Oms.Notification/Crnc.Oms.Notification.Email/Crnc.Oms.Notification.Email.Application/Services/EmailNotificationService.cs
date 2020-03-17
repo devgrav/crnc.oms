@@ -8,6 +8,7 @@ using Crnc.Oms.Notification.Gateway.Integration.Dto;
 using Crnc.Oms.Notification.Email.Application.Services.Abstractions;
 using Crnc.Oms.Notification.Email.Integration.Gateways.Abstractions;
 using Microsoft.Extensions.Logging;
+using Prometheus;
 
 namespace Crnc.Oms.Notification.Email.Application.Services
 {
@@ -15,6 +16,8 @@ namespace Crnc.Oms.Notification.Email.Application.Services
         : IEmailNotificationService
     {
         private readonly IEmailGateway _emailGateway;
+        public static readonly Prometheus.Counter SentEmailCount = Metrics
+            .CreateCounter("notification_email_sent_total", "Number of sent email");
 
         public EmailNotificationService(IEmailGateway emailGateway)
         {
@@ -28,6 +31,8 @@ namespace Crnc.Oms.Notification.Email.Application.Services
             
             var sentOutput = await _emailGateway.SendEmailAsync(new EmailMessageInputDto
                 (dto.MessageId, dto.SenderEmail, dto.ReceiverEmail, dto.Message), cancellationToken);
+            
+            SentEmailCount.Inc();
             
             return new SendEmailMessageOutputDto()
             {

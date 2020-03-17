@@ -46,7 +46,7 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Events
                 List<Task> notificationTasks = new List<Task>();
                 foreach (var mainManager in mainManagers)
                 {
-                    var message = $"Status of order {EnumHelper.GetDescription(domainEvent.OldStatus)} changed to " +
+                    var message = $"Status of order {domainEvent.OrderNumber} changed from {EnumHelper.GetDescription(domainEvent.OldStatus)} to " +
                                   $"{EnumHelper.GetDescription(domainEvent.NewStatus)} at {domainEvent.NewStatusDate.ToStandartFormatWithTime()} by {changedManager.FullName} ({changedManager.Login})";
                     
                     notificationTasks.Add(_notificationGateway.NotifyManagerAsync(message, mainManager, cancellationToken));

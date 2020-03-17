@@ -4,6 +4,8 @@ import { Menu, MenuItemProps, Label, Icon } from "semantic-ui-react";
 import * as Logo from "../../assets/images/logo.png";
 import UserInfo from "./UserInfo";
 import Notifications from "./Notifications";
+import CurrentUserContext from "../../auth/CurrentUserContext";
+import { Roles } from "../../auth/CurrentUserRole";
 
 export default class TopMenu
     extends React.Component<any,{}> {
@@ -30,9 +32,10 @@ export default class TopMenu
                     <Menu.Item as={Link} to="/">
                         <img src={Logo}/>
                     </Menu.Item>
-                    <Menu.Item as={NavLink} to="/users" name="users" link>
-                        Users
-                    </Menu.Item>
+                    {CurrentUserContext.user.role === Roles.Admin && 
+                        <Menu.Item as={NavLink} to="/users" name="users" link>
+                            Users
+                        </Menu.Item>}
                     <Menu.Item as={NavLink} isActive={this.isActiveForDefault} to="/orders" name="orders" link>
                         Orders
                     </Menu.Item>

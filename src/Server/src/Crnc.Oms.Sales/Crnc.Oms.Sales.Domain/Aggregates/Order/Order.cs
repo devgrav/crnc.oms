@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Crnc.Oms.Sales.Domain.SeedWork;
 
 namespace Crnc.Oms.Sales.Domain.Aggregates.Order
@@ -79,8 +80,13 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Order
             JobDescription = jobDescription;
             Status = OrderStatus.NotSent;
             StatusDate = dateCreated;
-            Number = Id.ToString(); //TODO: add different algoritm
+            Number = ComposeOrderNumber();
             Manager = manager;
+        }
+
+        public string ComposeOrderNumber()
+        {
+            return Id.ToString().Split(new string[]{"-"}, StringSplitOptions.RemoveEmptyEntries)[0].ToLower();
         }
 
         public void Edit(JobType jobType, string jobDescription, MaterialSource? materialSource,
@@ -100,7 +106,7 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Order
             Status = status;
             StatusDate = currentDate;
             
-            AddDomainEvent(new OrderStatusChanged(oldStatus, Status, changedManager, currentDate));
+            AddDomainEvent(new OrderStatusChanged(Id, Number, oldStatus, Status, changedManager, currentDate));
         }
 
         protected Order()

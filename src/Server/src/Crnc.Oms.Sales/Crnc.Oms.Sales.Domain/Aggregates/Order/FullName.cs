@@ -28,5 +28,10 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Order
         {
             
         }
+
+        public override string ToString()
+        {
+            return Value;
+        }
     }
 }

@@ -12,8 +12,7 @@ const OrdersGridRow: React.StatelessComponent<OrdersGridRowProps> = (props) => {
                         as={Link}
                         to={`/orders/${item.id}`}                                    
                         primary 
-                        content="Edit" 
-                        icon="pencil"
+                        icon="pencil" 
                         size="tiny"
                     />
                     </Table.Cell>

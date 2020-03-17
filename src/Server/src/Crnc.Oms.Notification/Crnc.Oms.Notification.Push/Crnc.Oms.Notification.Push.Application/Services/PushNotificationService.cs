@@ -8,6 +8,7 @@ using Crnc.Oms.Notification.Push.Application.Services.Abstractions;
 using Crnc.Oms.Notification.Push.Integration.Dto;
 using Crnc.Oms.Notification.Push.Integration.Gateways.Abstractions;
 using Microsoft.Extensions.Logging;
+using Prometheus;
 
 namespace Crnc.Oms.Notification.Push.Application.Services
 {
@@ -16,6 +17,10 @@ namespace Crnc.Oms.Notification.Push.Application.Services
     {
         private readonly IPushGateway _pushGateway;
 
+        private static readonly Prometheus.Counter SentPushCount = Metrics
+            .CreateCounter("notification_push_sent_total", "Number of sent push");
+        
+        
         public PushNotificationService(IPushGateway pushGateway)
         {
             _pushGateway = pushGateway;
@@ -28,6 +33,8 @@ namespace Crnc.Oms.Notification.Push.Application.Services
             
             var sentOutput = await _pushGateway.SendPushAsync(new PushMessageInputDto
                 (dto.MessageId, dto.ReceiverUserId, dto.Message), cancellationToken);
+            
+            SentPushCount.Inc();
             
             return new SendPushMessageOutputDto()
             {
