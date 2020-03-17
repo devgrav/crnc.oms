@@ -24,7 +24,6 @@ namespace Crnc.Oms.Notification.Push.WebApi.Controllers
     {
         private readonly IPushNotificationService _pushNotificationService;
 
-
         public PushNotificationsController(IPushNotificationService pushNotificationService)
         {
             _pushNotificationService = pushNotificationService;
@@ -45,7 +44,6 @@ namespace Crnc.Oms.Notification.Push.WebApi.Controllers
                 return BadRequest(ModelState);
 
             var sendResult = await _pushNotificationService.SendAsync(inputDto, cancellationToken);
-            
 
             return Ok(sendResult);
         }

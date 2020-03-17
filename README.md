@@ -52,6 +52,12 @@ API требует аутентификации, JWT-токен можно по�
 Полный список действий с примерами данных доступен по соответсвующему swagger endpoint после запуска.
 Технологии: ASP.NET Core, SignalR, RabbitMq, MassTransit.
 
+### Мониторинг
+Реализован мониторинг на базе `Prometheus` и `Grafana`, собираются базовые метрики для всех сервисов, кроме инфраструктуры (mongo, postgreSQL, rabbitmq). Метрики предоставляет пакет https://github.com/prometheus-net/prometheus-net. Добавлено несколько специальных метрик: общее число запросов на роуты api и количество отправленных push и email сообщений. Сбор метрик от сервисов каждые 5 секунд.
+Интерфейс `Prometheus` можно посмотреть по стандартному URL после запуска по ссылке ниже.
+Для отображение метрик добавлена `Grafana`. В `Grafana` создан дашборд по умолчанию, который отображает метрики, собираемые `Prometheus`. Логин/пароль для UI Grafana: admin/p@ssw0rd. После логина будет доступен дашборд prometheus-net.
+UI доступен по стандартному URL по ссылке ниже.
+
 ### UI
 В процессе реализации.
 
@@ -87,5 +93,9 @@ Backend для всей системы можно запустить через 
 Уведомления push: [CRNC Oms Push Notification API](http://localhost:8107/swagger).
 
 UI Rabbit Mq: [RabbitMq UI](http://localhost:15673). 
+
+UI Prometheus: [Prometheus UI](http://localhost:9090/). 
+
+UI Grafana: [Grafana UI](http://localhost:3000/d/zyAf4i4Zz/prometheus-net)
 
 Тестовый push-клиент `notification-push-client` не имеет api и просто пишет сообщения в консоль контейнера.
