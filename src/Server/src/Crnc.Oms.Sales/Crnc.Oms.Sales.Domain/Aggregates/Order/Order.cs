@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Crnc.Oms.Sales.Domain.SeedWork;
 
@@ -87,6 +88,11 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Order
         public string ComposeOrderNumber()
         {
             return Id.ToString().Split(new string[]{"-"}, StringSplitOptions.RemoveEmptyEntries)[0].ToLower();
+        }
+
+        public List<OrderStatus> GetAvailableStatusesForCurrent()
+        {
+            return Status.GetAvailableStatuses();
         }
 
         public void Edit(JobType jobType, string jobDescription, MaterialSource? materialSource,

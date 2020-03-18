@@ -8,6 +8,7 @@ using Crnc.Oms.Sales.Application.Factories;
 using Crnc.Oms.Sales.Application.Features.Orders.Dto;
 using Crnc.Oms.Sales.Application.Features.Orders.Dto.Input;
 using Crnc.Oms.Sales.Application.Features.Orders.Dto.Output;
+using Crnc.Oms.Sales.Domain.Aggregates.Order;
 using Crnc.Oms.Sales.Domain.Repositories;
 using Crnc.Oms.Sales.Domain.SeedWork;
 using Microsoft.Extensions.Logging;
@@ -43,7 +44,7 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Commands
 
             order = OrderMapper.MapExistedOrder(order, request);
 
-            order.ChangeStatus(request.Status,_currentDateTimeProvider.GetNow(), manager);
+            order.ChangeStatus(Enumeration.FromValue<OrderStatus>((int)request.Status),_currentDateTimeProvider.GetNow(), manager);
 
             await _orderRepository.SaveChangesAsync(cancellationToken);
             

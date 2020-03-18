@@ -34,7 +34,8 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Dto.Input
         [Required(ErrorMessage = "Job description is required")]
         public string JobDescription { get; set; }
         
-        public OrderStatus Status { get; set; }
+        [EnumRequired]
+        public OrderStatusEnum Status { get; set; }
         
         public MaterialSource? MaterialSource { get; set; }
         

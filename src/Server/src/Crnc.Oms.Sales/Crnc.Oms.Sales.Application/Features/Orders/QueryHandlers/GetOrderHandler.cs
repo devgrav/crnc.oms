@@ -47,11 +47,11 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Queries
                     Text = x.Value,
                     Value = x.Key
                 }).ToList(),
-                Status = order.Status,
-                Statuses = EnumHelper.ToDictionaryWithKeysAndDescriptions(OrderStatus.NotSent).Select(x => new TextValueOutputDto<int, string>()
+                Status = (OrderStatusEnum)order.Status.Value,
+                Statuses = order.GetAvailableStatusesForCurrent().Select(x => new TextValueOutputDto<int, string>()
                 {
-                    Text = x.Value,
-                    Value = x.Key
+                    Text = x.DisplayName,
+                    Value = x.Value
                 }).ToList(),
                 MaterialSource = order.MaterialSource,
                 MaterialSources = EnumHelper.ToDictionaryWithKeysAndDescriptions(MaterialSource.Stock).Select(x => new TextValueOutputDto<int, string>()
