@@ -8,7 +8,7 @@ export default interface BaseOrderModel{
     customerTitle: string;
     customerAbbreviation: string;
     customerContactPersonFirstName: string;
-
+    isDisabledForEdit: boolean;
     customerContactPersonLastName: string;
     customerContactPersonEmail: string;
     customerContactPersonPhone: string;        

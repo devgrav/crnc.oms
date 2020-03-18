@@ -15,6 +15,7 @@ export default class NewOrderModel
     @observable customerContactPersonEmail: string;
     @observable customerContactPersonPhone: string;        
     @observable jobTypes: TextValueDto[];
+    @observable isDisabledForEdit: boolean;
     [key: string]: any;
 
     constructor(){
@@ -27,5 +28,6 @@ export default class NewOrderModel
         this.customerContactPersonEmail = "";
         this.customerContactPersonPhone = "";
         this.jobTypes = [];
+        this.isDisabledForEdit = false;
     }
 }

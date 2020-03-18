@@ -25,6 +25,7 @@ export default class CustomerInfo extends React.Component<CustomerInfoProps>{
                     value={model.customerTitle || ""}
                     error={validationInfo.hasFieldValidationError(nameof<BaseOrderModel>(x => x.customerTitle))}
                     autoComplete="off"
+                    disabled = {model.isDisabledForEdit}
                 />
                 <Form.Input
                     name={nameof<BaseOrderModel>(x => x.customerAbbreviation)}
@@ -34,6 +35,7 @@ export default class CustomerInfo extends React.Component<CustomerInfoProps>{
                     value={model.customerAbbreviation || ""}
                     error={validationInfo.hasFieldValidationError(nameof<BaseOrderModel>(x => x.customerAbbreviation))}
                     autoComplete="off"
+                    disabled = {model.isDisabledForEdit}
                 />       
             </React.Fragment> 
         )
