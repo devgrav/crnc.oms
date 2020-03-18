@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Crnc.Oms.Sales.Application.Features.Orders.Dto.Input;
 using Crnc.Oms.Sales.Domain.Aggregates.Order;
 
 namespace Crnc.Oms.Sales.Application.Features.Orders.Dto.Output
@@ -7,7 +8,7 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Dto.Output
     public class GetOrderOutputDto
     {
         public Guid Id { get; set; }
-        public OrderStatus Status { get; set; }
+        public OrderStatusEnum Status { get; set; }
         public List<TextValueOutputDto<int, string>> Statuses { get; set; }
         public string DateCreated { get; set; }
         public JobType JobType { get; set; }
