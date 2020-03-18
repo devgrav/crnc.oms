@@ -8,6 +8,7 @@ import TextValueDto from "../../shared/TextValueDto";
 import OrderCardRootStore from "./OrderCardRootStore";
 import ValidationInfo from "../../shared/ValidationInfo";
 import EditOrderModel from "./EditOrderModel";
+import { OrderStatus } from "../OrderStatus";
 
 export default class EditOrderCardStore{
 
@@ -54,6 +55,11 @@ export default class EditOrderCardStore{
 
     @action
     public setModel(model: EditOrderModel){
+        if(model.status === OrderStatus.Closed || model.status === OrderStatus.ConvertedToJob)
+        {
+            model.isDisabledForEdit = true;
+        }
+
         this.orderCardRootStore.model = model;
     }
 

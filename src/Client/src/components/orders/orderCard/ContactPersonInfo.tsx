@@ -25,6 +25,7 @@ export default class ContactPersonInfo extends React.Component<ContactPersonInfo
                     value={model.customerContactPersonFirstName || ""}
                     error={validationInfo.hasFieldValidationError(nameof<BaseOrderModel>(x => x.customerContactPersonFirstName))}
                     autoComplete="off"
+                    disabled = {model.isDisabledForEdit}
                 />
                 <Form.Input
                     name={nameof<BaseOrderModel>(x => x.customerContactPersonLastName)}                            
@@ -34,6 +35,7 @@ export default class ContactPersonInfo extends React.Component<ContactPersonInfo
                     value={model.customerContactPersonLastName || ""}
                     error={validationInfo.hasFieldValidationError(nameof<BaseOrderModel>(x => x.customerContactPersonLastName))}
                     autoComplete="off"
+                    disabled = {model.isDisabledForEdit}
                 />
                 <Form.Input
                     name={nameof<BaseOrderModel>(x => x.customerContactPersonEmail)}
@@ -43,6 +45,7 @@ export default class ContactPersonInfo extends React.Component<ContactPersonInfo
                     label="Email"
                     value={model.customerContactPersonEmail || ""}
                     autoComplete="off"
+                    disabled = {model.isDisabledForEdit}
                 />
                 <Form.Input
                     name={nameof<BaseOrderModel>(x => x.customerContactPersonPhone)}
@@ -52,6 +55,7 @@ export default class ContactPersonInfo extends React.Component<ContactPersonInfo
                     label="Phone"
                     value={model.customerContactPersonPhone || ""}
                     autoComplete="off"
+                    disabled = {model.isDisabledForEdit}
                 />        
             </React.Fragment> 
         )

@@ -62,7 +62,7 @@ export default class OrderCard<TModel extends BaseOrderModel> extends React.Comp
                         list={validationInfo.validationMessages}
                     />}
                     <Form id="orderForm" className="ui form" onSubmit={onSave}>                                  
-                        <Header as="h3" content="Order" dividing/>                                    
+                        <Header as="h3" content="Order" dividing disabled={model.isDisabledForEdit}/>                                    
                         <OrderInfo
                             model ={model} 
                             validationInfo = {validationInfo} 
@@ -73,13 +73,13 @@ export default class OrderCard<TModel extends BaseOrderModel> extends React.Comp
                             onChange = {onChange}
                             isEdit = {isEdit} 
                         />
-                        <Header as="h3" content="Customer" dividing/>                                                                                                           
+                        <Header as="h3" content="Customer" dividing disabled={model.isDisabledForEdit}/>                                                                                                           
                         <CustomerInfo
                             model ={model} 
                             validationInfo = {validationInfo} 
                             onChange = {onChange}
                         />
-                        <Header as="h3" content="Contact Person" dividing/>          
+                        <Header as="h3" content="Contact Person" dividing disabled={model.isDisabledForEdit}/>          
                         <ContactPersonInfo 
                             model ={model} 
                             validationInfo = {validationInfo} 
@@ -88,8 +88,9 @@ export default class OrderCard<TModel extends BaseOrderModel> extends React.Comp
                     </Form>
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button basic color="green" type="submit" content="Save" form="orderForm"/>
-                    <Button basic color="red" type="reset" content="Cancel" onClick={this.onCancel}/>
+                    {!model.isDisabledForEdit && 
+                        <Button basic color="green" type="submit" content="Save" form="orderForm"/>}
+                        <Button basic color="red" type="reset" content="Cancel" onClick={this.onCancel}/>
                 </Modal.Actions>
             </Modal>
         );
