@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Crnc.Oms.Sales.Application.Features.Orders.Dto.Input
+namespace Crnc.Oms.Sales.Application.Features.Orders.Dto
 {
     public enum OrderStatusEnum
     {

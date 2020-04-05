@@ -38,7 +38,8 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Queries
                     JobDescription = x.JobDescription,
                     DateSentToCustomer = x.DateSentToCustomer.ToStandartFormatWithTime(),
                     CustomerSignOffType = EnumHelper.GetDescription(x.SignOffType),
-                    Status = x.Status.DisplayName
+                    Status = x.Status.DisplayName,
+                    StatusEnum = (OrderStatusEnum)x.Status.Value
                 })
                 .OrderByDescending(x => x.CreatedDate)
                 .ToList();

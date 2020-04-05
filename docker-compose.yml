@@ -124,7 +124,7 @@ services:
       args:
         SECURITY_API_URL: "http://localhost:8090/api"
         SALES_API_URL: "http://localhost:8091/api"
-        PUSH_HUBS_URL: "http://localhost:8107/api"
+        PUSH_HUBS_URL: "http://localhost:8107/hubs"
     container_name: 'crnc-oms-ui'
     restart: always
     ports:
