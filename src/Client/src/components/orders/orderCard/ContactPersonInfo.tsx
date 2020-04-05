@@ -18,7 +18,8 @@ export default class ContactPersonInfo extends React.Component<ContactPersonInfo
         return (
             <React.Fragment> 
                 <Form.Input
-                    name={nameof<BaseOrderModel>(x => x.customerContactPersonFirstName)}     
+                    name={nameof<BaseOrderModel>(x => x.customerContactPersonFirstName)}  
+                    placeholder="John"   
                     className="required"
                     onChange={onChange}                                            
                     label="First name"
@@ -28,7 +29,8 @@ export default class ContactPersonInfo extends React.Component<ContactPersonInfo
                     disabled = {model.isDisabledForEdit}
                 />
                 <Form.Input
-                    name={nameof<BaseOrderModel>(x => x.customerContactPersonLastName)}                            
+                    name={nameof<BaseOrderModel>(x => x.customerContactPersonLastName)}    
+                    placeholder="Smith"                        
                     className="required"
                     onChange={onChange}                                                                        
                     label="Last name"
@@ -39,6 +41,7 @@ export default class ContactPersonInfo extends React.Component<ContactPersonInfo
                 />
                 <Form.Input
                     name={nameof<BaseOrderModel>(x => x.customerContactPersonEmail)}
+                    placeholder="john_smith@crnc.com"
                     error={validationInfo.hasFieldValidationError(nameof<BaseOrderModel>(x => x.customerContactPersonEmail))}
                     className="required"
                     onChange={onChange}                                            
@@ -49,6 +52,7 @@ export default class ContactPersonInfo extends React.Component<ContactPersonInfo
                 />
                 <Form.Input
                     name={nameof<BaseOrderModel>(x => x.customerContactPersonPhone)}
+                    placeholder="89161234567"
                     error={validationInfo.hasFieldValidationError(nameof<BaseOrderModel>(x => x.customerContactPersonPhone))}
                     className="required"
                     onChange={onChange}                                            

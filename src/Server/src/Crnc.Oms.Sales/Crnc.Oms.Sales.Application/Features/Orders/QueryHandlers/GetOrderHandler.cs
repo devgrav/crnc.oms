@@ -39,7 +39,8 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Queries
                 CustomerContactPersonLastName = order.Customer.ContactPerson.FullName.LastName,
                 CustomerContactPersonEmail = order.Customer.ContactPerson.Email.Value,
                 CustomerContactPersonPhone = order.Customer.ContactPerson.Phone.Value,
-                DateCreated = order.DateCreated.ToString(),
+                DateCreated = order.DateCreated.ToString("dd.MM.yyyy HH:mm"),
+                DateSentToCustomer = order.DateSentToCustomer.HasValue ? order.DateSentToCustomer.Value.ToString("dd.MM.yyyy HH:mm") : "",
                 JobDescription = order.JobDescription,
                 JobType = order.JobType,
                 JobTypes = EnumHelper.ToDictionaryWithKeysAndDescriptions(JobType.New).Select(x => new TextValueOutputDto<int, string>()

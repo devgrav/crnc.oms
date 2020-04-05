@@ -28,5 +28,6 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Dto.Output
         public string CustomerAbbreviation { get; set; }
         public string CustomerContactPersonEmail { get; set; }
         public string CustomerContactPersonPhone { get; set; }
+        public string DateSentToCustomer { get; set; }
     }
 }

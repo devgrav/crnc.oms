@@ -5,6 +5,7 @@ import TextValueDto from "../../shared/TextValueDto";
 export default interface BaseOrderModel{
     jobType: JobType;
     jobDescription: string;    
+    dateSentToCustomer: string;
     customerTitle: string;
     customerAbbreviation: string;
     customerContactPersonFirstName: string;
