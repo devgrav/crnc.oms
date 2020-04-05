@@ -1,10 +1,18 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
-import { Checkbox, Icon, Label, Table, Item, Button } from "semantic-ui-react";
+import { Checkbox, Icon, Label, Table, Item, Button, SemanticCOLORS } from "semantic-ui-react";
 import OrderGridRowModel from "./OrderGridModelRow";
+import { OrderStatus } from "../OrderStatus";
 
 const OrdersGridRow: React.StatelessComponent<OrdersGridRowProps> = (props) => {
         const {item} = props;
+
+        let color: SemanticCOLORS = "blue";
+        if(item.statusEnum === OrderStatus.ConvertedToJob)
+            color = "green";
+        if(item.statusEnum === OrderStatus.Closed)
+            color = "red";
+
         return (
                 <Table.Row>
                     <Table.Cell>
@@ -38,7 +46,7 @@ const OrdersGridRow: React.StatelessComponent<OrdersGridRowProps> = (props) => {
                         <div>{item.customerSignOffType}</div>
                     </Table.Cell>
                     <Table.Cell>
-                        <div>{item.status}</div>
+                        <Label color={color}>{item.status}</Label>
                     </Table.Cell>
                 </Table.Row>
         );

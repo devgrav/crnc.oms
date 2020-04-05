@@ -1,4 +1,5 @@
 import { Guid } from "guid-typescript";
+import { OrderStatus } from "../OrderStatus";
 
 export default class OrderGridRowModel{
     id: string;
@@ -10,6 +11,7 @@ export default class OrderGridRowModel{
     dateSentToCustomer: string;    
     customerSignOffType: string;
     status: string;
+    statusEnum?: OrderStatus;
 
     constructor(){
         this.id = Guid.EMPTY;
