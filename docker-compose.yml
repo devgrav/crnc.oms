@@ -118,18 +118,18 @@ services:
       - '3000:3000'
     
   # UI
-  #crnc-oms-ui:
-  #  build:
-  #    context: "src/Client/"
-  #    args:
-  #      SECURITY_API_URL: "http://localhost:8090/api"
-  #      SALES_API_URL: "http://localhost:8091/api"
-  #      PUSH_HUBS_URL: "http://localhost:8107/api"
-  #  container_name: 'crnc-oms-ui'
-  #  restart: always
-  #  ports:
-  #    - "8092:80"      
-  #  depends_on: 
-  #    - security-api
-  #    - sales-api       
-  #    - notification-gateway-api
+  crnc-oms-ui:
+    build:
+      context: "src/Client/"
+      args:
+        SECURITY_API_URL: "http://localhost:8090/api"
+        SALES_API_URL: "http://localhost:8091/api"
+        PUSH_HUBS_URL: "http://localhost:8107/api"
+    container_name: 'crnc-oms-ui'
+    restart: always
+    ports:
+      - "8092:80"      
+    depends_on: 
+      - security-api
+      - sales-api       
+      - notification-gateway-api

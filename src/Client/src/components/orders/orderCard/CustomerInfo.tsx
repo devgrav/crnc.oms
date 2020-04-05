@@ -21,7 +21,8 @@ export default class CustomerInfo extends React.Component<CustomerInfoProps>{
                     name={nameof<BaseOrderModel>(x => x.customerTitle)}
                     className="required"
                     onChange={onChange}                                            
-                    label="Title"                                            
+                    label="Title"      
+                    placeholder="Awesome Company"                                      
                     value={model.customerTitle || ""}
                     error={validationInfo.hasFieldValidationError(nameof<BaseOrderModel>(x => x.customerTitle))}
                     autoComplete="off"
@@ -31,7 +32,8 @@ export default class CustomerInfo extends React.Component<CustomerInfoProps>{
                     name={nameof<BaseOrderModel>(x => x.customerAbbreviation)}
                     className="required"
                     onChange={onChange}                                            
-                    label="Abbreviation"                                            
+                    label="Abbreviation"  
+                    placeholder="AC"                                           
                     value={model.customerAbbreviation || ""}
                     error={validationInfo.hasFieldValidationError(nameof<BaseOrderModel>(x => x.customerAbbreviation))}
                     autoComplete="off"

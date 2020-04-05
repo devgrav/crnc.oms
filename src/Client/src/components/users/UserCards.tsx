@@ -56,7 +56,7 @@ export default class UserCards extends React.Component<any, UserCardsState>{
                 u.login.toLowerCase().includes(this.state.search.login.toLowerCase())
                 : true);
         }
-        if (this.state.search.role) {
+        if (this.state.search.role && this.state.search.role !== Guid.EMPTY) {
             users = users.filter((u) =>
                 u.roleId === this.state.search.role);
         }
@@ -235,7 +235,8 @@ export default class UserCards extends React.Component<any, UserCardsState>{
             const users = await this.getUsers();
     
             this.setState({
-                users
+                users,
+                usersForShow: users
             })
 
             this.setState({

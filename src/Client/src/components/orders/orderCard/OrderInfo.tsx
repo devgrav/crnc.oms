@@ -6,6 +6,7 @@ import ValidationInfo from "../../shared/ValidationInfo";
 import { observer } from "mobx-react";
 import TextValueDto from "../../shared/TextValueDto";
 import EditOrderModel from "./EditOrderModel";
+import { OrderStatus } from "../OrderStatus";
 
 @observer
 export default class OrderInfo extends React.Component<OrderInfoProps>{
@@ -30,7 +31,8 @@ export default class OrderInfo extends React.Component<OrderInfoProps>{
                     disabled = {model.isDisabledForEdit}
                 />
                 <Form.TextArea
-                    name={nameof<BaseOrderModel>(x => x.jobDescription)}     
+                    name={nameof<BaseOrderModel>(x => x.jobDescription)}   
+                    placeholder="E.g. produce new detail"  
                     className="required"
                     onChange={onChange}                                        
                     label="Job Description"                                        
@@ -49,6 +51,15 @@ export default class OrderInfo extends React.Component<OrderInfoProps>{
                         options = {orderStatuses}
                         disabled = {model.isDisabledForEdit}
                     />
+                    {model.status != OrderStatus.NotSent && 
+                    <Form.Input
+                        name={nameof<BaseOrderModel>(x => x.dateSentToCustomer)}
+                        label="Date sent to customer"                                           
+                        value={model.dateSentToCustomer || ""}
+                        autoComplete="off"
+                        disabled = {true}
+                    />
+                    }
                     <Form.Select
                         name={nameof<EditOrderModel>(x => x.materialSource)}     
                         className="required"

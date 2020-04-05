@@ -26,6 +26,7 @@ export default class EditOrderModel
     @observable signoffTypes: TextValueDto[];
     @observable materialSources: TextValueDto[];
     @observable isDisabledForEdit: boolean;
+    @observable dateSentToCustomer: string;
     [key: string]: any;
 
     constructor(){
@@ -45,6 +46,7 @@ export default class EditOrderModel
         this.signoffTypes = [];
         this.materialSources = [];
         this.isDisabledForEdit = false;
+        this.dateSentToCustomer = "";
     }
 
 }

@@ -111,6 +111,9 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Order
             
             Status = status;
             StatusDate = currentDate;
+
+            if (status.Equals(OrderStatus.NeedSignoff))
+                DateSentToCustomer = currentDate;
             
             AddDomainEvent(new OrderStatusChanged(Id, Number, oldStatus, Status, changedManager, currentDate));
         }

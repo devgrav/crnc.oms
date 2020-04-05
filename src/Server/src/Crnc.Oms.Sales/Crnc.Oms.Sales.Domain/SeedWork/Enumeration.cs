@@ -57,6 +57,8 @@ public abstract class Enumeration : IComparable
 
         return typeMatches && valueMatches;
     }
+    
+    
 
     public override int GetHashCode()
     {
