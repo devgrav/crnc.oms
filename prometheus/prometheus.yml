@@ -11,6 +11,12 @@ scrape_configs:
   static_configs:  
   - targets:  
     - sales-api
+- job_name: production_api_monitoring    
+  metrics_path: /metrics  
+  scheme: http  
+  static_configs:  
+  - targets:  
+    - production-api
 - job_name: notification_gateway_api_monitoring
   metrics_path: /metrics  
   scheme: http  
@@ -29,7 +35,3 @@ scrape_configs:
   static_configs:  
   - targets:  
     - notification-push-api
-- job_name: mongodb-exporter  
-  static_configs:  
-  - targets:  
-    - mongodb-exporter:9001

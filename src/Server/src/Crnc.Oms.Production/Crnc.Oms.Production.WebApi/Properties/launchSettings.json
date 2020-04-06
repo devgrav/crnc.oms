@@ -1,0 +1,14 @@
+﻿{
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "Crnc.Oms.Production.WebApi": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger/index.html",
+      "applicationUrl": "http://localhost:8098",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
