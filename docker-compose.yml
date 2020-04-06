@@ -55,6 +55,31 @@ services:
       - notification-gateway-api
       - message-broker
 
+  # Production context
+  production-db:
+    image: "postgres:9.6.17"
+    container_name: 'crnc-oms-production-db'
+    restart: always 
+    ports:
+      - 5434:5432
+    environment: 
+      - POSTGRES_PASSWORD=docker
+  production-api:
+    build: src/Server/src/Crnc.Oms.Production/
+    container_name: 'crnc-oms-production-api'
+    restart: always
+    ports:
+      - "8098:80"
+    environment:
+      - "ConnectionStrings:OmsProductionDb=Host=production-db;Database=crnc_oms_production_db;Username=postgres;Password=docker"
+      - "IntegrationEndpoints:MessageBrokerEndpoint=rabbitmq://message-broker"
+    depends_on: 
+      - sales-db
+      - security-api
+      - production-db
+      - notification-gateway-api
+      - message-broker
+
   # Notification context
   notification-email-api:
     build: src/Server/src/Crnc.Oms.Notification/Crnc.Oms.Notification.Email/
@@ -124,6 +149,7 @@ services:
       args:
         SECURITY_API_URL: "http://localhost:8090/api"
         SALES_API_URL: "http://localhost:8091/api"
+        PRODUCTION_API_URL: "http://localhost:8098/api"
         PUSH_HUBS_URL: "http://localhost:8107/hubs"
     container_name: 'crnc-oms-ui'
     restart: always
@@ -131,5 +157,6 @@ services:
       - "8092:80"      
     depends_on: 
       - security-api
-      - sales-api       
+      - sales-api
+      - production-api        
       - notification-gateway-api

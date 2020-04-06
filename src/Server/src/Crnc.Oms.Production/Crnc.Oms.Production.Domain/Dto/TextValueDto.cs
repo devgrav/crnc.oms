@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Crnc.Oms.Sales.Application.Features.Orders.Dto.Output
+namespace Crnc.Oms.Production.Domain.Dto
 {
-    public class TextValueOutputDto<Tkey,TValue>
+    public class TextValueDto<Tkey,TValue>
     {
         public Tkey Value { get; set; }
 

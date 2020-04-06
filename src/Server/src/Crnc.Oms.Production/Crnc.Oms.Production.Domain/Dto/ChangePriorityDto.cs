@@ -1,7 +1,9 @@
-﻿namespace Crnc.Oms.Production.Domain.Dto
+﻿using Crnc.Oms.Production.Domain.Aggregates.JobAggregate;
+
+namespace Crnc.Oms.Production.Domain.Dto
 {
-    public class ChangePriorotyDto
+    public class ChangePriorityDto
     {
-        
+        public Priority Priority { get; set; }
     }
 }
