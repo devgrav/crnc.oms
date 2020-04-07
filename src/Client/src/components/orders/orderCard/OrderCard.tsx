@@ -1,6 +1,6 @@
 import * as React from "react";
 import { observer, inject } from "mobx-react";
-import { Modal, Segment, Message, Form, Grid, Button, FormProps, ModalProps, ButtonProps, Select, Header } from "semantic-ui-react";
+import { Modal, Segment, Message, Form, Grid, Button, FormProps, ModalProps, ButtonProps, Select, Header, Label } from "semantic-ui-react";
 import {nameof} from "ts-simple-nameof";
 import OrderCardRootStore from "./OrderCardRootStore";
 import { Redirect } from "react-router-dom";
@@ -61,7 +61,7 @@ export default class OrderCard<TModel extends BaseOrderModel> extends React.Comp
                         header="There was some errors with your submission"
                         list={validationInfo.validationMessages}
                     />}
-                    <Form id="orderForm" className="ui form" onSubmit={onSave}>                                  
+                    <Form id="orderForm" className="ui form" onSubmit={onSave}>                                
                         <Header as="h3" content="Order" dividing disabled={model.isDisabledForEdit}/>                                    
                         <OrderInfo
                             model ={model} 
@@ -85,6 +85,10 @@ export default class OrderCard<TModel extends BaseOrderModel> extends React.Comp
                             validationInfo = {validationInfo} 
                             onChange = {onChange}
                         />
+                        {model.jobId && model.jobNumber && 
+                        <React.Fragment>
+                            <Label color="blue">Order converted to job: {model.jobNumber}</Label>
+                        </React.Fragment> }   
                     </Form>
                 </Modal.Content>
                 <Modal.Actions>

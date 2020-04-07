@@ -1,4 +1,4 @@
-﻿﻿namespace Crnc.Oms.Production.Integration.Settings.Settings
+﻿﻿namespace Crnc.Oms.Production.Integration.Settings
 {
     public class IntegrationEndpointSettings
     {

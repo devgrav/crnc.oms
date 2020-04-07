@@ -20,9 +20,7 @@ namespace Crnc.Oms.Sales.DataAccess
             
             dbContext.Orders.Add(new Order(
                 Guid.Parse("5c5c6017-1b1f-4a46-b423-455ad4f273fe"), 
-                DateTime.Now, 
-                JobType.New, 
-                "Develop new wall", 
+                DateTime.Now, new JobInfo(JobType.New,"Develop new wall"), 
                 customer,
                 new Manager(new FullName("Shon", "Bean"), new Email("shon_bean@crnc.com"), 
                     "shon_bean",

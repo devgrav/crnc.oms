@@ -8,16 +8,12 @@ namespace Crnc.Oms.Production.Domain.Dto
         public JobType JobType { get; set; }
         
         public string JobDescription { get; set; }
-        
-        public bool IsJobCompeted { get; set; }
-        
-        public MaterialSource? MaterialSource { get; set; }
+
+        public MaterialSource MaterialSource { get; set; }
         
         public string ManagerFullName { get; set; }
         
         public string ManagerLogin { get; set; }
-        
-        public Priority Priority { get; set; }
 
         public Guid OrderId { get; set; }
 

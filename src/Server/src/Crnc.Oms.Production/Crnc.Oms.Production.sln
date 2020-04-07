@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Production.WebApi"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Production.Messaging.Contract", "Crnc.Oms.Production.Messaging.Contract\Crnc.Oms.Production.Messaging.Contract.csproj", "{FCDB9548-CDE7-4626-8015-B9C9008B71A6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Production.Integration", "Crnc.Oms.Production.Integration\Crnc.Oms.Production.Integration.csproj", "{524B3CD9-8B28-4F2B-BCC7-5024050C6F7E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{FCDB9548-CDE7-4626-8015-B9C9008B71A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FCDB9548-CDE7-4626-8015-B9C9008B71A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FCDB9548-CDE7-4626-8015-B9C9008B71A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{524B3CD9-8B28-4F2B-BCC7-5024050C6F7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{524B3CD9-8B28-4F2B-BCC7-5024050C6F7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{524B3CD9-8B28-4F2B-BCC7-5024050C6F7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{524B3CD9-8B28-4F2B-BCC7-5024050C6F7E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

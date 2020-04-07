@@ -21,8 +21,7 @@ namespace Crnc.Oms.Sales.Application.Factories
             var order = new Order(
                 Guid.NewGuid(), 
                 currentDateTimeProvider.GetNow(), 
-                dto.JobType, 
-                dto.JobDescription,
+                new JobInfo(dto.JobType, dto.JobDescription),
                 customer,
                 manager);
 
@@ -40,10 +39,9 @@ namespace Crnc.Oms.Sales.Application.Factories
                     new Email(dto.CustomerContactPersonEmail),
                     new Phone(dto.CustomerContactPersonPhone)));
 
-            order.Edit(dto.JobType, 
-                dto.JobDescription, 
+            order.Edit(new JobInfo(dto.JobType, dto.JobDescription),
                 dto.MaterialSource, 
-                dto.SignOffType, 
+                dto.SignoffType, 
                 customer);
 
             return order;

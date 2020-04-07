@@ -7,7 +7,9 @@ export default class NewOrderModel
     implements BaseOrderModel {
         
     @observable jobType: JobType;
-    @observable jobDescription: string;    
+    @observable jobDescription: string;   
+    @observable jobId: string;
+    @observable jobNumber: string;   
     @observable customerTitle: string;
     @observable customerAbbreviation: string;
     @observable customerContactPersonFirstName: string;
@@ -31,5 +33,7 @@ export default class NewOrderModel
         this.jobTypes = [];
         this.isDisabledForEdit = false;
         this.dateSentToCustomer = "";
+        this.jobId = "";
+        this.jobNumber = "";
     }
 }

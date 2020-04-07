@@ -2,21 +2,24 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Threading.Tasks;
-using Crnc.Oms.Messaging.Contract.Commands;
+using Crnc.Oms.Messaging.Contract.Events;
 using Crnc.Oms.Production.Domain.SeedWork;
 using Crnc.Oms.Production.Application;
 using Crnc.Oms.Production.Application.Services;
 using Crnc.Oms.Production.Application.Services.Abstractions;
 using Crnc.Oms.Production.DataAccess;
 using Crnc.Oms.Production.DataAccess.Repositories;
+using Crnc.Oms.Production.Domain.Gateways;
 using Crnc.Oms.Production.Domain.Repositories;
+using Crnc.Oms.Production.Integration.Gateways;
+using Crnc.Oms.Production.Integration.Settings;
 using Crnc.Oms.Production.WebApi.Middlewares;
 using Crnc.Oms.Production.WebApi.Authorization;
-using Crnc.Oms.Production.WebApi.Settings;
+using Crnc.Oms.Production.WebApi.Consumers;
 using GreenPipes;
 using MassTransit;
 using MassTransit.AspNetCoreIntegration;
+using MassTransit.ExtensionsDependencyInjectionIntegration;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -71,8 +74,6 @@ namespace Crnc.Oms.Production.WebApi
                 options.UseNpgsql(Configuration.GetConnectionString("OmsProductionDb"));
             });
 
-            services.AddMassTransit(ConfigureBus(), LoggerFactory);
-
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             
             services.AddScoped<ICurrentUserContext, CurrentUserContext>();
@@ -81,9 +82,31 @@ namespace Crnc.Oms.Production.WebApi
             
             services.AddScoped<IJobService, JobService>();
             services.AddScoped<IJobRepository, JobRepository>();
-
-            services.Configure<AuthSettings>(Configuration.GetSection("Auth"));
+            services.AddScoped<ISalesOrderGateway, SalesOrderGateway>();
             
+            services.Configure<IntegrationEndpointSettings>(Configuration.GetSection("IntegrationEndpoints"));
+            
+            IBusControl CreateBus(IServiceProvider serviceProvider) => Bus.Factory.CreateUsingRabbitMq(cfg =>
+            {
+                var integrationSettings = new IntegrationEndpointSettings();
+                Configuration.GetSection("IntegrationEndpoints").Bind(integrationSettings);
+            
+                cfg.Host(integrationSettings.MessageBrokerEndpoint);
+            
+                cfg.ReceiveEndpoint("orderConvertedToJob", e =>
+                {
+                    e.ConfigureConsumer<OrderConvertedToJobConsumer>(serviceProvider);
+                });
+            });
+            
+            void ConfigureMassTransit(IServiceCollectionConfigurator configurator)
+            {
+                configurator.AddConsumer<OrderConvertedToJobConsumer>();
+            }
+            
+            services.AddMassTransit(CreateBus, ConfigureMassTransit);
+            
+            services.Configure<AuthSettings>(Configuration.GetSection("Auth"));
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -101,7 +124,7 @@ namespace Crnc.Oms.Production.WebApi
                         IssuerSigningKey = authSettings.SymmetricSecurityKey
                     };
                 });
-            
+
             services.AddOpenApiDocument(options =>
             {
                 //Title in header of api
@@ -117,17 +140,7 @@ namespace Crnc.Oms.Production.WebApi
                 });
             });
         }
-        
-        IBusControl ConfigureBus() => Bus.Factory.CreateUsingRabbitMq(cfg =>
-        {
-            var integrationSettings = new IntegrationEndpointSettings();
-            Configuration.GetSection("IntegrationEndpoints").Bind(integrationSettings);
-            
-            cfg.Host(integrationSettings.MessageBrokerEndpoint);
 
-            EndpointConvention.Map<OrderConvertedToJobEvent>(new Uri($"{integrationSettings.MessageBrokerEndpoint}/commands/sendNotificationToUser"));
-        });
-        
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ProductionDataContext dbContext)
         {

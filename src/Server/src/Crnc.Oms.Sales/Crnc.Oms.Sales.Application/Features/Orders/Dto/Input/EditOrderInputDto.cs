@@ -37,9 +37,11 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Dto.Input
         [EnumRequired]
         public OrderStatusEnum Status { get; set; }
         
+        [EnumRequired]
         public MaterialSource? MaterialSource { get; set; }
         
-        public SignoffType? SignOffType { get; set; }
+        [EnumRequired]
+        public SignoffType? SignoffType { get; set; }
 
         [Required(ErrorMessage = "Customer Title is required")]
         public string CustomerTitle { get; set; }

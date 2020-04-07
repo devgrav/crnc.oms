@@ -1,11 +1,21 @@
 ﻿using System;
 
-namespace Crnc.Oms.Messaging.Contract.Commands
+namespace Crnc.Oms.Messaging.Contract.Events
 {
     public interface OrderConvertedToJobEvent
     {
-        Guid UserId { get; set; }
+        string JobType { get; set; }
         
-        string Message { get; set; }
+        string JobDescription { get; set; }
+
+        string MaterialSource { get; set; }
+        
+        string ManagerFullName { get; set; }
+        
+        string ManagerLogin { get; set; }
+
+        Guid OrderId { get; set; }
+
+        string OrderNumber { get; set; }
     }
 }

@@ -41,7 +41,7 @@ namespace Crnc.Oms.Production.Domain.Aggregates.JobAggregate
         /// <summary>
         /// Source of material
         /// </summary>
-        public MaterialSource? MaterialSource { get; private set; }
+        public MaterialSource MaterialSource { get; private set; }
 
         /// <summary>
         /// Manager of manufactoring
@@ -63,7 +63,7 @@ namespace Crnc.Oms.Production.Domain.Aggregates.JobAggregate
         /// </summary>
         public string OrderNumber { get; set; }
 
-        public Job(Guid id, DateTime dateCreated, JobType jobType, string jobDescription, Manager manager, Guid orderId, string orderNumber)
+        public Job(Guid id, DateTime dateCreated, JobType jobType, string jobDescription, MaterialSource materialSource, Manager manager, Guid orderId, string orderNumber)
             : base(id)
         {
             if(string.IsNullOrWhiteSpace(jobDescription))
@@ -83,6 +83,7 @@ namespace Crnc.Oms.Production.Domain.Aggregates.JobAggregate
             Priority = Priority.Low;
             OrderId = orderId;
             OrderNumber = orderNumber;
+            MaterialSource = materialSource;
         }
 
         public string ComposeJobNumber()

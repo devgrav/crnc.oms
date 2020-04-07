@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Header, Form } from "semantic-ui-react";
+import { Header, Form, Label } from "semantic-ui-react";
 import { nameof } from "ts-simple-nameof";
 import BaseOrderModel from "./BaseOrderModel";
 import ValidationInfo from "../../shared/ValidationInfo";
@@ -40,7 +40,7 @@ export default class OrderInfo extends React.Component<OrderInfoProps>{
                     error={validationInfo.hasFieldValidationError(nameof<BaseOrderModel>(x => x.jobDescription))}
                     autoComplete="off"       
                     disabled = {model.isDisabledForEdit}                     
-                />    
+                />   
                 {isEdit && <React.Fragment>
                     <Form.Select
                         name={nameof<EditOrderModel>(x => x.status)}
