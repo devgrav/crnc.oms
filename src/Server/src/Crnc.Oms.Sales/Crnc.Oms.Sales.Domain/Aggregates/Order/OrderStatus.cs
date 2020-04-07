@@ -1,25 +1,66 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using Crnc.Oms.Sales.Domain.SeedWork;
 
 namespace Crnc.Oms.Sales.Domain.Aggregates.Order
 {
     /// <summary>
     /// Status of order
     /// </summary>
-    public enum OrderStatus
+    public class OrderStatus : Enumeration
     {
-        [Description("Not sent")]
-        NotSent=1,
+        public static readonly OrderStatus NotSent 
+            = new OrderStatus(1, "Not sent");
+        public static readonly OrderStatus NeedSignoff 
+            = new OrderStatus(2, "Need signoff");
+        public static readonly OrderStatus Signed 
+            = new OrderStatus(3, "Signed");
+        public static readonly OrderStatus ConvertedToJob 
+            = new OrderStatus(4, "Converted to job");
+        public static readonly OrderStatus Closed 
+            = new OrderStatus(5, "Closed");
 
-        [Description("Need signoff")]
-        NeedSignoff=2,
+        private static readonly Dictionary<OrderStatus, List<OrderStatus>> AvailableOrderStatuses =
+            new Dictionary<OrderStatus, List<OrderStatus>>
+            {
+                {
+                    NotSent, new List<OrderStatus>
+                    {
+                        NotSent,NeedSignoff, Closed
+                    }
+                },
+                {
+                    NeedSignoff, new List<OrderStatus>
+                    {
+                        NeedSignoff,Signed, Closed
+                    }
+                },
+                {
+                    Signed, new List<OrderStatus>
+                    {
+                        Signed,ConvertedToJob, Closed
+                    }
+                },
+                {
+                    ConvertedToJob, new List<OrderStatus>
+                    {
+                        ConvertedToJob
+                    }
+                },
+                {
+                    Closed, new List<OrderStatus>
+                    {
+                        Closed
+                    }              
+                }
+            };
+        
+        public OrderStatus() { }
+        
+        private OrderStatus(int value, string displayName) : base(value, displayName) { }
 
-        [Description("Signed")]
-        Signed=3,
-
-        [Description("Converted to job")]
-        ConvertedToJob=4,
-
-        [Description("Closed")]
-        Closed=5   
+        public List<OrderStatus> GetAvailableStatuses()
+        {
+            return AvailableOrderStatuses[this];
+        }
     }
 }

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Crnc.Oms.Sales.Domain.Aggregates.Order;
 using FluentAssertions;
 using Xunit;
@@ -10,13 +12,18 @@ namespace Crnc.Oms.Sales.Tests.Domain.Aggregates.OrderAggregate
         [Fact]
         public void ComposeOrderNumber_WithGuidId_ExpectedResult()
         {
+            var list = new List<int>
+            {
+                1, 2, 3, 4, 5
+            };
+
+            list.Where(x => x == 1);
+            
             //Arrange
             var id = Guid.Parse("3ed0adf9-7ff4-4b09-ae2f-db41e293d8c8");
             var expected = "3ed0adf9";
             var order = new Order(id,
-                DateTime.Now,
-                JobType.New,
-                "Some job",
+                DateTime.Now, new JobInfo(JobType.New, "Some job"),
                 new Customer(new Title("Some title", new NameAbbreviation("ST")),
                     new ContactPerson(
                         new FullName("John", "Galt"),

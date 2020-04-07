@@ -37,6 +37,21 @@ namespace Crnc.Oms.Sales.Application.Helpers
 
             return dictionary;
         }
+        
+        public static Dictionary<int, string> ToDictionaryWithKeysAndDescriptions(List<object> e)
+        {
+            var values = Enum.GetValues(e.GetType()).AsQueryable();
+            var dictionary = new Dictionary<int,string>();
+            
+            foreach (var val in values)
+            {
+                var key = (int)val;
+                var value = GetDescription((Enum)val);
+                dictionary.Add(key, value);
+            }
+
+            return dictionary;
+        }
     }
 }
     

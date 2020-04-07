@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Production.Application", "Crnc.Oms.Production.Application\Crnc.Oms.Production.Application.csproj", "{C6875935-DDE6-4D1B-85E9-E4A9DEBBE641}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Production.DataAccess", "Crnc.Oms.Production.DataAccess\Crnc.Oms.Production.DataAccess.csproj", "{CC395A9E-C9B3-4994-BEF7-B005438BC8FE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Production.Domain", "Crnc.Oms.Production.Domain\Crnc.Oms.Production.Domain.csproj", "{666CC5EE-DC9A-4C7D-9AD6-A8E2D40860FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Production.WebApi", "Crnc.Oms.Production.WebApi\Crnc.Oms.Production.WebApi.csproj", "{00C7E7B3-9D62-41E6-86E7-6855BE231D28}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Production.Messaging.Contract", "Crnc.Oms.Production.Messaging.Contract\Crnc.Oms.Production.Messaging.Contract.csproj", "{FCDB9548-CDE7-4626-8015-B9C9008B71A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Production.Integration", "Crnc.Oms.Production.Integration\Crnc.Oms.Production.Integration.csproj", "{524B3CD9-8B28-4F2B-BCC7-5024050C6F7E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C6875935-DDE6-4D1B-85E9-E4A9DEBBE641}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6875935-DDE6-4D1B-85E9-E4A9DEBBE641}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6875935-DDE6-4D1B-85E9-E4A9DEBBE641}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6875935-DDE6-4D1B-85E9-E4A9DEBBE641}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC395A9E-C9B3-4994-BEF7-B005438BC8FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC395A9E-C9B3-4994-BEF7-B005438BC8FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC395A9E-C9B3-4994-BEF7-B005438BC8FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC395A9E-C9B3-4994-BEF7-B005438BC8FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{666CC5EE-DC9A-4C7D-9AD6-A8E2D40860FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{666CC5EE-DC9A-4C7D-9AD6-A8E2D40860FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{666CC5EE-DC9A-4C7D-9AD6-A8E2D40860FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{666CC5EE-DC9A-4C7D-9AD6-A8E2D40860FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00C7E7B3-9D62-41E6-86E7-6855BE231D28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00C7E7B3-9D62-41E6-86E7-6855BE231D28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00C7E7B3-9D62-41E6-86E7-6855BE231D28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00C7E7B3-9D62-41E6-86E7-6855BE231D28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCDB9548-CDE7-4626-8015-B9C9008B71A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCDB9548-CDE7-4626-8015-B9C9008B71A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCDB9548-CDE7-4626-8015-B9C9008B71A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCDB9548-CDE7-4626-8015-B9C9008B71A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{524B3CD9-8B28-4F2B-BCC7-5024050C6F7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{524B3CD9-8B28-4F2B-BCC7-5024050C6F7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{524B3CD9-8B28-4F2B-BCC7-5024050C6F7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{524B3CD9-8B28-4F2B-BCC7-5024050C6F7E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

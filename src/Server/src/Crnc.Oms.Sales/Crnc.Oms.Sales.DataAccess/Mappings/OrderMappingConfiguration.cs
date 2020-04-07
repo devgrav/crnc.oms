@@ -10,9 +10,14 @@ namespace Crnc.Oms.Sales.DataAccess.Mappings
         public void Configure(EntityTypeBuilder<Order> builder)
         {
             builder.Property(x => x.Number).HasMaxLength(100);
-            builder.Property(x => x.JobDescription).HasMaxLength(4000);
+
 
             builder.Ignore(x => x.DomainEvents);
+            builder.OwnsOne(x => x.JobInfo, e =>
+            {
+                e.Property(x => x.Description).HasMaxLength(4000);
+            });
+            builder.OwnsOne(x => x.Status, e => { e.Property(x => x.DisplayName).HasMaxLength(200); });
             
             builder.OwnsOne(x => x.Customer, e =>
             {

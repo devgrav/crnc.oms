@@ -15,7 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\src\Crnc.Oms.Sales\Crnc.Oms.Sales.Domain\Crnc.Oms.Sales.Domain.csproj" />
+      <ProjectReference Include="..\Crnc.Oms.Sales.Domain\Crnc.Oms.Sales.Domain.csproj" />
     </ItemGroup>
 
 </Project>

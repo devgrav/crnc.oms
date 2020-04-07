@@ -29,8 +29,10 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Commands
         {
             if(request == null)
                 throw new ArgumentNullException(nameof(request));
-            
-            var manager = ManagerFactory.GetCurrentUserAsManager(_currentUserContext);
+
+            var manager = await _orderRepository.GetManagerByIdAsync(_currentUserContext.Id,cancellationToken);
+            if(manager == null)
+                manager = ManagerFactory.GetCurrentUserAsManager(_currentUserContext);
             var order = OrderMapper.MapNewOrder(request, _currentDateTimeProvider, manager);
             
             _orderRepository.Add(order);

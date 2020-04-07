@@ -39,6 +39,9 @@ export default class TopMenu
                     <Menu.Item as={NavLink} isActive={this.isActiveForDefault} to="/orders" name="orders" link>
                         Orders
                     </Menu.Item>
+                    <Menu.Item as={NavLink} to="/jobs" name="jobs" link>
+                        Jobs
+                    </Menu.Item>
                     <Menu.Menu position="right">
                         <Menu.Item header>
                             <Notifications/>                         

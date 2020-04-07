@@ -12,6 +12,8 @@ export default class EditOrderModel
 
     @observable jobType: JobType;
     @observable jobDescription: string;    
+    @observable jobId: string;
+    @observable jobNumber: string;  
     @observable materialSource: MaterialSource;
     @observable status: OrderStatus;
     @observable signoffType: SignoffType;
@@ -25,6 +27,8 @@ export default class EditOrderModel
     @observable statuses: TextValueDto[];
     @observable signoffTypes: TextValueDto[];
     @observable materialSources: TextValueDto[];
+    @observable isDisabledForEdit: boolean;
+    @observable dateSentToCustomer: string;
     [key: string]: any;
 
     constructor(){
@@ -43,6 +47,10 @@ export default class EditOrderModel
         this.statuses = [];
         this.signoffTypes = [];
         this.materialSources = [];
+        this.isDisabledForEdit = false;
+        this.dateSentToCustomer = "";
+        this.jobId = "";
+        this.jobNumber = "";
     }
 
 }
