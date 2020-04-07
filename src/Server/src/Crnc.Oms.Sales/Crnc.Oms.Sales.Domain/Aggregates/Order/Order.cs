@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Crnc.Oms.Sales.Domain.SeedWork;
 
@@ -24,17 +25,12 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Order
         /// Date sent to customer
         /// </summary>
         public DateTime? DateSentToCustomer { get; private set; }
-
+        
         /// <summary>
-        /// Job type
+        /// Info about job
         /// </summary>
-        public JobType JobType { get; private set; }
-
-        /// <summary>
-        /// Comments
-        /// </summary>
-        public string JobDescription { get; private set; }
-
+        public JobInfo JobInfo { get; private set; }
+        
         /// <summary>
         /// Current status of order
         /// </summary>
@@ -63,21 +59,17 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Order
         /// <summary>
         /// Manager of order
         /// </summary>
-        public Manager Manager { get; set; }
-
-        public Order(Guid id, DateTime dateCreated, JobType jobType, string jobDescription, Customer customer, Manager manager)
+        public Manager Manager { get; private set; }
+        
+        public Order(Guid id, DateTime dateCreated, JobInfo jobInfo, Customer customer, Manager manager)
             : base(id)
         {
-            if(string.IsNullOrWhiteSpace(jobDescription))
-                throw new ArgumentNullException(nameof(jobDescription));
-            
             if(manager == null)
                 throw new ArgumentNullException(nameof(manager));
 
             Customer = customer ?? throw new ArgumentNullException(nameof(customer));
             DateCreated = dateCreated;
-            JobType = jobType;
-            JobDescription = jobDescription;
+            JobInfo = jobInfo;
             Status = OrderStatus.NotSent;
             StatusDate = dateCreated;
             Number = ComposeOrderNumber();
@@ -89,11 +81,15 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Order
             return Id.ToString().Split(new string[]{"-"}, StringSplitOptions.RemoveEmptyEntries)[0].ToLower();
         }
 
-        public void Edit(JobType jobType, string jobDescription, MaterialSource? materialSource,
+        public List<OrderStatus> GetAvailableStatusesForCurrent()
+        {
+            return Status.GetAvailableStatuses();
+        }
+
+        public void Edit(JobInfo jobInfo, MaterialSource? materialSource,
             SignoffType? signoffType, Customer customer)
         {
-            JobType = jobType;
-            JobDescription = jobDescription;
+            SetInfoAboutJob(jobInfo);
             MaterialSource = materialSource;
             SignOffType = signoffType;
             Customer = customer;
@@ -105,8 +101,27 @@ namespace Crnc.Oms.Sales.Domain.Aggregates.Order
             
             Status = status;
             StatusDate = currentDate;
+
+            if (status.Equals(OrderStatus.NeedSignoff))
+                DateSentToCustomer = currentDate;
+            
+            if(status.Equals(OrderStatus.ConvertedToJob))
+                ConvertToJob();
             
             AddDomainEvent(new OrderStatusChanged(Id, Number, oldStatus, Status, changedManager, currentDate));
+        }
+
+        public void ConvertToJob()
+        {
+            if(!MaterialSource.HasValue)
+                throw new InvalidOperationException("Material source must be specified");
+            
+            AddDomainEvent(new OrderConvertedToJob(JobInfo, MaterialSource.Value, Manager,Id, Number));
+        }
+
+        public void SetInfoAboutJob(JobInfo jobInfo)
+        {
+            JobInfo = jobInfo;
         }
 
         protected Order()

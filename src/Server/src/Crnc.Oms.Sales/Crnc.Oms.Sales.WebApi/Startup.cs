@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Crnc.Oms.Messaging.Contract.Commands;
+using Crnc.Oms.Messaging.Contract.Events;
 using Crnc.Oms.Sales.Domain.SeedWork;
 using Crnc.Oms.Sales.Application;
 using Crnc.Oms.Sales.Application.Features.Orders.Commands;
@@ -13,16 +14,19 @@ using Crnc.Oms.Sales.Application.Features.Orders.Dto.Output;
 using Crnc.Oms.Sales.Application.Features.Orders.Queries;
 using Crnc.Oms.Sales.DataAccess;
 using Crnc.Oms.Sales.DataAccess.Repositories;
+using Crnc.Oms.Sales.Domain.Aggregates.Order;
 using Crnc.Oms.Sales.Domain.Gateways;
 using Crnc.Oms.Sales.Domain.Repositories;
 using Crnc.Oms.Sales.Integration.Dto;
 using Crnc.Oms.Sales.Integration.Gateways;
 using Crnc.Oms.Sales.Integration.Settings;
 using Crnc.Oms.Sales.WebApi.Authorization;
+using Crnc.Oms.Sales.WebApi.Consumers;
 using Crnc.Oms.Sales.WebApi.Middlewares;
 using GreenPipes;
 using MassTransit;
 using MassTransit.AspNetCoreIntegration;
+using MassTransit.ExtensionsDependencyInjectionIntegration;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -78,8 +82,28 @@ namespace Crnc.Oms.Sales.WebApi
             });
             
             services.Configure<IntegrationEndpointSettings>(Configuration.GetSection("IntegrationEndpoints"));
+
+            IBusControl CreateBus(IServiceProvider serviceProvider) => Bus.Factory.CreateUsingRabbitMq(cfg =>
+            {
+                var integrationSettings = new Crnc.Oms.Sales.Integration.Settings.IntegrationEndpointSettings();
+                Configuration.GetSection("IntegrationEndpoints").Bind(integrationSettings);
             
-            services.AddMassTransit(ConfigureBus(), LoggerFactory);
+                cfg.Host(integrationSettings.MessageBrokerEndpoint);
+            
+                cfg.ReceiveEndpoint("jobCreatedForOrder", e =>
+                {
+                    e.ConfigureConsumer<JobCreatedForOrderConsumer>(serviceProvider);
+                });
+
+                EndpointConvention.Map<SendNotificationToUserCommand>(new Uri($"{integrationSettings.MessageBrokerEndpoint}/commands/sendNotificationToUser"));
+            });
+            
+            void ConfigureMassTransit(IServiceCollectionConfigurator configurator)
+            {
+                configurator.AddConsumer<JobCreatedForOrderConsumer>();
+            }
+            
+            services.AddMassTransit(CreateBus, ConfigureMassTransit);
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
@@ -90,6 +114,7 @@ namespace Crnc.Oms.Sales.WebApi
             
             services.AddScoped<IEmployeeGateway, EmployeeSecurityGateway>();
             services.AddScoped<INotificationGateway, MessageBrokerNotificationGateway>();
+            services.AddScoped<IProductionJobGateway, ProductionJobGateway>();
             services.AddScoped<ICurrentUserContext, CurrentUserContext>();
 
             services.AddSingleton<ICurrentDateTimeProvider, CurrentDateTimeProvider>();
@@ -130,17 +155,7 @@ namespace Crnc.Oms.Sales.WebApi
                 });
             });
         }
-        
-        IBusControl ConfigureBus() => Bus.Factory.CreateUsingRabbitMq(cfg =>
-        {
-            var integrationSettings = new Crnc.Oms.Sales.Integration.Settings.IntegrationEndpointSettings();
-            Configuration.GetSection("IntegrationEndpoints").Bind(integrationSettings);
-            
-            cfg.Host(integrationSettings.MessageBrokerEndpoint);
 
-            EndpointConvention.Map<SendNotificationToUserCommand>(new Uri($"{integrationSettings.MessageBrokerEndpoint}/commands/sendNotificationToUser"));
-        });
-        
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, SalesDataContext dbContext)
         {

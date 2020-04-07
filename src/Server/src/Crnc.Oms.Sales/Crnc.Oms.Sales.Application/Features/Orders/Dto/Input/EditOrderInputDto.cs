@@ -34,11 +34,14 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Dto.Input
         [Required(ErrorMessage = "Job description is required")]
         public string JobDescription { get; set; }
         
-        public OrderStatus Status { get; set; }
+        [EnumRequired]
+        public OrderStatusEnum Status { get; set; }
         
+        [EnumRequired]
         public MaterialSource? MaterialSource { get; set; }
         
-        public SignoffType? SignOffType { get; set; }
+        [EnumRequired]
+        public SignoffType? SignoffType { get; set; }
 
         [Required(ErrorMessage = "Customer Title is required")]
         public string CustomerTitle { get; set; }

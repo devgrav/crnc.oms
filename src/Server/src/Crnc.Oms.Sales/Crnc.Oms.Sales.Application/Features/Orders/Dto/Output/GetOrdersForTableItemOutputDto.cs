@@ -1,4 +1,5 @@
 using System;
+using Crnc.Oms.Sales.Application.Features.Orders.Dto.Input;
 using Crnc.Oms.Sales.Domain.Aggregates.Order;
 
 namespace Crnc.Oms.Sales.Application.Features.Orders.Dto.Output
@@ -22,5 +23,7 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Dto.Output
         public string CustomerSignOffType { get; set; }
 
         public string Status { get; set; }
+        
+        public OrderStatusEnum StatusEnum { get; set; }
     }
 }

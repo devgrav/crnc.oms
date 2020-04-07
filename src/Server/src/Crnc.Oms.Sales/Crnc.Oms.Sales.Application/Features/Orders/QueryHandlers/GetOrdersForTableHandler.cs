@@ -34,11 +34,12 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Queries
                     Number = x.Number,
                     CreatedDate = x.DateCreated.ToStandartFormatWithTime(),
                     Customer = x.Customer.Title.Value,
-                    JobType = EnumHelper.GetDescription(x.JobType),
-                    JobDescription = x.JobDescription,
+                    JobType = EnumHelper.GetDescription(x.JobInfo.Type),
+                    JobDescription = x.JobInfo.Description,
                     DateSentToCustomer = x.DateSentToCustomer.ToStandartFormatWithTime(),
                     CustomerSignOffType = EnumHelper.GetDescription(x.SignOffType),
-                    Status = EnumHelper.GetDescription(x.Status)
+                    Status = x.Status.DisplayName,
+                    StatusEnum = (OrderStatusEnum)x.Status.Value
                 })
                 .OrderByDescending(x => x.CreatedDate)
                 .ToList();

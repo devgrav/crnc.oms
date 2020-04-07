@@ -1,11 +1,12 @@
 import * as React from "react";
-import { Header, Form } from "semantic-ui-react";
+import { Header, Form, Label } from "semantic-ui-react";
 import { nameof } from "ts-simple-nameof";
 import BaseOrderModel from "./BaseOrderModel";
 import ValidationInfo from "../../shared/ValidationInfo";
 import { observer } from "mobx-react";
 import TextValueDto from "../../shared/TextValueDto";
 import EditOrderModel from "./EditOrderModel";
+import { OrderStatus } from "../OrderStatus";
 
 @observer
 export default class OrderInfo extends React.Component<OrderInfoProps>{
@@ -27,16 +28,19 @@ export default class OrderInfo extends React.Component<OrderInfoProps>{
                     value = {model.jobType || jobTypes[0].value}
                     error={validationInfo.hasFieldValidationError(nameof<BaseOrderModel>(x => x.jobType))}
                     options = {jobTypes}
+                    disabled = {model.isDisabledForEdit}
                 />
                 <Form.TextArea
-                    name={nameof<BaseOrderModel>(x => x.jobDescription)}     
+                    name={nameof<BaseOrderModel>(x => x.jobDescription)}   
+                    placeholder="E.g. produce new detail"  
                     className="required"
                     onChange={onChange}                                        
                     label="Job Description"                                        
                     value={model.jobDescription || ""}
                     error={validationInfo.hasFieldValidationError(nameof<BaseOrderModel>(x => x.jobDescription))}
-                    autoComplete="off"                            
-                />    
+                    autoComplete="off"       
+                    disabled = {model.isDisabledForEdit}                     
+                />   
                 {isEdit && <React.Fragment>
                     <Form.Select
                         name={nameof<EditOrderModel>(x => x.status)}
@@ -45,7 +49,17 @@ export default class OrderInfo extends React.Component<OrderInfoProps>{
                         value = {model.status || orderStatuses[0].value}
                         error={validationInfo.hasFieldValidationError(nameof<EditOrderModel>(x => x.status))}
                         options = {orderStatuses}
+                        disabled = {model.isDisabledForEdit}
                     />
+                    {model.status != OrderStatus.NotSent && 
+                    <Form.Input
+                        name={nameof<BaseOrderModel>(x => x.dateSentToCustomer)}
+                        label="Date sent to customer"                                           
+                        value={model.dateSentToCustomer || ""}
+                        autoComplete="off"
+                        disabled = {true}
+                    />
+                    }
                     <Form.Select
                         name={nameof<EditOrderModel>(x => x.materialSource)}     
                         className="required"
@@ -54,6 +68,7 @@ export default class OrderInfo extends React.Component<OrderInfoProps>{
                         value = {model.materialSource || materialSources[0].value}
                         error={validationInfo.hasFieldValidationError(nameof<EditOrderModel>(x => x.materialSource))}
                         options = {materialSources}
+                        disabled = {model.isDisabledForEdit}
                     />
                     <Form.Select
                         name={nameof<EditOrderModel>(x => x.signoffType)}     
@@ -63,6 +78,7 @@ export default class OrderInfo extends React.Component<OrderInfoProps>{
                         value = {model.signoffType || signoffTypes[0].value}
                         error={validationInfo.hasFieldValidationError(nameof<EditOrderModel>(x => x.signoffType))}
                         options = {signoffTypes}
+                        disabled = {model.isDisabledForEdit}
                     />
                 </React.Fragment>}       
             </React.Fragment> 

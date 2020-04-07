@@ -27,7 +27,7 @@ namespace Crnc.Oms.Sales.DataAccess.Repositories
             return await _dataContext.Set<TEntity>().ToListAsync(cancellationToken);
         }
 
-        public async Task<TEntity> FindByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        public virtual async Task<TEntity> FindByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             return await _dataContext.Set<TEntity>().SingleOrDefaultAsync(x=> x.Id == id,cancellationToken);
         }

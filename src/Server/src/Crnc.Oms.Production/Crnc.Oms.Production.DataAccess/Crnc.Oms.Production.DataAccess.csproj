@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Crnc.Oms.Production.Domain\Crnc.Oms.Production.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="EFCore.NamingConventions" Version="1.0.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.0" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.1.0" />
+    </ItemGroup>
+
+</Project>
