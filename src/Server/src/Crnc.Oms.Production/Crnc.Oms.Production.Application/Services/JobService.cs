@@ -6,6 +6,7 @@ using Crnc.Oms.Production.Application.Helpers;
 using Crnc.Oms.Production.Application.Services.Abstractions;
 using Crnc.Oms.Production.Domain.Aggregates.JobAggregate;
 using Crnc.Oms.Production.Domain.Dto;
+using Crnc.Oms.Production.Domain.Gateways;
 using Crnc.Oms.Production.Domain.Repositories;
 using Crnc.Oms.Production.Domain.SeedWork;
 
@@ -16,11 +17,13 @@ namespace Crnc.Oms.Production.Application.Services
     {
         private readonly IJobRepository _jobRepository;
         private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
+        private readonly ISalesOrderGateway _salesOrderGateway;
 
-        public JobService(IJobRepository jobRepository, ICurrentDateTimeProvider currentDateTimeProvider)
+        public JobService(IJobRepository jobRepository, ICurrentDateTimeProvider currentDateTimeProvider, ISalesOrderGateway salesOrderGateway)
         {
             _jobRepository = jobRepository;
             _currentDateTimeProvider = currentDateTimeProvider;
+            _salesOrderGateway = salesOrderGateway;
         }
         
         public async Task<GetJobsForListDto> GetJobsForList()
@@ -84,22 +87,25 @@ namespace Crnc.Oms.Production.Application.Services
                 return job.Id;
             }
             
-            var newJob = new Job(
+            job = new Job(
                 dto.OrderId, 
                 _currentDateTimeProvider.GetNow(), 
                 dto.JobType, 
                 dto.JobDescription, 
+                dto.MaterialSource,
                 new Manager(
                     dto.ManagerFullName, 
                     dto.ManagerLogin), 
                 dto.OrderId, 
                 dto.OrderNumber);
             
-            _jobRepository.Add(newJob);
+            _jobRepository.Add(job);
 
             await _jobRepository.SaveChangesAsync();
 
-            return newJob.Id;
+            await _salesOrderGateway.NotifyThatJobForOrderCreatedAsync(job.Id, job.Number, job.OrderId);
+
+            return job.Id;
         }
 
         public async Task FinishJob(Guid id)

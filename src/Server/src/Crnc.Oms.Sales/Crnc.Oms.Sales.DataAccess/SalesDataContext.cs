@@ -22,6 +22,11 @@ namespace Crnc.Oms.Sales.DataAccess
         /// </summary>
         public DbSet<Order> Orders { get; set; }
         
+        /// <summary>
+        /// Managers set
+        /// </summary>
+        public DbSet<Manager> Managers { get; set; }
+        
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

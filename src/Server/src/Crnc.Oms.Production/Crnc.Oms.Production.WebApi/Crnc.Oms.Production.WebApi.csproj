@@ -10,14 +10,15 @@
       <ProjectReference Include="..\Crnc.Oms.Production.Application\Crnc.Oms.Production.Application.csproj" />
       <ProjectReference Include="..\Crnc.Oms.Production.DataAccess\Crnc.Oms.Production.DataAccess.csproj" />
       <ProjectReference Include="..\Crnc.Oms.Production.Domain\Crnc.Oms.Production.Domain.csproj" />
+      <ProjectReference Include="..\Crnc.Oms.Production.Integration\Crnc.Oms.Production.Integration.csproj" />
       <ProjectReference Include="..\Crnc.Oms.Production.Messaging.Contract\Crnc.Oms.Production.Messaging.Contract.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="MassTransit.AspNetCore" Version="6.1.0" />
-      <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="6.1.0" />
+      <PackageReference Include="MassTransit.AspNetCore" Version="6.2.4" />
+      <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="6.2.4" />
       <PackageReference Include="MassTransit.Extensions.Logging" Version="5.5.6" />
-      <PackageReference Include="MassTransit.RabbitMQ" Version="6.1.0" />
+      <PackageReference Include="MassTransit.RabbitMQ" Version="6.2.4" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.1" />
       <PackageReference Include="Microsoft.AspNetCore.Diagnostics" Version="2.2.0" />
       <PackageReference Include="Microsoft.AspNetCore.Diagnostics.HealthChecks" Version="2.2.0" />

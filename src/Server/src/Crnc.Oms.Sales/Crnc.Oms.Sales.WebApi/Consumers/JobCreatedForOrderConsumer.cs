@@ -1,33 +1,36 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Crnc.Oms.Messaging.Contract.Commands;
-using Crnc.Oms.Notification.Gateway.Application.Dto;
-using Crnc.Oms.Notification.Gateway.Application.Services.Abstractions;
+using Crnc.Oms.Messaging.Contract.Events;
+using Crnc.Oms.Sales.Application;
+using Crnc.Oms.Sales.Application.Features.Orders.Commands;
+using Crnc.Oms.Sales.Application.Features.Orders.Dto.Input;
 using MassTransit;
 
-namespace Crnc.Oms.Notification.Gateway.WebApi.Consumers
+namespace Crnc.Oms.Sales.WebApi.Consumers
 {
-    public class SendNotificationToUserConsumer:
-            IConsumer<SendNotificationToUserCommand>
+    public class JobCreatedForOrderConsumer:
+            IConsumer<JobCreatedForOrderEvent>
         {
-            private readonly INotificationService _notificationService;
+            private readonly ICommandQueryDispatcher _dispatcher;
 
-            public SendNotificationToUserConsumer(INotificationService notificationService)
+            public JobCreatedForOrderConsumer( ICommandQueryDispatcher dispatcher)
             {
-                _notificationService = notificationService;
+                _dispatcher = dispatcher;
             }
 
-            public async Task Consume(ConsumeContext<SendNotificationToUserCommand> context)
+            public async Task Consume(ConsumeContext<JobCreatedForOrderEvent> context)
             {
                 var notification = context.Message;
                 
                 if(notification == null)
                     throw new ArgumentNullException(nameof(notification));
 
-                await _notificationService.SendNotificationToUserAsync(new SendToNotificationUserInputDto()
+                await _dispatcher.Dispatch(new SetOrderJobInfoInputDto()
                 {
-                    Message = notification.Message,
-                    UserId = notification.UserId
+                    JobId = notification.JobId,
+                    JobNumber = notification.JobNumber,
+                    OrderId = notification.OrderId
                 });
             }
         }

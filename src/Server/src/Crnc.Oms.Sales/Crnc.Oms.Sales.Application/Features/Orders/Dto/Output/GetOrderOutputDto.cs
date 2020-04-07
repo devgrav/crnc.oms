@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection.PortableExecutable;
 using Crnc.Oms.Sales.Application.Features.Orders.Dto.Input;
 using Crnc.Oms.Sales.Domain.Aggregates.Order;
 
@@ -22,6 +23,10 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Dto.Output
         
         public List<TextValueOutputDto<int, string>> SignoffTypes { get; set; }
         public string JobDescription { get; set; }
+
+        public Guid? JobId { get; set; }
+
+        public string JobNumber { get; set; }
         public string CustomerContactPersonFirstName { get; set; }
         public string CustomerContactPersonLastName { get; set; }
         public string CustomerTitle { get; set; }

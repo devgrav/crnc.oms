@@ -16,6 +16,7 @@ namespace Crnc.Oms.Production.DataAccess
                 DateTime.Now, 
                 JobType.New, 
                 "Develop new wall",
+                MaterialSource.IncludedByCustomer,
                 new Manager("Shon Bean", "shon_bean"), 
                 Guid.Parse("5c5c6017-1b1f-4a46-b423-455ad4f273fe"),
                 "5c5c6017")); 

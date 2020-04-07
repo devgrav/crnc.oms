@@ -7,12 +7,12 @@ using Crnc.Oms.Sales.Domain.Repositories;
 
 namespace Crnc.Oms.Sales.Application.Features.Orders.Commands
 {
-    public class SetJobInfoHandler
+    public class SetOrderJobInfoHandler
         : IUseCaseCommandHandler<SetOrderJobInfoInputDto, EmptyOutputDto>
     {
         private readonly IOrderRepository _orderRepository;
 
-        public SetJobInfoHandler(IOrderRepository orderRepository)
+        public SetOrderJobInfoHandler(IOrderRepository orderRepository)
         {
             _orderRepository = orderRepository;
         }

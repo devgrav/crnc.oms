@@ -35,7 +35,9 @@ namespace Crnc.Oms.Sales.Application.Features.Orders.Commands
             if(request == null)
                 throw new ArgumentNullException(nameof(request));
 
-            var manager = ManagerFactory.GetCurrentUserAsManager(_userContext);
+            var manager = await _orderRepository.GetManagerByIdAsync(_userContext.Id,cancellationToken);
+            if(manager == null)
+                manager = ManagerFactory.GetCurrentUserAsManager(_userContext);
             
             var order = await _orderRepository.FindByIdAsync(request.Id, cancellationToken);
             

@@ -12,6 +12,8 @@ export default class EditOrderModel
 
     @observable jobType: JobType;
     @observable jobDescription: string;    
+    @observable jobId: string;
+    @observable jobNumber: string;  
     @observable materialSource: MaterialSource;
     @observable status: OrderStatus;
     @observable signoffType: SignoffType;
@@ -47,6 +49,8 @@ export default class EditOrderModel
         this.materialSources = [];
         this.isDisabledForEdit = false;
         this.dateSentToCustomer = "";
+        this.jobId = "";
+        this.jobNumber = "";
     }
 
 }

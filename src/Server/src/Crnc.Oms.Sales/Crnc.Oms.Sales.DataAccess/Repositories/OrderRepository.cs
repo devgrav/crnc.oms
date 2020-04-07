@@ -16,6 +16,19 @@ namespace Crnc.Oms.Sales.DataAccess.Repositories
             :base(dbContext, domainEventDispatcher)
         {
         }
-        
+
+        public override async Task<Order> FindByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        {
+            return
+                await _dataContext.Orders.Include(x => x.Manager)
+                    .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+        }
+
+        public async Task<Manager> GetManagerByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        {
+            return
+                await _dataContext.Managers
+                    .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+        }
     }
 }

@@ -2,10 +2,12 @@
 
 namespace Crnc.Oms.Messaging.Contract.Events
 {
-    public interface JobCreatedEvent
+    public interface JobCreatedForOrderEvent
     { 
         Guid JobId { get; set; }
 
         string JobNumber { get; set; }
+        
+        Guid OrderId { get; set; }
     }
 }
