@@ -47,6 +47,7 @@ module.exports = env => {
 				NODE_ENV: env.NODE_ENV || 'development',
 				REACT_APP_SECURITY_API_URL: env.REACT_APP_SECURITY_API_URL || 'http://localhost:8090/api',
 				REACT_APP_SALES_API_URL: env.REACT_APP_SALES_API_URL || 'http://localhost:8091/api',
+				REACT_APP_PRODUCTION_API_URL: env.REACT_APP_PRODUCTION_API_URL || 'http://localhost:8098/api',
 				REACT_APP_NOTIFICATION_PUSH_HUBS_URL: env.REACT_APP_NOTIFICATION_PUSH_HUBS_URL || 'http://localhost:8107/hubs'
 				})
 		],

@@ -34,6 +34,7 @@ namespace Crnc.Oms.Production.Application.Services
             {
                 Id = x.Id,
                 Number = x.Number,
+                DateCreated = x.DateCreated.ToStandartFormatWithTime(),
                 Manager = $"{x.Manager.FullName} ({x.Manager.Login})",
                 Priority = EnumHelper.GetDescription(x.Priority),
                 JobDescription = x.JobDescription,

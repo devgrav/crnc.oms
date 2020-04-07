@@ -10,6 +10,7 @@ import {Roles, CurrentUserRole} from "./auth/CurrentUserRole";
 import Forbidden from "./components/forbidden/Forbidden";
 import OrdersGridContainer from "./components/orders/ordersGrid/OrdersGridContainer";
 import OrderCardContainer from "./components/orders/orderCard/OrderCardContainer";
+import JobsGridContainer from "./components/jobs/jobsGrid/JobsGridContainer";
 
 const Routes: React.StatelessComponent = () => {
     return (
@@ -19,6 +20,7 @@ const Routes: React.StatelessComponent = () => {
             <PrivateRoute roles={[Roles.Admin]} path="/users" component={UserCards}/>            
             <PrivateRoute roles={[Roles.MainManager, Roles.Manager]} path="/orders/:id" component={OrderCardContainer}/>
             <PrivateRoute roles={[Roles.MainManager, Roles.Manager]} path="/orders" component={OrdersGridContainer}/> 
+            <PrivateRoute roles={[Roles.MainManager, Roles.Manager]} path="/jobs" component={JobsGridContainer}/> 
             <Route path="/login" component={Login}/>
             <Route component={NotFound}/>
         </Switch>
