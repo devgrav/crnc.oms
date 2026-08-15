@@ -40,7 +40,11 @@ namespace Crnc.Oms.Security.Infrastructure.DataAccess.Repositories
         {
             var users = await _usersCollectionCache.GetAsync(UsersCacheKey);
 
-            return users.AsQueryable().Where(UserQueries.ById(id)).SingleOrDefault();
+            var user = users.AsQueryable().Where(UserQueries.ById(id)).SingleOrDefault();
+            if (user == null)
+                throw new MissingEntityException($"User with Id={id} is not found");
+
+            return user;
         }
         
         public override async Task<User> FindByLoginAsync(string login, CancellationToken cancellationToken = default)
