@@ -23,6 +23,18 @@ Sales/Production (MassTransit + EF Core, единственный тестовы
 
 ---
 
+## Пререквизит: e2e-тесты
+
+Перед тем как приступать к самой миграции, на ветке `features/2-add-end-to-end-tests-for-security-project` добавлен набор e2e-тестов: `src/Server/src/Crnc.Oms.Security/Crnc.Oms.Security.E2ETests`. Тесты HTTP-интеграционные, на Testcontainers — каждый прогон сам поднимает изолированное окружение (контейнер Mongo + образ security-api, собранный из реального `Dockerfile`), без ручного `docker-compose up`.
+
+Набор покрывает основные сценарии API (аутентификация, CRUD пользователей, роли, авторизация по ролям) и, что важнее всего для этой миграции, включает два теста, которые прицельно проверяют риски, описанные ниже:
+- `CreateUser_MissingRequiredField_ReturnsBadRequestWithCamelCaseKeys` — автоматическая версия проверки из §4 (`DictionaryKeyPolicy`/`System.Text.Json`).
+- `CreateUser_DuplicateLoginDifferentCase_ReturnsBadRequest` — автоматическая версия проверки из §5 (`UserQueries.IsExisted`/LINQ3).
+
+Порядок работы с миграцией: прогнать `dotnet test src/Server/src/Crnc.Oms.Security/Crnc.Oms.Security.E2ETests/Crnc.Oms.Security.E2ETests.csproj` на текущем (ещё netcoreapp3.1) сервисе — это baseline, все тесты должны быть зелёными. После каждого значимого шага миграции (особенно после §4 и §5) прогонять набор снова — в первую очередь два regression-теста выше — прежде чем переходить к ручной проверке через Swagger UI из §7/§8.
+
+---
+
 ## Инвентаризация (подтверждено)
 
 Все 4 проекта Security сейчас на `netcoreapp3.1`, без `LangVersion`/`Nullable`:
