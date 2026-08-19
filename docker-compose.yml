@@ -6,50 +6,58 @@ services:
     image: rabbitmq:3-management
     container_name: 'crnc-oms-message-broker'
     restart: always
+    profiles: ["sales", "production", "notification", "client", "full"]
     ports:
-      - "15673:15672" 
+      - "15673:15672"
       - "5673:5672"
 
 # Security context
   security-db:
-    image: "mongo:4.2.3"
+    image: "mongo:8.3.8"
     container_name: 'crnc-oms-security-db'
     restart: always
+    profiles: ["security", "sales", "production", "notification", "client", "full"]
     ports:
-      - "27021:27017" 
+      - "27021:27017"
   security-api:
     build: src/Server/src/Crnc.Oms.Security/
     container_name: 'crnc-oms-security-api'
     restart: always
+    # depends_on does NOT auto-activate another service's profile in Docker Compose -
+    # every context whose services (transitively) reach security-api must list it here,
+    # or `docker-compose --profile <that context> up` fails with "undefined service".
+    profiles: ["security", "sales", "production", "notification", "client", "full"]
     ports:
-      - "8090:80"
+      - "8090:8080"
     environment:
       - "ConnectionStrings:OmsSecurityDb:Server=mongodb://security-db"
       - "Cache:IsUse=true"
-    depends_on: 
-      - security-db      
+    depends_on:
+      - security-db
 
   # Sales context
   sales-db:
     image: "postgres:9.6.17"
     container_name: 'crnc-oms-sales-db'
-    restart: always 
+    restart: always
+    profiles: ["sales", "production", "client", "full"]
     ports:
       - 5433:5432
-    environment: 
+    environment:
       - POSTGRES_PASSWORD=docker
   sales-api:
     build: src/Server/src/Crnc.Oms.Sales/
     container_name: 'crnc-oms-sales-api'
     restart: always
+    profiles: ["sales", "client", "full"]
     ports:
       - "8091:80"
     environment:
-      - "ConnectionStrings:OmsSalesDb=Host=sales-db;Database=crnc_oms_sales_db;Username=postgres;Password=docker"          
-      - "IntegrationEndpoints:NotificationServiceEndpoint=http://notification-gateway-api"      
-      - "IntegrationEndpoints:SecurityServiceEndpoint=http://security-api"
+      - "ConnectionStrings:OmsSalesDb=Host=sales-db;Database=crnc_oms_sales_db;Username=postgres;Password=docker"
+      - "IntegrationEndpoints:NotificationServiceEndpoint=http://notification-gateway-api"
+      - "IntegrationEndpoints:SecurityServiceEndpoint=http://security-api:8080"
       - "IntegrationEndpoints:MessageBrokerEndpoint=rabbitmq://message-broker"
-    depends_on: 
+    depends_on:
       - sales-db
       - security-api
       - notification-gateway-api
@@ -59,21 +67,26 @@ services:
   production-db:
     image: "postgres:9.6.17"
     container_name: 'crnc-oms-production-db'
-    restart: always 
+    restart: always
+    profiles: ["production", "client", "full"]
     ports:
       - 5434:5432
-    environment: 
+    environment:
       - POSTGRES_PASSWORD=docker
   production-api:
     build: src/Server/src/Crnc.Oms.Production/
     container_name: 'crnc-oms-production-api'
     restart: always
+    profiles: ["production", "client", "full"]
     ports:
       - "8098:80"
     environment:
       - "ConnectionStrings:OmsProductionDb=Host=production-db;Database=crnc_oms_production_db;Username=postgres;Password=docker"
       - "IntegrationEndpoints:MessageBrokerEndpoint=rabbitmq://message-broker"
-    depends_on: 
+    depends_on:
+      # sales-db here looks like a copy-paste leftover (Production's own connection
+      # string only references production-db) - pre-existing, out of scope to "fix" here,
+      # but it does mean sales-db must carry the production/client profiles too.
       - sales-db
       - security-api
       - production-db
@@ -85,6 +98,7 @@ services:
     build: src/Server/src/Crnc.Oms.Notification/Crnc.Oms.Notification.Email/
     container_name: 'crnc-oms-notification-email-api'
     restart: always
+    profiles: ["sales", "production", "notification", "client", "full"]
     ports:
       - "8104:80"
     environment:
@@ -94,24 +108,26 @@ services:
     build: src/Server/src/Crnc.Oms.Notification/Crnc.Oms.Notification.Push/
     container_name: 'crnc-oms-notification-push-api'
     restart: always
+    profiles: ["sales", "production", "notification", "client", "full"]
     environment:
       - "IntegrationEndpoints:UiEndpoint=http://localhost:8092"
       - "IntegrationEndpoints:MessageBrokerEndpoint=rabbitmq://message-broker"
     ports:
       - "8107:80"
-  
+
   notification-gateway-api:
     build: src/Server/src/Crnc.Oms.Notification/Crnc.Oms.Notification.Gateway/
     container_name: 'crnc-oms-notification-gateway-api'
     restart: always
+    profiles: ["sales", "production", "notification", "client", "full"]
     ports:
       - "8100:80"
     environment:
       - "IntegrationEndpoints:EmailNotificationServiceEndpoint=http://notification-email-api"
       - "IntegrationEndpoints:PushNotificationServiceEndpoint=http://notification-push-api"
-      - "IntegrationEndpoints:SecurityServiceEndpoint=http://security-api"
+      - "IntegrationEndpoints:SecurityServiceEndpoint=http://security-api:8080"
       - "IntegrationEndpoints:MessageBrokerEndpoint=rabbitmq://message-broker"
-    depends_on: 
+    depends_on:
       - notification-email-api
       - notification-push-api
       - message-broker
@@ -120,10 +136,11 @@ services:
     build: src/Server/src/Crnc.Oms.Notification/Crnc.Oms.Notification.Push.Client/
     container_name: 'crnc-oms-notification-push-client'
     restart: always
+    profiles: ["notification", "full"]
     environment:
-      - "IntegrationEndpoints:SecurityServiceEndpoint=http://security-api"
-      - "IntegrationEndpoints:PushNotificationServiceEndpoint=http://notification-push-api"      
-    depends_on:      
+      - "IntegrationEndpoints:SecurityServiceEndpoint=http://security-api:8080"
+      - "IntegrationEndpoints:PushNotificationServiceEndpoint=http://notification-push-api"
+    depends_on:
       - notification-push-api
       - security-api
       - message-broker
@@ -131,17 +148,19 @@ services:
   prometheus:
     build: prometheus/
     restart: always
+    profiles: ["monitoring", "full"]
     ports:
       - "9090:9090"
 
   grafana:
     build: './grafana'
     container_name: 'crnc-oms-grafana'
+    profiles: ["monitoring", "full"]
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=p@ssw0rd
     ports:
       - '3000:3000'
-    
+
   # UI
   crnc-oms-ui:
     build:
@@ -153,10 +172,11 @@ services:
         PUSH_HUBS_URL: "http://localhost:8107/hubs"
     container_name: 'crnc-oms-ui'
     restart: always
+    profiles: ["client", "full"]
     ports:
-      - "8092:80"      
-    depends_on: 
+      - "8092:80"
+    depends_on:
       - security-api
       - sales-api
-      - production-api        
+      - production-api
       - notification-gateway-api
