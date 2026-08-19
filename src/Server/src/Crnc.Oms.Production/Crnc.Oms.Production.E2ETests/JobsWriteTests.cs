@@ -33,20 +33,18 @@ public sealed class JobsWriteTests
     }
 
     [Fact]
-    public async Task FinishJob_UnknownId_ReturnsInternalServerError()
+    public async Task FinishJob_UnknownId_ReturnsNotFound()
     {
-        //Arrange - фиксация текущего (неправильного) поведения перед миграцией:
-        //JobService.FinishJob не проверяет результат FindByIdAsync и падает с
-        //NullReferenceException, хотя контроллер декларирует 404 - см. §7 плана.
-        //Починка запланирована ПОСЛЕ миграции (фаза 5); этот тест правится тем же
-        //коммитом, что и JobService, иначе baseline перестанет быть baseline'ом.
+        //Arrange - до фазы 5 плана миграции JobService.FinishJob не проверяло
+        //результат FindByIdAsync и падало с NullReferenceException (500), хотя
+        //контроллер декларировал и уже ловил 404. Починено вместе с этим тестом.
         using var client = _fixture.CreateAuthorizedClient();
 
         //Act
         var response = await client.PutAsync($"api/jobs/{Guid.NewGuid()}/finished", null);
 
         //Assert
-        response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
@@ -96,10 +94,9 @@ public sealed class JobsWriteTests
     }
 
     [Fact]
-    public async Task ChangePriority_UnknownId_ReturnsInternalServerError()
+    public async Task ChangePriority_UnknownId_ReturnsNotFound()
     {
-        //Arrange - то же предсуществующее поведение и та же ссылка на §7 плана,
-        //что в FinishJob_UnknownId_ReturnsInternalServerError.
+        //Arrange - см. FinishJob_UnknownId_ReturnsNotFound: тот же фикс, тот же коммит.
         using var client = _fixture.CreateAuthorizedClient();
 
         //Act
@@ -109,7 +106,7 @@ public sealed class JobsWriteTests
             JsonDefaults.Options);
 
         //Assert
-        response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]

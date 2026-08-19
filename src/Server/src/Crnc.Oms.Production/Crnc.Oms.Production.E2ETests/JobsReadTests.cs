@@ -87,9 +87,9 @@ public sealed class JobsReadTests
     [Fact]
     public async Task GetJobById_UnknownId_ReturnsNotFound()
     {
-        //Arrange - в отличие от FinishJob/ChangePriority (§7 плана), GetJob
-        //проверяет результат FindByIdAsync и бросает MissingEntityException, которую
-        //контроллер ловит и превращает в 404 - это уже правильное поведение.
+        //Arrange - GetJob проверяет результат FindByIdAsync и бросает
+        //MissingEntityException, которую контроллер ловит и превращает в 404
+        //(FinishJob/ChangePriority делают то же самое с фазы 5 плана миграции).
         using var client = _fixture.CreateAuthorizedClient();
 
         //Act

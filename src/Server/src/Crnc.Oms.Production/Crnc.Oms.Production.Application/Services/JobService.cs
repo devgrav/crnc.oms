@@ -112,7 +112,10 @@ namespace Crnc.Oms.Production.Application.Services
         public async Task FinishJob(Guid id)
         {
             var job = await _jobRepository.FindByIdAsync(id);
-            
+
+            if(job == null)
+                throw new MissingEntityException("Job not found");
+
             job.FinishJob();
 
             await _jobRepository.SaveChangesAsync();
@@ -121,7 +124,10 @@ namespace Crnc.Oms.Production.Application.Services
         public async Task ChangePriority(Guid id, Priority priority)
         {
             var job = await _jobRepository.FindByIdAsync(id);
-            
+
+            if(job == null)
+                throw new MissingEntityException("Job not found");
+
             job.ChangePriority(priority);
 
             await _jobRepository.SaveChangesAsync();
