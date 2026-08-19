@@ -650,4 +650,10 @@ Crnc.Oms.Production.E2ETests/
 
 Не проверялось и не должно: сквозной сценарий с реальным Notification (вне периметра, Production до него не доходит), Grafana-дашборд визуально (Prometheus-таргета `up` достаточно для цели шага 17).
 
-**Фаза 5 (баг 500→404 и опечатка порта в `appsettings.json`) не начата** — по плану идёт отдельными коммитами после фазы 4.
+**Фаза 5 выполнена, миграция завершена.** Три отдельных коммита, как и требовал план:
+
+- `AGENTS.md` обновлён под §10 (это был шаг 18, пропущенный при закрытии фазы 4 — наверстан перед фазой 5, поскольку следующий коммит и так трогал ту же таблицу БД).
+- Опечатка `Port=5433` → `5434` в `appsettings.json`, вместе со снятием документирующей её оговорки из `AGENTS.md`.
+- `JobService.FinishJob`/`ChangePriority` теперь бросают `MissingEntityException` на неизвестном id — контроллер уже её ловил и уже декларировал 404, просто исключение никогда не долетало. Заодно поправлен `[ProducesResponseType]` на `GET /api/jobs/{id}` (был задекларирован 400, реально — 404). Два e2e-теста, фиксировавших старое поведение (`FinishJob_UnknownId_ReturnsInternalServerError`, `ChangePriority_UnknownId_ReturnsInternalServerError`), переписаны на `...ReturnsNotFound` тем же коммитом.
+
+Финальный прогон: `dotnet build Crnc.Oms.Production.sln` — чисто, ноль предупреждений; `Crnc.Oms.Production.E2ETests` — 14/14 зелёных.
