@@ -16,9 +16,9 @@ public sealed class ProductionApiFixture : IAsyncLifetime
     private const int RabbitMqContainerPort = 5672;
     private const int RabbitMqManagementPort = 15672;
 
-    // Сервис пока на netcoreapp3.1 (базовый образ dotnet/core/aspnet:3.1 слушает 80).
-    // После миграции на aspnet:10.0 здесь станет 8080 - см. §8.5 плана миграции.
-    private const int ApiContainerPort = 80;
+    // Сервис на net10.0: базовый образ aspnet:10.0 слушает 8080
+    // (ASPNETCORE_HTTP_PORTS=8080 зашит в образ) - см. §8.5 плана миграции.
+    private const int ApiContainerPort = 8080;
 
     private static readonly TimeSpan MessageTimeout = TimeSpan.FromSeconds(20);
 

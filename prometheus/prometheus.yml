@@ -16,7 +16,7 @@ scrape_configs:
   scheme: http  
   static_configs:  
   - targets:  
-    - production-api
+    - production-api:8080
 - job_name: notification_gateway_api_monitoring
   metrics_path: /metrics  
   scheme: http  
