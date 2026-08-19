@@ -1,10 +1,8 @@
 using System;
-using MediatR;
 
 namespace Crnc.Oms.Production.Domain.SeedWork
 {
     public class DomainEvent
-        : INotification
     {
         public Guid Id { get; protected set; }
 

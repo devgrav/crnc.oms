@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Crnc.Oms.Production.Domain.Aggregates.JobAggregate;
-using Crnc.Oms.Production.Domain.Aggregates.Order;
 using Crnc.Oms.Production.Domain.SeedWork;
 
 namespace Crnc.Oms.Production.Domain.Aggregates.JobAggregate

@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Production.Application", "Crnc.Oms.Production.Application\Crnc.Oms.Production.Application.csproj", "{C6875935-DDE6-4D1B-85E9-E4A9DEBBE641}"
 EndProject
@@ -11,6 +11,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Production.Messaging.Contract", "Crnc.Oms.Production.Messaging.Contract\Crnc.Oms.Production.Messaging.Contract.csproj", "{FCDB9548-CDE7-4626-8015-B9C9008B71A6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Production.Integration", "Crnc.Oms.Production.Integration\Crnc.Oms.Production.Integration.csproj", "{524B3CD9-8B28-4F2B-BCC7-5024050C6F7E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Production.E2ETests", "Crnc.Oms.Production.E2ETests\Crnc.Oms.Production.E2ETests.csproj", "{93EA13FF-EEC3-4051-92B9-F6494A33E214}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,5 +44,9 @@ Global
 		{524B3CD9-8B28-4F2B-BCC7-5024050C6F7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{524B3CD9-8B28-4F2B-BCC7-5024050C6F7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{524B3CD9-8B28-4F2B-BCC7-5024050C6F7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93EA13FF-EEC3-4051-92B9-F6494A33E214}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93EA13FF-EEC3-4051-92B9-F6494A33E214}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93EA13FF-EEC3-4051-92B9-F6494A33E214}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93EA13FF-EEC3-4051-92B9-F6494A33E214}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
