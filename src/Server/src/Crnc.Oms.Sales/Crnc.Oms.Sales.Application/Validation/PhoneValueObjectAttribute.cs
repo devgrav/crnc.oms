@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Crnc.Oms.Sales.Domain.Aggregates.Order;
 
 namespace Crnc.Oms.Sales.Application.Validation

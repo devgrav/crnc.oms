@@ -21,7 +21,7 @@ public sealed class SalesApiFixture : IAsyncLifetime
 
     // Сервис пока на netcoreapp3.1 (базовый образ dotnet/core/aspnet:3.1 слушает 80).
     // После миграции на aspnet:10.0 здесь станет 8080 - см. §9.5 плана миграции.
-    private const int ApiContainerPort = 80;
+    private const int ApiContainerPort = 8080;
 
     /// <summary>Очередь, в которую MassTransit складывает команды уведомления
     /// (её же слушает Notification.Gateway, здесь он не поднимается).</summary>
