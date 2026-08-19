@@ -386,6 +386,8 @@ Crnc.Oms.Security.E2ETests/
 
 ## Риски и как их ловить
 
+Риски 1-8 — из первой редакции плана, все подтвердились именно так, как описано. Риски 9-11 обнаружены только при реальном прогоне мигрированного сервиса (первая редакция плана их не предвидела — все три были ложно приняты за «зависание» e2e-тестов, пока не разобрались по логам контейнеров).
+
 | # | Риск | Как ловить |
 |---|---|---|
 | 1 | **`dotnet publish -o` по solution — `NETSDK1194`, сборка образа падает на `sdk:10.0`** | Гарантированно ловится любой сборкой образа (в т.ч. прогоном e2e-тестов). Фикс — §6.2, сделать до смены базовых образов |
@@ -396,6 +398,9 @@ Crnc.Oms.Security.E2ETests/
 | 6 | `UseSwaggerUi3()` переименован в NSwag 14 | Ловится компилятором мгновенно |
 | 7 | Bogus 28→35 (мажорный скачок) | Использованное API (`CustomInstantiator`, `RuleFor`, `PickRandom`, `GenerateForever`) давно стабильно; тесты `GetUsers_*`/`GetUserById_KnownSeededAdminId_*` проверяют, что seed-пользователи (включая `admin`) на месте |
 | 8 | NSwag может не подхватить camelCase-схему из STJ-конфига | Тестами не покрыто — визуально сверить схему DTO в Swagger UI после миграции (шаг 10) |
+| 9 | **MongoDB.Driver 3.x требует сервер с wire version ≥9 (MongoDB ≥4.4.0)** — `mongo:4.2.3` (и в `docker-compose.yml`, и в тестовой фикстуре) даёт только wire version 8. Приложение падает сразу при первом обращении к БД с `MongoIncompatibleDriverException: Server ... reports wire version 8, but this version of the driver requires at least 9` | Любой e2e-тест/ручной запуск — сразу видно в логах контейнера. Фикс: обновить образ Mongo в обоих местах — здесь выбрана актуальная стабильная `mongo:8.3.8` (проверено на nuget/Docker Hub 2026-08-19); т.к. `MongoDbInitializer` дропает и пересевает базу на каждом старте, миграции данных не требуется |
+| 10 | **Образ `mcr.microsoft.com/dotnet/aspnet:10.0` по умолчанию слушает порт 8080** (`ASPNETCORE_HTTP_PORTS=8080` зашит в образ), а не 80, как старый `dotnet/core/aspnet:3.1`. Приложение стартует и работает полностью нормально, просто на другом порту — выглядит это как «зависшая» проверка готовности контейнера (и в Testcontainers, и при `docker run -p host:80`), а не как явная ошибка | Обнаруживается только руками — сравнением `docker exec <container> env \| grep ASPNETCORE_HTTP_PORTS` с ожидаемым портом, или через `/proc/net/tcp` внутри контейнера. **Решение: принять дефолт образа (8080), а не переопределять его в Dockerfile** — обновить все места, которые ходят на Security изнутри Docker-сети без явного порта (там неявно резолвится 80): `docker-compose.yml` — `security-api.ports` → `"8090:8080"` (внешний порт 8090 не меняется) и три `IntegrationEndpoints:SecurityServiceEndpoint=http://security-api` (Sales, Notification.Gateway, Notification.Push.Client) → `http://security-api:8080`; `prometheus/prometheus.yml` — таргет `security-api` → `security-api:8080`; `SecurityApiFixture.cs` — `ApiContainerPort` → `8080`. AGENTS.md/README не трогать — внешний URL `http://localhost:8090` не изменился |
+| 11 | `MongoDbInitializer.Initialize()` использовал `.GetAwaiter().GetResult()` поверх async Mongo-вызовов — не является причиной риска 10 (перепроверено: с этим кодом как есть и с переводом на честный `async`/`await` результат одинаков), но переведён на `InitializeAsync()`/`await` как более безопасная практика уже в рамках этой миграции, раз всё равно разбирались с этим кодом | Не тестозависимый риск сам по себе — просто заодно устранённый code smell |
 
 ## Критичные файлы
 
@@ -405,5 +410,13 @@ Crnc.Oms.Security.E2ETests/
 - `src/Server/src/Crnc.Oms.Security/Crnc.Oms.Security.Infrastructure.DataAccess/Repositories/MongoDbUserRepository.cs` (цель регресс-теста `IsExisted`)
 - `src/Server/src/Crnc.Oms.Security/Dockerfile` (§6.1, §6.2) и новый `src/Server/src/Crnc.Oms.Security/.dockerignore` (§6.3)
 - `src/Server/src/Crnc.Oms.Security/Crnc.Oms.Security.sln` (§6.4)
-- `src/Server/src/Crnc.Oms.Security/Crnc.Oms.Security.WebApi/appsettings.json` — только если сработает риск 2 (короткий JWT-ключ)
-- `AGENTS.md` (§8)
+- `src/Server/src/Crnc.Oms.Security/Crnc.Oms.Security.WebApi/appsettings.json` — риск 2, новый 32-байтный JWT-ключ (сработал)
+- `src/Server/src/Crnc.Oms.Security/Crnc.Oms.Security.Infrastructure.DataAccess/MongoDbInitializer.cs` — переведён на `InitializeAsync`/`await` (риск 11)
+- `docker-compose.yml` — `security-db` → `mongo:8.3.8` (риск 9); `security-api.ports` → `"8090:8080"` и три `IntegrationEndpoints:SecurityServiceEndpoint` → `http://security-api:8080` (риск 10)
+- `prometheus/prometheus.yml` — таргет `security-api` → `security-api:8080` (риск 10)
+- `Crnc.Oms.Security.E2ETests/SecurityApiFixture.cs` — `mongo:8.3.8` (риск 9) и `ApiContainerPort = 8080` (риск 10)
+- `AGENTS.md` (§8 + версия MongoDB в таблице БД)
+
+## Статус
+
+Миграция выполнена и подтверждена: `dotnet build Crnc.Oms.Security.sln` — чисто, `dotnet test Crnc.Oms.Security.E2ETests` — 18/18 зелёных на полностью мигрированном сервисе (net10.0 + MongoDB.Driver 3.11.0 + MongoDB 8.3.8 + System.Text.Json + minimal hosting), плюс ручная проверка через `docker run`/`curl`: логин, роли, camelCase-ключи валидации, детект дубликата логина.
