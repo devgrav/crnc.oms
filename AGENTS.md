@@ -39,7 +39,7 @@ Cross-service integration is two-pronged:
 1. **Sync HTTP** for reads (e.g. Sales calling Security to resolve an employee/manager).
 2. **Async messaging via RabbitMQ/MassTransit** for workflow events — e.g. Sales publishes an order-converted event, Production's consumer creates a job and replies with a job-created event, which Sales's consumer uses to store the job id back on the order. Commands (imperative, e.g. `SendNotificationToUserCommand`) and events (past-tense, e.g. job/order state changes) are modeled as distinct MassTransit contract types.
 
-Test coverage today: `Crnc.Oms.Sales.Tests` (Sales `Domain` unit tests) and `Crnc.Oms.Security.E2ETests` (Security over HTTP, via Testcontainers). Production and Notification.* have none. See "Test conventions" below.
+Test coverage today: `Crnc.Oms.Sales.Tests` (Sales `Domain` unit tests), `Crnc.Oms.Security.E2ETests` and `Crnc.Oms.Sales.E2ETests` (those services over HTTP, via Testcontainers). Production and Notification.* have none. See "Test conventions" below.
 
 Monitoring: Prometheus scrapes each service's `/metrics` endpoint every 5s (via `prometheus-net`); Grafana ships with a default dashboard. Not collected for infra containers (Mongo/Postgres/RabbitMQ).
 
@@ -68,6 +68,11 @@ There are two established shapes. Every service is expected to eventually have b
 - Request/response DTOs are re-declared locally as `record`s in `TestModels.cs` — never referenced from the service — alongside `SeedData` (the seeded role/user ids and the `admin` / `shon_bean` logins) and `JsonDefaults.Options` (`JsonSerializerDefaults.Web`), which every `PostAsJsonAsync` / `ReadFromJsonAsync` call passes.
 - The fixture logs in once per role at startup and exposes `AdminJwt` / `MainManagerJwt` plus `CreateAuthorizedClient(jwt)`; the unauthenticated `Client` is used directly for 401 checks. Each endpoint group gets its own `[Collection(SecurityApiCollection.Name)]` class (`RolesTests`, `UsersReadTests`, `UsersWriteTests`, `AuthenticateTests`) covering the happy path plus the no-auth (401) and wrong-role (403) cases.
 - Where a test guards a specific migration hazard (JSON casing of ModelState keys, Mongo LINQ3 translation), the `//Arrange` comment says so and cites the plan under `docs/migrations/` — keep that habit so the regression's reason survives.
+
+**E2E tests for a service with outbound dependencies (`Crnc.Oms.Sales.E2ETests`)** — same shape as above, plus the rule that **only the database is real**. Security is replaced by a `wiremock/wiremock` container running under the *same network alias and port* as the real service, stubbed from `WireMockAdmin` via its `/__admin` API; `GET /__admin/requests` doubles as the assertion that the service actually made the outbound call. RabbitMQ is real (the bus must connect for the service to start) but the assertion stops at "the message reached the queue" — no consumer services are started. Two consequences worth knowing before writing more of these:
+
+- The fixture **mints its own JWT** (`TestJwt`, short claim names as the real issuer emits them) and forces the signing key onto the container via `Auth:JwtBase64SymmetricKey`, so the suite neither needs Security nor breaks when keys rotate.
+- MassTransit `Publish` goes to a fanout exchange, and **an event with no subscriber is silently dropped** — the queue counter never moves. `RabbitMqAdmin.EnsureSpyQueueAsync` therefore declares a spy queue and binds it to the message's exchange *before* the acting request, and assertions are deltas (`before`/`after`) because the fixture is shared.
 
 ## Commands
 
@@ -136,6 +141,10 @@ Other solutions: `Crnc.Oms.Security.sln`, `Crnc.Oms.Production.sln`, `Crnc.Oms.N
 `Crnc.Oms.Security` was migrated to .NET 10 (`net10.0` across all 4 app projects) — the rest of the backend is still on `netcoreapp3.1`; building `Crnc.Oms.Security.sln` with the .NET 10 SDK is expected to show `NETSDK1138` warnings for the still-3.1 solutions, not for Security's own projects. Security's e2e test project runs on `net10.0` regardless of the API's own TFM (it drives the service over HTTP through a container, not via `ProjectReference`):
 ```
 dotnet test src/Server/src/Crnc.Oms.Security/Crnc.Oms.Security.E2ETests/Crnc.Oms.Security.E2ETests.csproj
+```
+The same holds for Sales, which is still on `netcoreapp3.1` while its e2e project is `net10.0`. Neither e2e project is a member of its service's `.sln` — the Dockerfiles still `dotnet restore` by solution on `sdk:3.1`, and a `net10.0` project in the solution would break the image build (`NETSDK1045`), and with it the tests that build that image:
+```
+dotnet test src/Server/src/Crnc.Oms.Sales/Crnc.Oms.Sales.E2ETests/Crnc.Oms.Sales.E2ETests.csproj
 ```
 **On Windows, set `DOCKER_HOST=tcp://localhost:2375` first** (and enable "Expose daemon on tcp://localhost:2375 without TLS" in Docker Desktop) — Testcontainers doesn't pick up Docker Desktop's `desktop-linux` npipe context on its own and hangs instead of failing fast.
 
