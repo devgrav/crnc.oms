@@ -16,18 +16,18 @@ namespace Crnc.Oms.Security.Infrastructure.DataAccess
             _dataContext = dataContext;
         }
 
-        public void Initialize()
+        public async Task InitializeAsync()
         {
             var dbName = _dataContext.Database.DatabaseNamespace.DatabaseName;
             try
             {
-                var isExist = IsDatabaseExistAsync().GetAwaiter().GetResult(); 
+                var isExist = await IsDatabaseExistAsync();
                 if(isExist)
-                    _dataContext.Client.DropDatabase(dbName);  
+                    await _dataContext.Client.DropDatabaseAsync(dbName);
 
                 //Порядок имеет значение, иначе будут неверно сгенерированы ссылки
-                var roles = FillRoles();
-                FillUsers(roles);                      
+                var roles = await FillRolesAsync();
+                await FillUsersAsync(roles);
             }
             catch(TimeoutException e)
             {
@@ -36,19 +36,19 @@ namespace Crnc.Oms.Security.Infrastructure.DataAccess
             catch (Exception e)
             {
                 throw new DataAccessException($"Not connected to database {dbName}, unexpected error caused", e);
-            }               
+            }
         }
 
-        private void FillUsers(List<Role> roles)
+        private async Task FillUsersAsync(List<Role> roles)
         {
             var users = DataFactory.GetUsers(roles);
-            _dataContext.Users.InsertMany(users);
+            await _dataContext.Users.InsertManyAsync(users);
         }
 
-        private List<Role> FillRoles()
+        private async Task<List<Role>> FillRolesAsync()
         {
             var roles = DataFactory.GetRoles();
-            _dataContext.Roles.InsertMany(roles);
+            await _dataContext.Roles.InsertManyAsync(roles);
             return roles;
         }
 
@@ -56,7 +56,7 @@ namespace Crnc.Oms.Security.Infrastructure.DataAccess
         {
             using(var cursor =  await _dataContext.Client.ListDatabaseNamesAsync()){
                 var dbNames = await cursor.ToListAsync();
-                return dbNames.Contains(_dataContext.Database.DatabaseNamespace.DatabaseName);                    
+                return dbNames.Contains(_dataContext.Database.DatabaseNamespace.DatabaseName);
             }
         }
     }

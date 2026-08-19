@@ -10,7 +10,8 @@ public sealed class SecurityApiFixture : IAsyncLifetime
 {
     private const string MongoNetworkAlias = "security-db";
     private const int MongoContainerPort = 27017;
-    private const int ApiContainerPort = 80;
+
+    private const int ApiContainerPort = 8080;
 
     private INetwork _network = null!;
     private IContainer _mongoContainer = null!;
@@ -28,9 +29,12 @@ public sealed class SecurityApiFixture : IAsyncLifetime
 
         // Plain ContainerBuilder, not the Testcontainers.MongoDb module - that module
         // enables Mongo authorization by default, which this app never speaks (it uses
-        // the same unauthenticated "mongo:4.2.3" setup as docker-compose.yml) and whose
-        // auth-aware readiness check hangs indefinitely without WithUsername/WithPassword.
-        _mongoContainer = new ContainerBuilder("mongo:4.2.3")
+        // the same unauthenticated setup as docker-compose.yml) and whose auth-aware
+        // readiness check hangs indefinitely without WithUsername/WithPassword.
+        // Image version must stay in sync with docker-compose.yml's security-db - MongoDB.Driver
+        // 3.x requires server wire version >= 9 (MongoDB >= 4.4.0), so anything older than that
+        // (e.g. the previous mongo:4.2.3) fails immediately with MongoIncompatibleDriverException.
+        _mongoContainer = new ContainerBuilder("mongo:8.3.8")
             .WithNetwork(_network)
             .WithNetworkAliases(MongoNetworkAlias)
             .WithWaitStrategy(Wait.ForUnixContainer()
