@@ -15,6 +15,7 @@ using Microsoft.Extensions.Caching.Memory;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 
 namespace Crnc.Oms.Security.Infrastructure.DataAccess.Cache
 {

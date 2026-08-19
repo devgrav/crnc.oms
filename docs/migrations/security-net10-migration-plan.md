@@ -10,7 +10,7 @@ CRNC OMS — pet-проект, набор независимых .NET-микро
 - Архитектурно проще остальных: нет `.Application`-слоя и CQRS-диспетчера (`ICommandQueryDispatcher`), контроллеры дёргают `IUserRepository` напрямую.
 - Наименьший и самый однородный набор пакетов.
 
-Sales/Production (MassTransit + EF Core, единственный тестовый проект в репо) и Notification.* — следующие кандидаты, не сейчас.
+Sales/Production (MassTransit + EF Core; у Sales единственный юнит-тестовый проект в репо) и Notification.* — следующие кандидаты, не сейчас.
 
 ### Согласованные решения
 1. **Целевая версия**: .NET 10 (LTS).
@@ -21,23 +21,37 @@ Sales/Production (MassTransit + EF Core, единственный тестовы
 
 Все факты в плане перепроверены чтением реальных файлов (не только результатами суб-агентов) — см. точные пути и номера строк ниже.
 
+**Ревизия 2026-08-15** (после добавления e2e-тестов): версии пакетов §1 пересверены с nuget.org, breaking changes MongoDB 3.x — с официальным upgrade-гайдом, анализ LINQ-рисков §5 — повторным чтением `MongoDbUserRepository.cs`. Найдены и добавлены два блокера, которых не было в первой редакции: `NETSDK1194` в Dockerfile (§6.2) и короткий JWT-ключ (риск 2). Также добавлены §6.3/§6.4 (`.dockerignore`, членство e2e-проекта в `.sln`) и §8 (правки AGENTS.md).
+
 ---
 
-## Пререквизит: e2e-тесты
+## Пререквизит: e2e-тесты (выполнено, в `master`)
 
-Перед тем как приступать к самой миграции, на ветке `features/2-add-end-to-end-tests-for-security-project` добавлен набор e2e-тестов: `src/Server/src/Crnc.Oms.Security/Crnc.Oms.Security.E2ETests`. Тесты HTTP-интеграционные, на Testcontainers — каждый прогон сам поднимает изолированное окружение (контейнер Mongo + образ security-api, собранный из реального `Dockerfile`), без ручного `docker-compose up`.
+Перед тем как приступать к самой миграции, добавлен набор e2e-тестов: `src/Server/src/Crnc.Oms.Security/Crnc.Oms.Security.E2ETests` (18 тестов, все зелёные на текущем netcoreapp3.1-сервисе). Тесты HTTP-интеграционные, на Testcontainers — каждый прогон сам поднимает изолированное окружение (контейнер Mongo + образ security-api, собранный из реального `Dockerfile`), без ручного `docker-compose up`.
 
 Набор покрывает основные сценарии API (аутентификация, CRUD пользователей, роли, авторизация по ролям) и, что важнее всего для этой миграции, включает два теста, которые прицельно проверяют риски, описанные ниже:
 - `CreateUser_MissingRequiredField_ReturnsBadRequestWithCamelCaseKeys` — автоматическая версия проверки из §4 (`DictionaryKeyPolicy`/`System.Text.Json`).
 - `CreateUser_DuplicateLoginDifferentCase_ReturnsBadRequest` — автоматическая версия проверки из §5 (`UserQueries.IsExisted`/LINQ3).
 
-Порядок работы с миграцией: прогнать `dotnet test src/Server/src/Crnc.Oms.Security/Crnc.Oms.Security.E2ETests/Crnc.Oms.Security.E2ETests.csproj` на текущем (ещё netcoreapp3.1) сервисе — это baseline, все тесты должны быть зелёными. После каждого значимого шага миграции (особенно после §4 и §5) прогонять набор снова — в первую очередь два regression-теста выше — прежде чем переходить к ручной проверке через Swagger UI из §7/§8.
+Запуск:
+```
+dotnet test src/Server/src/Crnc.Oms.Security/Crnc.Oms.Security.E2ETests/Crnc.Oms.Security.E2ETests.csproj
+```
+**На Windows обязательно задать `DOCKER_HOST=tcp://localhost:2375`** (и включить в Docker Desktop «Expose daemon on tcp://localhost:2375 without TLS»): Testcontainers не подхватывает npipe-контекст `desktop-linux` и вместо ошибки просто виснет.
+
+Порядок работы с миграцией: baseline уже зафиксирован (18/18 зелёных до миграции). После каждого значимого шага миграции — особенно после §4 и §5 — прогонять набор снова, в первую очередь два regression-теста выше, прежде чем переходить к ручной проверке через Swagger UI.
+
+Побочный эффект, полезный для миграции: фикстура собирает образ из реального `Dockerfile`, поэтому прогон тестов заодно проверяет, что сборка образа не сломалась (см. §6 — там как раз есть блокирующая правка).
+
+Попутно этими тестами уже найден и исправлен (в `master`) баг, не связанный с миграцией: `CachedMongoDbUserRepository.FindByIdAsync` возвращал `null` вместо `MissingEntityException`, из-за чего `GET /api/users/{неизвестный id}` отдавал 500 вместо 404.
 
 ---
 
 ## Инвентаризация (подтверждено)
 
-Все 4 проекта Security сейчас на `netcoreapp3.1`, без `LangVersion`/`Nullable`:
+В папке сервиса 5 проектов, но мигрируются только 4 — `Crnc.Oms.Security.E2ETests` уже написан на `net10.0` и **из миграции исключён** (он не ссылается на проекты сервиса, а работает с ним по HTTP через контейнер, поэтому переживает смену TFM без правок).
+
+Все 4 мигрируемых проекта сейчас на `netcoreapp3.1`, без `LangVersion`/`Nullable`:
 
 | Проект | Путь | Пакеты сейчас |
 |---|---|---|
@@ -53,7 +67,9 @@ Sales/Production (MassTransit + EF Core, единственный тестовы
 - **Нет enum-типов** нигде в Domain/Dto Security — регистрация `StringEnumConverter` сейчас мёртвый код без наблюдаемого эффекта.
 - `CamelCasePropertyNamesContractResolver` включает `ProcessDictionaryKeys = true` — значит `BadRequest(ModelState)` в `UsersController.cs:141,185` сейчас отдаёт **camelCase-ключи** словаря ошибок валидации (`"firstName": [...]`). `System.Text.Json`'s `PropertyNamingPolicy` НЕ применяется к ключам словаря — нужен отдельный `DictionaryKeyPolicy`. Без этого валидационные ошибки на фронте молча сломаются.
 - В `MongoDataContext.cs:25` — `BsonDefaults.GuidRepresentation = GuidRepresentation.Standard;` — это API убрано в MongoDB.Driver 3.x, вызовет **ошибку компиляции**, не рантайм-баг.
-- Локально уже установлен .NET 10 SDK (`dotnet --list-sdks` → `10.0.100`) наравне с 8.0.404 и 9.0.101 — можно верифицировать через `dotnet build`/`dotnet run` без доп. установок.
+- Локально уже установлен .NET 10 SDK (`dotnet --list-sdks` → `10.0.100`) наравне с 8.0.404 и 9.0.101 — можно верифицировать через `dotnet build`/`dotnet run` без доп. установок. Сборка netcoreapp3.1-проектов новым SDK работает, но выдаёт warning `NETSDK1138` («target framework is out of support») — это ожидаемо до миграции и не является ошибкой.
+- **JWT-ключ короче, чем требует RFC**: `appsettings.json:14` — `"JwtBase64SymmetricKey": "D66D0341FB220444284FC1A90700B38A"` = 32 base64-символа = **24 байта = 192 бита**. RFC 7518 требует для HS256 ключ ≥256 бит. Сейчас работает, потому что исторический минимум `Microsoft.IdentityModel` — 128 бит, но 192 бита попадают ровно между старым минимумом и требованием RFC. Подробности и план действий — в §«Риски», пункт 2.
+- В `Crnc.Oms.Security.WebApi/Authorization/` нет никаких policy handlers — только константы ролей (`Roles.cs`) и `AuthSettings`. (AGENTS.md сейчас утверждает обратное — правится в §8.)
 
 ---
 
@@ -258,18 +274,23 @@ BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard
 |---|---|---|
 | `UserQueries.ById`/`ByLogin`, `RoleQueries.ById` | server-side, простое равенство полей | нет |
 | `UserQueries.IsExisted(entity)` — `x.Id == entity.Id \|\| x.Login.ToLower() == entity.Login.ToLower()`, используется в `MongoDbUserRepository.AddAsync` (строка 82) | **server-side**, `.ToLower()` переводится в Mongo aggregation expression | **единственный реальный риск трансляции LINQ3 в этом сервисе** |
-| `UserQueries.ByFilter`, `AsUserItemDtoProjection`/`AsUserShortInfoItemDtoProjection` (с `.ToLower()`, `u.Photo?.ContentBase64`, `u.Role.Title`) | применяются через `.Where()`/`.Select()` на уже материализованном `List<User>.AsQueryable()` (после `.ToListAsync()` без предиката) — это обычный LINQ-to-Objects, **не** идёт через Mongo LINQ-провайдер | нет |
+| `UserQueries.ByFilter`, `AsUserItemDtoProjection`/`AsUserShortInfoItemDtoProjection` (с `.ToLower()`, `u.Photo?.ContentBase64`, `u.Role.Title`) | применяются через `.Where()`/`.Select()` на уже материализованном `List<User>.AsQueryable()` (после `.ToListAsync()` без предиката — `MongoDbUserRepository.cs:43,55`) — это обычный LINQ-to-Objects, **не** идёт через Mongo LINQ-провайдер | нет |
+| Все методы `CachedMongoDbUserRepository` (включая `FindByIdAsync`) | работают поверх коллекции из `IMemoryCache` через `AsQueryable()` — тоже LINQ-to-Objects | нет |
 | `MongoInMemoryEntityCollectionCacheProvider<T>` | server-side, но без предиката/проекции — полное сканирование коллекции | нет |
 
 Регресс-проверка для `IsExisted` (единственное, что нужно реально протестировать вручную): `POST /api/users` с логином, отличающимся от существующего только регистром → ожидается `400` с `EntityAlreadyExistedException`; затем с валидным новым логином → `200 OK`. Это подтверждает, что и `.ToLower()`, и `||`-композиция всё ещё транслируются корректно.
 
 `Mappings/MongoDbMapping.cs` (сам паттерн `BsonClassMap.RegisterClassMap<T>(cm => cm.AutoMap())`) правок не требует. `using MongoDB.Driver.Linq;` в `MongoDbUserRepository.cs:13` — проверить на этапе сборки, не используется ли явно ни один тип оттуда (похоже, что нет — можно будет убрать при появлении warning/ошибки, поведение не изменится).
 
+**Запечатанные классы**: в 3.x `MongoClient`, `MongoDatabase` и `MongoCollection` стали `sealed`. На нас не влияет — `MongoDataContext` их только хранит (`public MongoClient Client { get; private set; }`), не наследуется от них. Опционально, по рекомендации MongoDB, можно сменить тип свойства на интерфейс `IMongoClient`.
+
 ---
 
-## 6. Dockerfile
+## 6. Dockerfile и Docker build-контекст
 
-`src/Server/src/Crnc.Oms.Security/Dockerfile` — меняются только две строки `FROM`:
+Правок здесь больше, чем «две строки `FROM`» — есть блокирующая.
+
+### 6.1. Базовые образы
 
 ```dockerfile
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build      # было: mcr.microsoft.com/dotnet/core/sdk:3.1
@@ -277,7 +298,39 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build      # было: mcr.microsoft.c
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime  # было: mcr.microsoft.com/dotnet/core/aspnet:3.1
 ```
 
-Обратите внимание — у новых образов путь без сегмента `/core/` (старый путь ретайрен). Триггер кеширования restore-слоя (`COPY *.sln .` + `COPY */*.csproj ./` + `for file in *.csproj; do mkdir -p ...; mv ...; done`) от версии фреймворка не зависит, править не нужно.
+Обратите внимание — у новых образов путь без сегмента `/core/` (старый путь ретайрен).
+
+### 6.2. `dotnet publish -o` по solution — блокер (NETSDK1194)
+
+Текущие строки `RUN dotnet restore` и `RUN dotnet publish -c Release -o out` выполняются **без явного таргета**, то есть против solution (`Crnc.Oms.Security.sln` лежит рядом). Начиная с SDK 7.0.200 опция `--output` для solution — **ошибка `NETSDK1194`** («The '--output' option isn't supported when building a solution»). На `sdk:3.1` это работало, на `sdk:10.0` сборка образа упадёт. Заменить обе строки на явный таргет:
+
+```dockerfile
+RUN dotnet restore Crnc.Oms.Security.WebApi/Crnc.Oms.Security.WebApi.csproj
+...
+RUN dotnet publish Crnc.Oms.Security.WebApi/Crnc.Oms.Security.WebApi.csproj -c Release -o out
+```
+
+Побочные плюсы: restore тянет только WebApi и его три `ProjectReference` вместо всей solution, и состав solution перестаёт влиять на прод-образ (это то, что делает возможным §6.4).
+
+Сам трюк с кешированием restore-слоя (`COPY *.sln .` + `COPY */*.csproj ./` + `for file in *.csproj; do mkdir -p ...; mv ...; done`) от версии фреймворка не зависит и остаётся как есть.
+
+### 6.3. Нужен `.dockerignore` (новый файл)
+
+`Crnc.Oms.Security.E2ETests/` физически лежит **внутри Docker build-контекста** сервиса. Последствия сегодня: `COPY . ./aspnetapp` затягивает `bin/` тестового проекта (~18 МБ), контекст вырос с ~1.7 МБ до ~21 МБ. Хуже того, фикстура тестов пересобирает образ из этого же каталога, а её собственный `bin/` меняется на каждом прогоне — то есть слой `COPY` инвалидируется **при каждом запуске тестов**. `.gitignore` для Docker не действует, нужен отдельный `src/Server/src/Crnc.Oms.Security/.dockerignore`:
+
+```
+Crnc.Oms.Security.E2ETests/
+**/bin/
+**/obj/
+```
+
+### 6.4. Добавить E2ETests в `Crnc.Oms.Security.sln` — только после 6.2 и 6.3
+
+По конвенции из `AGENTS.md` каждый контекст собирается и тестируется своим `.sln`, но `Crnc.Oms.Security.E2ETests` сейчас зарегистрирован только в корневом `src/Server/Crnc.Oms.sln`. Его нужно добавить и в `Crnc.Oms.Security.sln`, **строго после** правок 6.2 и 6.3.
+
+Причина жёсткого порядка: пока Dockerfile делает `dotnet restore` по solution на `sdk:3.1`, появление в ней `net10.0`-проекта немедленно ломает сборку образа (`NETSDK1045` — SDK 3.1 не знает про net10.0), а вместе с образом ломаются и сами e2e-тесты, которые его собирают. После 6.2 restore идёт по конкретному csproj, и состав solution на образ не влияет.
+
+### 6.5. docker-compose
 
 `docker-compose.yml` в корне репо изменений не требует — `security-api` продолжает билдиться из того же Dockerfile, переменные окружения (`ConnectionStrings:OmsSecurityDb:Server=mongodb://security-db`, `Cache:IsUse=true`) синтаксически не зависят от TFM.
 
@@ -285,35 +338,85 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime  # было: mcr.microsoft.
 
 ## 7. Порядок выполнения
 
-1. Обновить TFM + версии пакетов во всех 4 csproj (§2).
-2. Слить `Startup.cs` в `Program.cs` (§3), удалить `Startup.cs`.
-3. Заменить `AddNewtonsoftJson` на `AddJsonOptions` (уже в шаге 2, но отдельно сверить, что `DictionaryKeyPolicy` на месте).
-4. Поправить `MongoDataContext.cs` под MongoDB.Driver 3.x (§5) — `GuidSerializer` до `RegisterAllMappings()`.
-5. `dotnet build` по всем 4 проектам — добиться чистой сборки; ожидаемые точки поломки: `BsonDefaults.GuidRepresentation` (пока не поправлено), `UseSwaggerUi3()` (переименован).
-6. Регресс-проверка LINQ3 для `IsExisted` (§5) — через локальный запуск (`docker-compose up -d security-db` + `dotnet run --project .../Crnc.Oms.Security.WebApi.csproj`).
-7. Обновить Dockerfile (§6).
-8. End-to-end: `docker-compose build security-api && docker-compose up security-db security-api`, полный ручной прогон через Swagger UI (`http://localhost:8090/swagger`): `POST /api/accounts/auth` (`admin`/`111111`) → JWT → `GET /api/users`, `GET /api/users/{id}`, `GET /api/roles`, `POST/PUT/DELETE /api/users/{id}` (полный CRUD), и отдельно — `POST /api/users` с невалидным телом → проверить, что ключи в теле 400-ответа camelCase (`firstName`, не `FirstName`) — это прямая проверка фикса из §4. По возможности — то же самое через реальный SPA-логин.
-9. Опционально, по желанию: `app.MapHealthChecks("/health")` (уже в черновике Program.cs), удалить неиспользуемый `Microsoft.Extensions.Caching.Abstractions` из Domain.csproj, заменить `RNGCryptoServiceProvider` в `PasswordHelper.cs:37` (обозначен `[Obsolete("SYSLIB0023")]` начиная с .NET 6 — новый build warning, не ошибка) на `RandomNumberGenerator.Fill/GetBytes`.
+**Подготовка инфраструктуры сборки (до смены TFM, работает на текущем 3.1):**
 
-**Изменений в SPA не требуется** — маршруты/контракты не меняются, форма ответов при выбранной JSON-конфигурации побайтово совпадает с текущей (см. §4), кроме сознательно зафиксированного `DictionaryKeyPolicy`-фикса. Подтверждается шагом 8 выше, а не просто предполагается.
+1. Перевести restore/publish в Dockerfile на явный csproj (§6.2) и добавить `.dockerignore` (§6.3). Прогнать e2e-набор — образ должен собираться как раньше, тесты остаться зелёными.
+2. Добавить `Crnc.Oms.Security.E2ETests` в `Crnc.Oms.Security.sln` (§6.4). Снова прогнать e2e-набор.
+
+**Сама миграция:**
+
+3. Обновить TFM + версии пакетов в 4 мигрируемых csproj (§2) — `Crnc.Oms.Security.E2ETests` не трогать, он уже на net10.0.
+4. Слить `Startup.cs` в `Program.cs` (§3), удалить `Startup.cs`.
+5. Заменить `AddNewtonsoftJson` на `AddJsonOptions` (уже в шаге 4, но отдельно сверить, что `DictionaryKeyPolicy` на месте).
+6. Поправить `MongoDataContext.cs` под MongoDB.Driver 3.x (§5) — `GuidSerializer` до `RegisterAllMappings()`.
+7. `dotnet build` по всем 4 проектам — добиться чистой сборки; ожидаемые точки поломки: `BsonDefaults.GuidRepresentation` (пока не поправлено), `UseSwaggerUi3()` (переименован).
+8. Поменять базовые образы в Dockerfile на `sdk:10.0`/`aspnet:10.0` (§6.1).
+
+**Проверка:**
+
+9. Прогнать e2e-набор — это основная проверка миграции, она же покрывает регрессы из §4 (camelCase-ключи валидации), §5 (LINQ3 в `IsExisted`), выдачу JWT (см. риск 2) и сам факт того, что образ на новом SDK собирается:
+   ```
+   dotnet test src/Server/src/Crnc.Oms.Security/Crnc.Oms.Security.E2ETests/Crnc.Oms.Security.E2ETests.csproj
+   ```
+   (на Windows — с `DOCKER_HOST=tcp://localhost:2375`, см. секцию «Пререквизит»).
+10. Дополнительно, вручную: `docker-compose build security-api && docker-compose up security-db security-api`, прогон через Swagger UI (`http://localhost:8090/swagger`) — логин `admin`/`111111`, `GET /api/users`, `GET /api/roles`, CRUD пользователя; и по возможности то же через реальный SPA-логин. Это ловит то, что тесты не проверяют: работу самого Swagger UI, генерацию OpenAPI-схемы новым NSwag (риск 6) и внешний вид ответов.
+11. Обновить `AGENTS.md` (§8).
+12. Опционально, по желанию: `app.MapHealthChecks("/health")` (уже в черновике Program.cs), удалить неиспользуемый `Microsoft.Extensions.Caching.Abstractions` из Domain.csproj, заменить `RNGCryptoServiceProvider` в `PasswordHelper.cs:37` (обозначен `[Obsolete("SYSLIB0023")]` начиная с .NET 6 — новый build warning, не ошибка) на `RandomNumberGenerator.Fill/GetBytes`, сменить тип `MongoDataContext.Client` на `IMongoClient` (§5).
+
+**Изменений в SPA не требуется** — маршруты/контракты не меняются, форма ответов при выбранной JSON-конфигурации побайтово совпадает с текущей (см. §4), кроме сознательно зафиксированного `DictionaryKeyPolicy`-фикса. Подтверждается шагами 9-10, а не просто предполагается.
+
+---
+
+## 8. Обновление AGENTS.md
+
+После миграции `AGENTS.md` станет местами неверным — часть утверждений неверна уже сейчас. Правки:
+
+Уже неверно (можно править в любой момент):
+- «Only `Crnc.Oms.Sales` currently has an automated test project» — добавить `Crnc.Oms.Security.E2ETests` (e2e поверх HTTP на Testcontainers).
+- «`Authorization/` has role-based policy handlers» — для Security неверно: там только константы ролей и `AuthSettings`, никаких policy handlers.
+- Health checks `/health` — уточнить, что в Security `AddHealthChecks()` зарегистрирован, но никогда не был замаплен, то есть эндпоинт не отвечает (чинится опционально, шаг 12).
+- В секцию Commands добавить команду запуска e2e-тестов Security и Windows-готчу с `DOCKER_HOST=tcp://localhost:2375`.
+- Зафиксировать как ориентир: **все сервисы потенциально должны иметь юнит- и интеграционные тесты**. Текущее состояние: Security — e2e-набор, Sales — юниты по Domain, остальные пока без тестов.
+
+Станет неверным после миграции:
+- Заголовок «### Backend (.NET Core 3.1)» — отразить смешанное состояние: Security на .NET 10, остальные сервисы ещё на .NET Core 3.1.
+- «`.WebApi` — ASP.NET Core host: `Startup.cs` wires DI…» — оговорить, что Security перешёл на minimal hosting и `Startup.cs` у него больше нет.
 
 ---
 
 ## Риски и как их ловить
 
+Риски 1-8 — из первой редакции плана, все подтвердились именно так, как описано. Риски 9-11 обнаружены только при реальном прогоне мигрированного сервиса (первая редакция плана их не предвидела — все три были ложно приняты за «зависание» e2e-тестов, пока не разобрались по логам контейнеров).
+
 | # | Риск | Как ловить |
 |---|---|---|
-| 1 | `BsonDefaults.GuidRepresentation` — breaking-компиляция | `dotnet build` сразу падает на `MongoDataContext.cs` — фикс в §5 |
-| 2 | Забытый `DictionaryKeyPolicy` → молчаливая регрессия camelCase→PascalCase в ошибках валидации | Явно протестировать `POST /api/users` с невалидным телом (шаг 8) — обычный smoke-test это не поймает |
-| 3 | Неверная трансляция `.ToLower()` в `IsExisted` через LINQ3 | Регресс-тест кейс-инсенситивного дубля логина (§5) |
-| 4 | `UseSwaggerUi3()` переименован в NSwag 14 | Ловится компилятором мгновенно |
-| 5 | Bogus 28→35 (мажорный скачок) | Использованное API (`CustomInstantiator`, `RuleFor`, `PickRandom`, `GenerateForever`) давно стабильно; проверить на `GET /api/users`, что seed-пользователи (включая `admin`/`111111`) на месте |
-| 6 | NSwag может не подхватить camelCase-схему из STJ-конфига | Визуально сверить схему DTO в Swagger UI после миграции |
+| 1 | **`dotnet publish -o` по solution — `NETSDK1194`, сборка образа падает на `sdk:10.0`** | Гарантированно ловится любой сборкой образа (в т.ч. прогоном e2e-тестов). Фикс — §6.2, сделать до смены базовых образов |
+| 2 | **JWT-ключ 192 бита при требовании RFC 7518 ≥256 бит для HS256** — `Microsoft.IdentityModel` 7/8 ужесточал валидацию размера (есть escape-hatch `UnsafeRelaxHmacKeySizeValidation`). Падение **в рантайме при выдаче JWT**: ломается логин, а с ним всё приложение | Тест `Authenticate_ValidAdminCredentials_ReturnsJwtAndUserInfo` падает сразу. Фикс — сгенерировать новый 32-байтный ключ и положить в `appsettings.json` (в docker-compose он не переопределяется) |
+| 3 | `BsonDefaults.GuidRepresentation` — breaking-компиляция | `dotnet build` сразу падает на `MongoDataContext.cs` — фикс в §5 |
+| 4 | Забытый `DictionaryKeyPolicy` → молчаливая регрессия camelCase→PascalCase в ошибках валидации | Тест `CreateUser_MissingRequiredField_ReturnsBadRequestWithCamelCaseKeys`; обычный smoke-test это не поймает |
+| 5 | Неверная трансляция `.ToLower()` в `IsExisted` через LINQ3 | Тест `CreateUser_DuplicateLoginDifferentCase_ReturnsBadRequest` |
+| 6 | `UseSwaggerUi3()` переименован в NSwag 14 | Ловится компилятором мгновенно |
+| 7 | Bogus 28→35 (мажорный скачок) | Использованное API (`CustomInstantiator`, `RuleFor`, `PickRandom`, `GenerateForever`) давно стабильно; тесты `GetUsers_*`/`GetUserById_KnownSeededAdminId_*` проверяют, что seed-пользователи (включая `admin`) на месте |
+| 8 | NSwag может не подхватить camelCase-схему из STJ-конфига | Тестами не покрыто — визуально сверить схему DTO в Swagger UI после миграции (шаг 10) |
+| 9 | **MongoDB.Driver 3.x требует сервер с wire version ≥9 (MongoDB ≥4.4.0)** — `mongo:4.2.3` (и в `docker-compose.yml`, и в тестовой фикстуре) даёт только wire version 8. Приложение падает сразу при первом обращении к БД с `MongoIncompatibleDriverException: Server ... reports wire version 8, but this version of the driver requires at least 9` | Любой e2e-тест/ручной запуск — сразу видно в логах контейнера. Фикс: обновить образ Mongo в обоих местах — здесь выбрана актуальная стабильная `mongo:8.3.8` (проверено на nuget/Docker Hub 2026-08-19); т.к. `MongoDbInitializer` дропает и пересевает базу на каждом старте, миграции данных не требуется |
+| 10 | **Образ `mcr.microsoft.com/dotnet/aspnet:10.0` по умолчанию слушает порт 8080** (`ASPNETCORE_HTTP_PORTS=8080` зашит в образ), а не 80, как старый `dotnet/core/aspnet:3.1`. Приложение стартует и работает полностью нормально, просто на другом порту — выглядит это как «зависшая» проверка готовности контейнера (и в Testcontainers, и при `docker run -p host:80`), а не как явная ошибка | Обнаруживается только руками — сравнением `docker exec <container> env \| grep ASPNETCORE_HTTP_PORTS` с ожидаемым портом, или через `/proc/net/tcp` внутри контейнера. **Решение: принять дефолт образа (8080), а не переопределять его в Dockerfile** — обновить все места, которые ходят на Security изнутри Docker-сети без явного порта (там неявно резолвится 80): `docker-compose.yml` — `security-api.ports` → `"8090:8080"` (внешний порт 8090 не меняется) и три `IntegrationEndpoints:SecurityServiceEndpoint=http://security-api` (Sales, Notification.Gateway, Notification.Push.Client) → `http://security-api:8080`; `prometheus/prometheus.yml` — таргет `security-api` → `security-api:8080`; `SecurityApiFixture.cs` — `ApiContainerPort` → `8080`. AGENTS.md/README не трогать — внешний URL `http://localhost:8090` не изменился |
+| 11 | `MongoDbInitializer.Initialize()` использовал `.GetAwaiter().GetResult()` поверх async Mongo-вызовов — не является причиной риска 10 (перепроверено: с этим кодом как есть и с переводом на честный `async`/`await` результат одинаков), но переведён на `InitializeAsync()`/`await` как более безопасная практика уже в рамках этой миграции, раз всё равно разбирались с этим кодом | Не тестозависимый риск сам по себе — просто заодно устранённый code smell |
 
 ## Критичные файлы
 
 - `src/Server/src/Crnc.Oms.Security/Crnc.Oms.Security.WebApi/Startup.cs` (удалить) и `Program.cs` (переписать, §3)
 - `src/Server/src/Crnc.Oms.Security/Crnc.Oms.Security.Infrastructure.DataAccess/MongoDataContext.cs` (GuidSerializer, §5)
-- Все 4 `.csproj` под `Crnc.Oms.Security/` (§2)
+- 4 мигрируемых `.csproj` под `Crnc.Oms.Security/` (§2) — `Crnc.Oms.Security.E2ETests.csproj` не трогаем
 - `src/Server/src/Crnc.Oms.Security/Crnc.Oms.Security.Infrastructure.DataAccess/Repositories/MongoDbUserRepository.cs` (цель регресс-теста `IsExisted`)
-- `src/Server/src/Crnc.Oms.Security/Dockerfile` (§6)
+- `src/Server/src/Crnc.Oms.Security/Dockerfile` (§6.1, §6.2) и новый `src/Server/src/Crnc.Oms.Security/.dockerignore` (§6.3)
+- `src/Server/src/Crnc.Oms.Security/Crnc.Oms.Security.sln` (§6.4)
+- `src/Server/src/Crnc.Oms.Security/Crnc.Oms.Security.WebApi/appsettings.json` — риск 2, новый 32-байтный JWT-ключ (сработал)
+- `src/Server/src/Crnc.Oms.Security/Crnc.Oms.Security.Infrastructure.DataAccess/MongoDbInitializer.cs` — переведён на `InitializeAsync`/`await` (риск 11)
+- `docker-compose.yml` — `security-db` → `mongo:8.3.8` (риск 9); `security-api.ports` → `"8090:8080"` и три `IntegrationEndpoints:SecurityServiceEndpoint` → `http://security-api:8080` (риск 10)
+- `prometheus/prometheus.yml` — таргет `security-api` → `security-api:8080` (риск 10)
+- `Crnc.Oms.Security.E2ETests/SecurityApiFixture.cs` — `mongo:8.3.8` (риск 9) и `ApiContainerPort = 8080` (риск 10)
+- `AGENTS.md` (§8 + версия MongoDB в таблице БД)
+
+## Статус
+
+Миграция выполнена и подтверждена: `dotnet build Crnc.Oms.Security.sln` — чисто, `dotnet test Crnc.Oms.Security.E2ETests` — 18/18 зелёных на полностью мигрированном сервисе (net10.0 + MongoDB.Driver 3.11.0 + MongoDB 8.3.8 + System.Text.Json + minimal hosting), плюс ручная проверка через `docker run`/`curl`: логин, роли, camelCase-ключи валидации, детект дубликата логина.

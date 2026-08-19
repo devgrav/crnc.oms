@@ -31,13 +31,13 @@ Each backend context follows the same layered/DDD structure (project names prefi
 - **`.DataAccess`** (Sales/Production, EF Core+Postgres) or **`.Infrastructure.DataAccess`** (Security, Mongo) — repository implementations, EF mappings / Mongo mappings, DB initializer/seeder.
 - **`.Integration`** — outbound gateways to other services (HTTP clients to other APIs, MassTransit-based gateways), and typed settings bound from `IntegrationEndpoints` config section.
 - **`.Messaging.Contract`** — shared MassTransit command/event contracts published/consumed across services (e.g. `SendNotificationToUserCommand`, order/job conversion events).
-- **`.WebApi`** — ASP.NET Core host: `Startup.cs` wires DI, EF `DbContext`, MassTransit bus + consumers, JWT auth, NSwag/Swagger, Prometheus metrics, health checks (`/health`). `Controllers/` call the `ICommandQueryDispatcher`; `Consumers/` handle inbound MassTransit messages; `Authorization/` has role-based policy handlers.
+- **`.WebApi`** — ASP.NET Core host: `Startup.cs` wires DI, EF `DbContext`, MassTransit bus + consumers, JWT auth, NSwag/Swagger, Prometheus metrics, health checks (`/health`). `Controllers/` call the `ICommandQueryDispatcher`; `Consumers/` handle inbound MassTransit messages; `Authorization/` has role-based policy handlers. **Security is the exception** (post-.NET 10 migration): minimal hosting in `Program.cs`, no `Startup.cs`; `Authorization/` only has role constants (`Roles.cs`) and `AuthSettings`, no policy handlers; no MassTransit (pure inbound HTTP).
 
 Cross-service integration is two-pronged:
 1. **Sync HTTP** for reads (e.g. Sales calling Security to resolve an employee/manager).
 2. **Async messaging via RabbitMQ/MassTransit** for workflow events — e.g. Sales publishes an order-converted event, Production's consumer creates a job and replies with a job-created event, which Sales's consumer uses to store the job id back on the order. Commands (imperative, e.g. `SendNotificationToUserCommand`) and events (past-tense, e.g. job/order state changes) are modeled as distinct MassTransit contract types.
 
-Only `Crnc.Oms.Sales` currently has an automated test project (`Crnc.Oms.Sales.Tests`, xUnit + FluentAssertions), covering the `Domain` layer.
+Test coverage today: `Crnc.Oms.Sales.Tests` (xUnit + FluentAssertions) covers the Sales `Domain` layer with unit tests; `Crnc.Oms.Security.E2ETests` (xUnit + FluentAssertions + Testcontainers) covers the Security service end-to-end over HTTP (auth, users CRUD, roles, role-based authorization) against a container built from its real Dockerfile — see "Backend" below for how to run it. Production and Notification.* currently have no automated tests. Every service is expected to eventually have both unit tests (Domain layer, xUnit + FluentAssertions, Sales-style) and integration/e2e tests (Security-style) — add them opportunistically as services get touched, not just during a dedicated migration.
 
 Monitoring: Prometheus scrapes each service's `/metrics` endpoint every 5s (via `prometheus-net`); Grafana ships with a default dashboard. Not collected for infra containers (Mongo/Postgres/RabbitMQ).
 
@@ -55,7 +55,7 @@ React + TypeScript + Mobx + Semantic UI, bundled with Webpack (no CRA). Entry po
 
 ## Commands
 
-### Run the whole system (Docker)
+### Run the whole system, or one context at a time (Docker)
 
 From the repo root:
 ```
@@ -70,6 +70,17 @@ docker system prune
 docker-compose build
 docker-compose up
 ```
+
+Every service in `docker-compose.yml` carries `profiles:`. The root `.env` sets `COMPOSE_PROFILES=full`, so a bare `docker-compose up` (no flags) still starts everything, same as before. Passing `--profile <name>` on the CLI **overrides** that default (it does not add to it), so it starts only that context plus whatever it actually depends on:
+```
+docker-compose --profile security up      # security-db + security-api only
+docker-compose --profile sales up         # sales + its real deps: security, notification, message-broker
+docker-compose --profile production up
+docker-compose --profile notification up  # all 3 notification sub-services + push-client + security
+docker-compose --profile client up        # the SPA + the whole backend it talks to
+docker-compose --profile monitoring up    # prometheus + grafana only
+```
+Available profiles: `security`, `sales`, `production`, `notification`, `client`, `monitoring`, `full`. Docker Compose does **not** auto-activate a dependency's own profile via `depends_on` — every service lists every context profile that can reach it transitively, so e.g. `security-api` carries `security`, `sales`, `production`, `notification`, and `client` (every context that ends up depending on it), not just `security`. Keep this in sync when changing `depends_on` edges or adding services.
 
 Service endpoints once running:
 | Service | URL |
@@ -90,13 +101,13 @@ Seeded logins in the UI: `admin/111111` (administrator), `shon_bean/111111` (man
 Databases, reachable from the host once `docker-compose up` is running (e.g. via MongoDB Compass / pgAdmin):
 | DB | Engine | Host:port | Database | Auth |
 |---|---|---|---|---|
-| security-db | MongoDB 4.2.3 | `localhost:27021` | `crnc_oms_security_db` | none |
+| security-db | MongoDB 8.3.8 | `localhost:27021` | `crnc_oms_security_db` | none |
 | sales-db | PostgreSQL 9.6.17 | `localhost:5433` | `crnc_oms_sales_db` | `postgres` / `docker` |
 | production-db | PostgreSQL 9.6.17 | `localhost:5434` | `crnc_oms_production_db` | `postgres` / `docker` |
 
 These are the ports mapped in `docker-compose.yml`; inside the Docker network services reach each other by container name (`security-db`, `sales-db`, `production-db`) on the default port. Note: `Crnc.Oms.Production.WebApi/appsettings.json`'s local (non-Docker) connection string has `Port=5433` (copy-pasted from Sales) instead of `5434` — only matters if you run the Production API with `dotnet run` directly against the Dockerized `production-db`; fix the port locally or override `ConnectionStrings:OmsProductionDb` when doing so.
 
-### Backend (.NET Core 3.1)
+### Backend (mixed: Security on .NET 10, others on .NET Core 3.1)
 
 Each context is built/tested independently via its own `.sln`, e.g.:
 ```
@@ -105,6 +116,12 @@ dotnet test src/Server/src/Crnc.Oms.Sales/Crnc.Oms.Sales.Tests/Crnc.Oms.Sales.Te
 dotnet test src/Server/src/Crnc.Oms.Sales/Crnc.Oms.Sales.Tests/Crnc.Oms.Sales.Tests.csproj --filter FullyQualifiedName~<TestName>
 ```
 Other solutions: `Crnc.Oms.Security.sln`, `Crnc.Oms.Production.sln`, `Crnc.Oms.Notification.sln` (and per-sub-service `.sln` files under `Crnc.Oms.Notification/`). `src/Server/Crnc.Oms.sln` exists but individual context solutions are what map to the Docker builds.
+
+`Crnc.Oms.Security` was migrated to .NET 10 (`net10.0` across all 4 app projects) — the rest of the backend is still on `netcoreapp3.1`; building `Crnc.Oms.Security.sln` with the .NET 10 SDK is expected to show `NETSDK1138` warnings for the still-3.1 solutions, not for Security's own projects. Security's e2e test project runs on `net10.0` regardless of the API's own TFM (it drives the service over HTTP through a container, not via `ProjectReference`):
+```
+dotnet test src/Server/src/Crnc.Oms.Security/Crnc.Oms.Security.E2ETests/Crnc.Oms.Security.E2ETests.csproj
+```
+**On Windows, set `DOCKER_HOST=tcp://localhost:2375` first** (and enable "Expose daemon on tcp://localhost:2375 without TLS" in Docker Desktop) — Testcontainers doesn't pick up Docker Desktop's `desktop-linux` npipe context on its own and hangs instead of failing fast.
 
 ### Frontend (`src/Client`)
 

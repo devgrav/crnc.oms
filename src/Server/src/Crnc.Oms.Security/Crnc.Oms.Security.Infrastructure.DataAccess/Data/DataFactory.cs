@@ -68,7 +68,7 @@ namespace Crnc.Oms.Security.Infrastructure.DataAccess.Data
                     .RuleFor(x => x.Id, (f, u) => Guid.NewGuid());
 
                 var counter = 1;
-                var maxCount = 10000;
+                var maxCount = 100;
                 foreach (var userItemDto in faker.GenerateForever())
                 {
                     if(counter == maxCount)
