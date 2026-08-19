@@ -21,6 +21,8 @@ Each backend service is its own independently buildable/deployable solution and 
 - `src/Client/` — the React SPA (single frontend project, source under `src/Client/src/`).
 - `prometheus/`, `grafana/` — Docker build contexts for the monitoring stack.
 - `docker-compose.yml` (repo root) — wires every service, its DB, and the monitoring stack together for local runs.
+- `docs/migrations/` — written-up plans for cross-cutting migrations (e.g. `security-net10-migration-plan.md`). Put a plan here before starting a multi-service migration, and update it as steps land.
+- `README.md` (Russian) — the product-level spec: what each bounded context is supposed to do, the messaging flows in prose, and links to the architecture diagrams / Miro context map. Read it for intent; this file for mechanics.
 
 ## Architecture (per backend service)
 
@@ -37,7 +39,7 @@ Cross-service integration is two-pronged:
 1. **Sync HTTP** for reads (e.g. Sales calling Security to resolve an employee/manager).
 2. **Async messaging via RabbitMQ/MassTransit** for workflow events — e.g. Sales publishes an order-converted event, Production's consumer creates a job and replies with a job-created event, which Sales's consumer uses to store the job id back on the order. Commands (imperative, e.g. `SendNotificationToUserCommand`) and events (past-tense, e.g. job/order state changes) are modeled as distinct MassTransit contract types.
 
-Test coverage today: `Crnc.Oms.Sales.Tests` (xUnit + FluentAssertions) covers the Sales `Domain` layer with unit tests; `Crnc.Oms.Security.E2ETests` (xUnit + FluentAssertions + Testcontainers) covers the Security service end-to-end over HTTP (auth, users CRUD, roles, role-based authorization) against a container built from its real Dockerfile — see "Backend" below for how to run it. Production and Notification.* currently have no automated tests. Every service is expected to eventually have both unit tests (Domain layer, xUnit + FluentAssertions, Sales-style) and integration/e2e tests (Security-style) — add them opportunistically as services get touched, not just during a dedicated migration.
+Test coverage today: `Crnc.Oms.Sales.Tests` (Sales `Domain` unit tests) and `Crnc.Oms.Security.E2ETests` (Security over HTTP, via Testcontainers). Production and Notification.* have none. See "Test conventions" below.
 
 Monitoring: Prometheus scrapes each service's `/metrics` endpoint every 5s (via `prometheus-net`); Grafana ships with a default dashboard. Not collected for infra containers (Mongo/Postgres/RabbitMQ).
 
@@ -52,6 +54,20 @@ React + TypeScript + Mobx + Semantic UI, bundled with Webpack (no CRA). Entry po
 - **Feature/store pattern** (`src/components/<feature>/`, e.g. `orders`, `jobs`, `users`) — each screen has a `*Container` component that constructs a per-mount tree of Mobx `RootStore`/`Store` objects and injects them via `mobx-react`'s `<Provider>`; child components are `@inject`/`@observer`-connected to read from those stores rather than props drilling. Stores call the matching `*Service` for I/O and expose `@observable` state + `@action` methods (loading flags, models, CRUD operations). This container→root store→feature store layering is repeated per feature (e.g. `OrdersGridContainer` → `OrdersGridRootStore` → `OrdersGridStore`; same shape for `orderCard`, `jobsGrid`).
 - **Push notifications** (`src/components/layout/Notifications.tsx`) — connects directly to the Push service's SignalR hub (`APP_CONFIG.pushUrl`) using `@microsoft/signalr`, authenticating via `accessTokenFactory` (the current JWT), and appends incoming `ReceivePushMessageAsync` messages to local component state (not a Mobx store).
 - **Layout** (`src/components/layout/`) — `Layout`/`Content`/`TopMenu`/`UserInfo` wrap every authenticated page (applied inside `PrivateRoute`); `Notifications` (the bell icon) lives in the top menu.
+
+## Test conventions
+
+There are two established shapes. Every service is expected to eventually have both — add them opportunistically as services get touched, not only during a dedicated migration. Both use xUnit + FluentAssertions, and both name tests `Method_Condition_ExpectedResult` with `//Arrange` / `//Act` / `//Assert` comment blocks in the body.
+
+**Unit tests, Sales-style (`Crnc.Oms.Sales.Tests`)** — a `Crnc.Oms.<Context>.Tests` project sitting next to the other projects in the context's `.sln`, `ProjectReference`-ing only `.Domain`, and mirroring the domain's namespace layout under a `Domain/Aggregates/<X>Aggregate/` folder. Targets the same TFM as the service (`netcoreapp3.1` for everything except Security). Aggregates are constructed through their real constructors with real value objects — no mocking framework is in use anywhere in the repo; if a test needs a collaborator, prefer a hand-written fake over adding one.
+
+**E2E tests, Security-style (`Crnc.Oms.Security.E2ETests`)** — a `net10.0` project deliberately *outside* the service's `.sln` and with **no `ProjectReference`** to the service: it drives the running API purely over HTTP, so it stays on modern .NET regardless of the service's own TFM and exercises the same artifact that ships. Key pieces:
+
+- `SecurityApiFixture` (`IAsyncLifetime` + `ICollectionFixture` via `SecurityApiCollection`) builds a Testcontainers network, starts the infra container, then builds the service image **from its real `Dockerfile`** (`ImageFromDockerfileBuilder`, context located by walking up from `AppContext.BaseDirectory` to the `.sln`) and wires it to the infra by network alias. Container config is overridden with `WithEnvironment` using the same keys as `docker-compose.yml`; readiness waits on `/swagger/index.html`. One fixture is shared by the whole collection — tests must not depend on each other's writes, so generate unique logins/emails per test (`Guid.NewGuid():N`) rather than reusing fixed ones.
+- Infra container image tags must stay in sync with `docker-compose.yml` (see the comments in the fixture about Mongo's wire version and why the plain `ContainerBuilder` is used instead of the `Testcontainers.MongoDb` module).
+- Request/response DTOs are re-declared locally as `record`s in `TestModels.cs` — never referenced from the service — alongside `SeedData` (the seeded role/user ids and the `admin` / `shon_bean` logins) and `JsonDefaults.Options` (`JsonSerializerDefaults.Web`), which every `PostAsJsonAsync` / `ReadFromJsonAsync` call passes.
+- The fixture logs in once per role at startup and exposes `AdminJwt` / `MainManagerJwt` plus `CreateAuthorizedClient(jwt)`; the unauthenticated `Client` is used directly for 401 checks. Each endpoint group gets its own `[Collection(SecurityApiCollection.Name)]` class (`RolesTests`, `UsersReadTests`, `UsersWriteTests`, `AuthenticateTests`) covering the happy path plus the no-auth (401) and wrong-role (403) cases.
+- Where a test guards a specific migration hazard (JSON casing of ModelState keys, Mongo LINQ3 translation), the `//Arrange` comment says so and cites the plan under `docs/migrations/` — keep that habit so the regression's reason survives.
 
 ## Commands
 
