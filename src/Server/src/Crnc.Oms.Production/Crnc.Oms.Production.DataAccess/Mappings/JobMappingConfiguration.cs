@@ -1,4 +1,3 @@
-using Crnc.Oms.Production.Domain.Aggregates.Order;
 using Crnc.Oms.Production.Domain.Aggregates.JobAggregate;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

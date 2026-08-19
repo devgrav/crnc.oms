@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Crnc.Oms.Production.Domain.Aggregates.JobAggregate;
-using Crnc.Oms.Production.Domain.Aggregates.Order;
 using Crnc.Oms.Production.Domain.Repositories;
 using Crnc.Oms.Production.Domain.SeedWork;
 using Microsoft.EntityFrameworkCore;

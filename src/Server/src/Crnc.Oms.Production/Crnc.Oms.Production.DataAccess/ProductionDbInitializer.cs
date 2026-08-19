@@ -1,6 +1,5 @@
 using System;
 using Crnc.Oms.Production.Domain.Aggregates.JobAggregate;
-using Crnc.Oms.Production.Domain.Aggregates.Order;
 
 namespace Crnc.Oms.Production.DataAccess
 {

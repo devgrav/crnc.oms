@@ -1,5 +1,4 @@
 ﻿﻿using System;
- using Crnc.Oms.Production.Domain.Aggregates.Order;
  using Crnc.Oms.Production.Domain.Aggregates.JobAggregate;
 
  namespace Crnc.Oms.Production.Domain.SeedWork
