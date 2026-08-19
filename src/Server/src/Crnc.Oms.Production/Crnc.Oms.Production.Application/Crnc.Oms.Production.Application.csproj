@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>$(NoWarn);1591</NoWarn>
     </PropertyGroup>
@@ -9,7 +10,6 @@
     <ItemGroup>
       <ProjectReference Include="..\Crnc.Oms.Production.Domain\Crnc.Oms.Production.Domain.csproj" />
       <ProjectReference Include="..\Crnc.Oms.Production.DataAccess\Crnc.Oms.Production.DataAccess.csproj" />
-      <ProjectReference Include="..\Crnc.Oms.Production.Domain\Crnc.Oms.Production.Domain.csproj" />
     </ItemGroup>
 
 </Project>

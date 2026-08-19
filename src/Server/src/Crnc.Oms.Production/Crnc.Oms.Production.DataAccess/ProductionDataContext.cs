@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Crnc.Oms.Production.DataAccess.Mappings;
 using Crnc.Oms.Production.Domain.Aggregates.JobAggregate;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Crnc.Oms.Production.DataAccess
 {
@@ -28,13 +27,6 @@ namespace Crnc.Oms.Production.DataAccess
             modelBuilder.ApplyConfiguration(new JobMappingConfiguration());
 
         }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            base.OnConfiguring(optionsBuilder);
-            //optionsBuilder.UseSnakeCaseNamingConvention();
-        }
-
 
         public ProductionDataContext(DbContextOptions<ProductionDataContext> options)
             : base(options)

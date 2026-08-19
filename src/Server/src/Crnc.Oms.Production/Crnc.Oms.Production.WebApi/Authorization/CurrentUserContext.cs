@@ -2,7 +2,6 @@
 using System.Linq;
  using System.Security.Claims;
  using Crnc.Oms.Production.Domain.Aggregates.JobAggregate;
- using Crnc.Oms.Production.Domain.Aggregates.Order;
  using Crnc.Oms.Production.Domain.SeedWork;
  using Microsoft.AspNetCore.Http;
 
