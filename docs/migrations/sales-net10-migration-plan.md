@@ -37,7 +37,7 @@ Sales отличается от Security по объёму принципиал�
 
 `docker-compose.yml` секцию `Auth` не переопределяет вообще (`grep -n "Auth" docker-compose.yml` пуст), то есть каждый сервис валидирует подпись своим `appsettings.json`. Значит **сейчас в `master` токен, выданный Security, отвергается всеми остальными сервисами**: логин в SPA проходит, а любой запрос к Sales/Production/Notification возвращает 401. Система сломана end-to-end.
 
-Фикс: проставить новый ключ Security в `appsettings.json` остальных пяти сервисов. Отдельным маленьким коммитом, до начала работы над Sales — это баг в `master`, а не часть миграции. Без него e2e-тесты Sales не заработают в принципе, потому что они логинятся через реальный Security.
+Фикс: проставить новый ключ Security в `appsettings.json` остальных пяти сервисов. Это баг в `master`, а не часть миграции, но чинится он внутри неё (фаза 0 в §10). E2E-тесты Sales от него **не зависят** — они не поднимают Security и подписывают токен сами, см. следующий раздел.
 
 ---
 
@@ -45,26 +45,46 @@ Sales отличается от Security по объёму принципиал�
 
 По схеме Security: сначала набор e2e-тестов, зелёный на текущем `netcoreapp3.1`-сервисе, потом миграция под его защитой. Конвенции — в AGENTS.md, раздел «Test conventions»; проект `Crnc.Oms.Sales.E2ETests` на `net10.0`, вне `Crnc.Oms.Sales.sln`, без `ProjectReference`, поверх Testcontainers.
 
-Окружение, которое должна поднимать фикстура (Sales, в отличие от Security, не изолирован):
+### Периметр: настоящая только БД, всё внешнее — заглушки
 
-| Контейнер | Зачем | Как |
+Sales, в отличие от Security, не изолирован: он ходит в Security по HTTP и в RabbitMQ по AMQP. Тянуть в тесты соседние сервисы целиком — значит проверять чужой код и делать прогон хрупким. Поэтому периметр такой:
+
+- **PostgreSQL — настоящий.** Это и есть то, что здесь надо проверять по-настоящему: EF-маппинг, owned types, типы колонок под даты. Ровно тот слой, куда бьёт риск 1.
+- **Security — заглушка** (`wiremock/wiremock:3.13.2` в контейнере, стабы задаются из фикстуры через его admin API). Sales ждёт от него ровно один ответ — `GET /api/users?roles=Main manager` со списком `UserItemDto`. Настоящий Security для этого не нужен, а его отсутствие заодно снимает зависимость тестов от блокера №0.
+- **RabbitMQ — настоящий брокер, но проверяем только факт отправки.** Шину подменить нечем (без брокера сервис не стартует), но система за ней в тесты не входит: убеждаемся, что сообщение легло в очередь, и на этом останавливаемся. Ни Production, ни Notification не поднимаются.
+
+### Контейнеры фикстуры
+
+| Контейнер | Алиас в сети | Зачем |
 |---|---|---|
-| `postgres:18.6` | БД Sales | сетевой алиас `sales-db` |
-| `rabbitmq:3-management` | шина | алиас `message-broker` |
-| security-api | Sales валидирует JWT и ходит в Security за списком `Main manager` (`EmployeeSecurityGateway`) | образ из `Crnc.Oms.Security/Dockerfile` + свой `mongo:8.3.8` |
-| sales-api | тестируемый сервис | образ из `Crnc.Oms.Sales/Dockerfile` |
+| `postgres:18.6` | `sales-db` | настоящая БД Sales |
+| `rabbitmq:3-management` | `message-broker` | шина; management API (15672) — для проверки очередей из теста |
+| `wiremock/wiremock:3.13.2` | `security-api` | заглушка Security для `EmployeeSecurityGateway` |
+| образ из `Crnc.Oms.Sales/Dockerfile` | — | тестируемый сервис |
 
-Notification и Production поднимать **не нужно**: Sales только публикует в RabbitMQ (`SendNotificationToUserCommand`, `OrderConvertedToJobEvent`) — без консьюмера сообщения просто лежат в очереди, а `OrderStatusChangedHandler` ошибки отправки и так глотает в `try/catch` с логом.
+Тег RabbitMQ держим равным `docker-compose.yml` (`3-management`); поднимать его до 4.x в рамках этой работы не нужно — текущий сервис на MassTransit 6, и это отдельный вопрос.
 
-Что набор должен покрыть, с прицелом на риски этой миграции:
+### Аутентификация: тест подписывает токен сам
 
-- **CRUD заказов через HTTP**: `GET /api/orders`, `GET /api/orders/{id}`, `GET /api/orders/new`, `POST /api/orders`, `PUT /api/orders`; 401 без токена; 404 на неизвестный id. Плюс сид-заказ `5c5c6017-…` из `SalesDbInitializer` как известная точка опоры.
-- **Даты** — прицельно под риск 1 (Npgsql/timestamptz): создание заказа обязано сохраняться и читаться обратно, а `dateCreated`/`dateSentToCustomer` приходить в формате `dd.MM.yyyy` (`DateTimeExtensions`). Именно этот тест первым покажет `InvalidCastException` при смене провайдера.
-- **Enum'ы числами** — под §4: `status`, `jobType`, `materialSource` в JSON — числа, не строки.
-- **camelCase-ключи ошибок валидации** — под §4, аналог `CreateUser_MissingRequiredField_ReturnsBadRequestWithCamelCaseKeys`: `POST /api/orders` без `jobDescription` → 400 с ключом `jobDescription`, не `JobDescription`.
-- **Смена статуса → публикация в шину** — под §6 (MassTransit 6→8): `PUT /api/orders` со статусом `NeedSignoff` должен привести к появлению сообщения в очереди `commands/sendNotificationToUser`. Проверять либо через management API RabbitMQ, либо подписавшись из теста.
-- **Round-trip конвертации в работу** — самый ценный тест под §6: перевести заказ в `ConvertedToJob`, убедиться, что опубликован `OrderConvertedToJobEvent`, затем **самому опубликовать** `JobCreatedForOrderEvent` (тест играет роль Production) и проверить, что `JobCreatedForOrderConsumer` проставил заказу `jobId`/`jobNumber`. Это покрывает и консьюмера, и продюсера, и формат конверта.
-- **Интеграция с Security** — `GetMainManagersAsync` под §7 (замена RestSharp): смена статуса заказа не должна падать при живом Security, и должна деградировать в лог при недоступном.
+Sales только **валидирует** JWT — выдаёт их Security, которого в тестах нет. Поэтому фикстура генерирует токен сама: HS256 тем же ключом, с `iss`/`aud` из `Auth`, и клеймами, которые читает `CurrentUserContext` (`NameIdentifier`, `Name`, `GivenName`, `Surname`, `Email`).
+
+Ключ фикстура **задаёт сама** через переменную окружения контейнера (`Auth:JwtBase64SymmetricKey=<тестовый ключ>`), а не берёт из `appsettings.json`. Тогда тесты не сломаются ни от выравнивания ключа в фазе 0, ни от любой будущей его ротации.
+
+### Что покрываем
+
+- **CRUD заказов через HTTP**: `GET /api/orders`, `GET /api/orders/{id}`, `GET /api/orders/new`, `POST /api/orders`, `PUT /api/orders`; 401 без токена; 404 на неизвестный id. Сид-заказ `5c5c6017-…` из `SalesDbInitializer` — известная точка опоры.
+- **Даты** — прицельно под риск 1 (Npgsql/timestamptz): созданный заказ должен сохраняться и читаться обратно, а `dateCreated`/`dateSentToCustomer` приходить в формате `dd.MM.yyyy` (`DateTimeExtensions`). Именно этот тест первым покажет `InvalidCastException` после смены провайдера.
+- **Enum'ы числами** — под §4: `status`, `jobType`, `materialSource` в JSON числа, не строки.
+- **camelCase-ключи ошибок валидации** — под §4, аналог `CreateUser_MissingRequiredField_ReturnsBadRequestWithCamelCaseKeys`: `POST /api/orders` без `jobDescription` → 400 с ключом `jobDescription`, не `FirstName`-стиля.
+- **Смена статуса → сообщение в очереди**: `PUT /api/orders` со статусом `NeedSignoff` → в очереди `sendNotificationToUser` появилось сообщение. Проверка через management API RabbitMQ (`GET /api/queues/%2f/sendNotificationToUser` → `messages`), без MassTransit в тестовом проекте.
+- **Конвертация в работу → событие опубликовано**: `PUT /api/orders` со статусом `ConvertedToJob` (и заполненным `materialSource`) → событие ушло в exchange `Crnc.Oms.Messaging.Contract.Events:OrderConvertedToJobEvent`. Важная деталь: `Publish` идёт в fanout-exchange, и **без подписчика сообщение просто отбрасывается**, счётчик очереди не вырастет. Поэтому тест до действия сам объявляет временную очередь и биндит её к этому exchange через management API, а потом проверяет, что в ней что-то появилось.
+- **Обращение к Security** — под §7 (замена RestSharp на `HttpClient`): смена статуса проходит успешно, когда заглушка отвечает списком менеджеров, и не валит запрос, когда заглушка отвечает 500 (`OrderStatusChangedHandler` глотает ошибку в лог). Заодно можно сверить через `GET /__admin/requests` WireMock, что Sales действительно сходил на `/api/users` с `Bearer`-заголовком — это и есть регресс-тест на склейку `BaseAddress` (риск 10).
+
+### Что сознательно НЕ покрываем
+
+- **Потребление `JobCreatedForOrderEvent`** (`JobCreatedForOrderConsumer`). Чтобы его дёрнуть, тест должен опубликовать сообщение в формате конверта MassTransit — то есть либо тащить MassTransit в тестовый проект, либо собирать конверт руками. Обратная связь «работа создана → `jobId` вернулся в заказ» проверяется вручную на `docker-compose up` (шаг 14 в §10).
+- **Сквозной сценарий Sales → Production → Sales.** Вне периметра по определению; риск 2 (совместимость MassTransit 8 и 6) e2e-тестами не закрывается — только ручной проверкой.
+- **Notification и Push.** Sales до них не доходит, его зона ответственности заканчивается очередью.
 
 Baseline фиксируется на `netcoreapp3.1` **после** фикса блокера №0.
 
@@ -407,7 +427,7 @@ Sales после миграции разговаривает с сервисам
 - обязательный шаг проверки — полный round-trip на живом `docker-compose up`: перевести заказ в `ConvertedToJob` через SPA/Swagger, увидеть созданную работу в Production API и проставленный `jobId` обратно в заказе;
 - если round-trip не проходит — escape hatch: добавить `MassTransit.Newtonsoft` и `cfg.UseNewtonsoftJsonSerializer()` в конфигурацию Sales, что возвращает ровно прежний формат. Это временная мера до миграции Production.
 
-E2E-тест, где тест сам играет роль Production (см. «Пререквизит»), эту проблему **не поймает**, если тестовый харнесс тоже на MassTransit 8 — он проверит Sales↔Sales. Ловится только ручным round-trip с реальным Production либо тестом, где издатель сконфигурирован с Newtonsoft-сериализатором.
+E2E-набор эту проблему **не поймает по построению**: его периметр заканчивается на «сообщение легло в очередь», а несовместимость проявляется на стороне читателя. Ловится только ручным round-trip с реальным Production (шаг 14).
 
 ### 6.3. RabbitMQ
 
@@ -535,13 +555,13 @@ Crnc.Oms.Sales.E2ETests/
 
 ## 10. Порядок выполнения
 
-**Фаза 0 — починить `master`:**
-
-1. Выровнять `Auth:JwtBase64SymmetricKey` в Sales, Production и трёх Notification-сервисах по значению из Security (блокер №0). Отдельный коммит. Проверка: `docker-compose up`, логин в SPA, открыть список заказов — не должно быть 401.
-
 **Фаза 1 — e2e-тесты на текущем 3.1 (текущая ветка):**
 
-2. Создать `Crnc.Oms.Sales.E2ETests` по конвенциям Security (см. «Пререквизит» и раздел «Test conventions» в AGENTS.md). Зафиксировать зелёный baseline.
+1. Создать `Crnc.Oms.Sales.E2ETests` по конвенциям Security и периметру из раздела «Пререквизит»: настоящий PostgreSQL, WireMock вместо Security, RabbitMQ с проверкой только факта отправки. Тесты пишутся и доводятся до зелёного **на текущем `netcoreapp3.1`-сервисе** — это baseline миграции. От блокера №0 не зависят: токен фикстура подписывает сама, ключ задаёт переменной окружения.
+
+**Фаза 0 — починить `master` (внутри миграции, до смены TFM):**
+
+2. Выровнять `Auth:JwtBase64SymmetricKey` в Sales, Production и трёх Notification-сервисах по значению из Security (блокер №0). Отдельный коммит. Проверка ручная: `docker-compose up`, логин в SPA, открыть список заказов — не должно быть 401. E2E-набор на это не отреагирует (и не должен).
 
 **Фаза 2 — инфраструктура сборки (до смены TFM, работает на 3.1):**
 
@@ -561,7 +581,7 @@ Crnc.Oms.Sales.E2ETests/
 
 **Фаза 4 — проверка:**
 
-13. Прогнать e2e-набор — основная проверка. Покрывает §4 (camelCase, числовые enum'ы), §5.1 (даты), §6.1 (публикация и потребление), §7 (поход в Security) и сам факт сборки образа на новом SDK.
+13. Прогнать e2e-набор — основная автоматическая проверка. Покрывает §4 (camelCase, числовые enum'ы), §5.1 (даты), §5.2 (owned types), §6.1 (публикация в шину), §7 (поход в Security и склейка URL) и сам факт сборки образа на новом SDK. Не покрывает потребление сообщений и совместимость шины с Production — это шаг 14.
 14. **Ручной round-trip через `docker-compose up` — обязателен**, e2e его не заменяет (§6.2): логин в SPA, создание заказа, смена статуса → push-уведомление в `notification-push-client`, конвертация в работу → работа появилась в Production API (`http://localhost:8098/swagger`) → `jobId` вернулся в заказ. Это единственная проверка совместимости MassTransit 8 ↔ MassTransit 6.
 15. Swagger UI (`http://localhost:8091/swagger`) — визуально сверить схемы DTO после NSwag 14, особенно `TextValueOutputDto<int,string>` и nullable-enum'ы.
 16. Grafana/Prometheus — убедиться, что таргет `sales_api_monitoring` снова `UP` после смены порта.
@@ -593,7 +613,7 @@ Crnc.Oms.Sales.E2ETests/
 
 | # | Риск | Как ловить |
 |---|---|---|
-| 0 | **Рассинхрон JWT-ключа между Security и остальными сервисами (уже в `master`)** — Sales отвергает все токены, 401 на любой запрос | Виден сразу при логине в SPA или в первом же e2e-тесте. Фикс — фаза 0, до всего остального |
+| 0 | **Рассинхрон JWT-ключа между Security и остальными сервисами (уже в `master`)** — Sales отвергает все токены, 401 на любой запрос | **E2E-тестами не ловится намеренно** — фикстура подписывает токен сама и задаёт ключ через переменную окружения, чтобы тесты не зависели от ротации ключа. Виден только при логине в SPA. Фикс — фаза 0 |
 | 1 | **Npgsql 6+ маппит `DateTime` на `timestamptz` и запрещает запись `Kind=Local`** — сервис падает на старте в `SalesDbInitializer.Initialize` | Любой запуск. Фикс — `EnableLegacyTimestampBehavior` первой строкой `Program.cs` (§5.1); e2e-тесты на даты подтверждают формат вывода |
 | 2 | **MassTransit 8 (STJ) ↔ MassTransit 6 (Newtonsoft) в Production/Notification** — конвертация заказа в работу молча перестаёт доходить | **E2E-тестами не ловится.** Только ручной round-trip шага 14. Escape hatch — `MassTransit.Newtonsoft` + `UseNewtonsoftJsonSerializer()` |
 | 3 | **`aspnet:10.0` слушает 8080, а не 80** — выглядит как «зависший» контейнер, а не ошибка | Проверенный по опыту Security сценарий: `docker exec <c> env \| grep ASPNETCORE_HTTP_PORTS`. Фикс — §9.5 |
@@ -603,7 +623,7 @@ Crnc.Oms.Sales.E2ETests/
 | 7 | Валидация модели EF Core 10 на трёхуровневых `OwnsOne` (optional dependents) | Первый же старт сервиса + `GET /api/orders/{id}` в e2e. Смягчено тем, что схема пересоздаётся при каждом старте (§5.2) |
 | 8 | PostgreSQL 9.6 вне окна поддержки Npgsql | Проявляется как странные SQL-ошибки на ровном месте. Профилактика — `postgres:18.6` (§5.4); данные не мигрируем |
 | 9 | `UseSwaggerUi3()` переименован в NSwag 14; `Configure(…, SalesDataContext)` в minimal hosting так не работает | Ловится компилятором мгновенно |
-| 10 | `HttpClient.BaseAddress` + относительный путь склеиваются не так, как у RestSharp | E2E-тест на смену статуса заказа (он дёргает Security через гейтвей). Детали — §7 |
+| 10 | `HttpClient.BaseAddress` + относительный путь склеиваются не так, как у RestSharp | E2E-тест на смену статуса заказа + сверка `GET /__admin/requests` у WireMock: Sales должен реально сходить на `/api/users`. Детали — §7 |
 | 11 | FluentAssertions 5 → 7 в `Crnc.Oms.Sales.Tests` | `dotnet test` шага 10; существующий тест сравнивает строки, задеть не должно |
 | 12 | NSwag 14 может иначе сгенерировать схему для дженерик-DTO и nullable-enum'ов | Тестами не покрыто — визуальная сверка Swagger UI, шаг 15 |
 
@@ -628,4 +648,4 @@ Crnc.Oms.Sales.E2ETests/
 
 ## Статус
 
-План составлен, работа не начата. Следующий шаг — фаза 0 (JWT-ключ), затем фаза 1 (e2e-тесты Sales) в ветке `6-add-end-to-end-tests-for-salesproject`.
+План составлен, работа не начата. Следующий шаг — фаза 1: e2e-тесты Sales на текущем `netcoreapp3.1`-сервисе в ветке `6-add-end-to-end-tests-for-salesproject`. Остальные фазы — после того, как набор станет зелёным.
