@@ -7,11 +7,7 @@ using Crnc.Oms.Sales.Domain.Gateways;
 using Crnc.Oms.Sales.Domain.SeedWork;
 using Crnc.Oms.Sales.Integration.Dto;
 using MassTransit;
-using MassTransit.Conductor.Server;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using RestSharp;
-using RestSharp.Authenticators;
 
 namespace Crnc.Oms.Sales.Integration.Gateways
 {

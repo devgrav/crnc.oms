@@ -9,8 +9,8 @@ scrape_configs:
   metrics_path: /metrics  
   scheme: http  
   static_configs:  
-  - targets:  
-    - sales-api
+  - targets:
+    - sales-api:8080
 - job_name: production_api_monitoring    
   metrics_path: /metrics  
   scheme: http  

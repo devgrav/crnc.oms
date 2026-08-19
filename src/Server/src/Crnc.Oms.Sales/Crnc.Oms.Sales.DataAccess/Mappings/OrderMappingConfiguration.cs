@@ -42,7 +42,16 @@ namespace Crnc.Oms.Sales.DataAccess.Mappings
                                 e.Property(x => x.LastName).HasMaxLength(300);
                             });
                     });
+                // Title и ContactPerson - обязательные поля домена (Customer ctor бросает на null),
+                // но EF Core 10 больше не выводит это автоматически для owned-типа с
+                // несколькими вложенными dependents при table sharing - требует явного IsRequired().
+                e.Navigation(x => x.Title).IsRequired();
+                e.Navigation(x => x.ContactPerson).IsRequired();
             });
+            // Customer - обязательное поле домена (Order ctor бросает на null); та же причина,
+            // что и для ContactPerson выше - EF Core 10 требует явного IsRequired() для
+            // owned-типа с несколькими вложенными dependents при table sharing.
+            builder.Navigation(x => x.Customer).IsRequired();
         }
     }
 }

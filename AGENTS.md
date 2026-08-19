@@ -28,12 +28,12 @@ Each backend service is its own independently buildable/deployable solution and 
 
 Each backend context follows the same layered/DDD structure (project names prefixed `Crnc.Oms.<Context>.`):
 
-- **`.Domain`** — aggregates, domain events, repository interfaces, `SeedWork` (base types: `DomainEntity`, `IAggregateRoot`, `DomainEvent`, `DomainException`, `Enumeration`, `ICurrentUserContext`, `ICurrentDateTimeProvider`, `IDomainEventDispatcher`). No framework dependencies.
-- **`.Application`** — use cases, organized under `Features/<Aggregate>/{CommandHandlers,QueryHandlers,EventHandlers,Dto}`. Commands/queries do **not** use MediatR directly — they go through a custom `ICommandQueryDispatcher` / `IUseCaseCommandHandler<TIn,TOut>` / `IUseCaseQueryHandler<TIn,TOut>` pattern (see `Crnc.Oms.Sales.Application/CommandQueryDispatcher.cs`). MediatR *is* used, but only for dispatching domain events (`IDomainEventNotificationHandler`, wired via `IDomainEventDispatcher`).
+- **`.Domain`** — aggregates, domain events, repository interfaces, `SeedWork` (base types: `DomainEntity`, `IAggregateRoot`, `DomainEvent`, `DomainException`, `Enumeration`, `ICurrentUserContext`, `ICurrentDateTimeProvider`, `IDomainEventDispatcher`). Framework-free for Security/Production/Notification; Sales's `Domain` is the exception — it carries a direct `PackageReference` on MediatR because `DomainEvent : INotification`.
+- **`.Application`** — use cases, organized under `Features/<Aggregate>/{CommandHandlers,QueryHandlers,EventHandlers,Dto}`. Commands/queries go through a custom `ICommandQueryDispatcher` / `IUseCaseCommandHandler<TIn,TOut>` / `IUseCaseQueryHandler<TIn,TOut>` pattern (see `Crnc.Oms.Sales.Application/CommandQueryDispatcher.cs`) — but this is a thin wrapper over MediatR, not an alternative to it: `IUseCaseCommand<TOut> : IRequest<TOut>`, `IUseCaseCommandHandler : IRequestHandler`, and `CommandQueryDispatcher` itself just calls `IMediator.Send`. MediatR is the load-bearing dispatch mechanism for the whole Application layer, not only for domain events (`IDomainEventNotificationHandler`, wired via `IDomainEventDispatcher`).
 - **`.DataAccess`** (Sales/Production, EF Core+Postgres) or **`.Infrastructure.DataAccess`** (Security, Mongo) — repository implementations, EF mappings / Mongo mappings, DB initializer/seeder.
-- **`.Integration`** — outbound gateways to other services (HTTP clients to other APIs, MassTransit-based gateways), and typed settings bound from `IntegrationEndpoints` config section.
+- **`.Integration`** — outbound gateways to other services (typed `HttpClient` calls to other APIs, MassTransit-based gateways), and typed settings bound from `IntegrationEndpoints` config section.
 - **`.Messaging.Contract`** — shared MassTransit command/event contracts published/consumed across services (e.g. `SendNotificationToUserCommand`, order/job conversion events).
-- **`.WebApi`** — ASP.NET Core host: `Startup.cs` wires DI, EF `DbContext`, MassTransit bus + consumers, JWT auth, NSwag/Swagger, Prometheus metrics, health checks (`/health`). `Controllers/` call the `ICommandQueryDispatcher`; `Consumers/` handle inbound MassTransit messages; `Authorization/` has role-based policy handlers. **Security is the exception** (post-.NET 10 migration): minimal hosting in `Program.cs`, no `Startup.cs`; `Authorization/` only has role constants (`Roles.cs`) and `AuthSettings`, no policy handlers; no MassTransit (pure inbound HTTP).
+- **`.WebApi`** — ASP.NET Core host: `Startup.cs` wires DI, EF `DbContext`, MassTransit bus + consumers, JWT auth, NSwag/Swagger, Prometheus metrics, health checks (`/health`). `Controllers/` call the `ICommandQueryDispatcher`; `Consumers/` handle inbound MassTransit messages; `Authorization/` has role-based policy handlers. **Security and Sales are the exception** (post-.NET 10 migration): minimal hosting in `Program.cs`, no `Startup.cs`; `Authorization/` only has role constants/`AuthSettings` and `CurrentUserContext`, no policy handlers. Security additionally has no MassTransit (pure inbound HTTP); Sales keeps MassTransit (RabbitMQ, MassTransit 8.x) since it both publishes and consumes workflow events.
 
 Cross-service integration is two-pronged:
 1. **Sync HTTP** for reads (e.g. Sales calling Security to resolve an employee/manager).
@@ -59,9 +59,9 @@ React + TypeScript + Mobx + Semantic UI, bundled with Webpack (no CRA). Entry po
 
 There are two established shapes. Every service is expected to eventually have both — add them opportunistically as services get touched, not only during a dedicated migration. Both use xUnit + FluentAssertions, and both name tests `Method_Condition_ExpectedResult` with `//Arrange` / `//Act` / `//Assert` comment blocks in the body.
 
-**Unit tests, Sales-style (`Crnc.Oms.Sales.Tests`)** — a `Crnc.Oms.<Context>.Tests` project sitting next to the other projects in the context's `.sln`, `ProjectReference`-ing only `.Domain`, and mirroring the domain's namespace layout under a `Domain/Aggregates/<X>Aggregate/` folder. Targets the same TFM as the service (`netcoreapp3.1` for everything except Security). Aggregates are constructed through their real constructors with real value objects — no mocking framework is in use anywhere in the repo; if a test needs a collaborator, prefer a hand-written fake over adding one.
+**Unit tests, Sales-style (`Crnc.Oms.Sales.Tests`)** — a `Crnc.Oms.<Context>.Tests` project sitting next to the other projects in the context's `.sln`, `ProjectReference`-ing only `.Domain`, and mirroring the domain's namespace layout under a `Domain/Aggregates/<X>Aggregate/` folder. Targets the same TFM as the service (`netcoreapp3.1` for Production and Notification.*; `net10.0` for Security and Sales). Aggregates are constructed through their real constructors with real value objects — no mocking framework is in use anywhere in the repo; if a test needs a collaborator, prefer a hand-written fake over adding one.
 
-**E2E tests, Security-style (`Crnc.Oms.Security.E2ETests`)** — a `net10.0` project deliberately *outside* the service's `.sln` and with **no `ProjectReference`** to the service: it drives the running API purely over HTTP, so it stays on modern .NET regardless of the service's own TFM and exercises the same artifact that ships. Key pieces:
+**E2E tests, Security-style (`Crnc.Oms.Security.E2ETests`)** — a `net10.0` project that *is* a member of the service's `.sln` (added once the Dockerfile restores/publishes an explicit `.csproj` rather than the whole solution, so an extra project in the `.sln` can't affect the image build) but carries **no `ProjectReference`** to the service: it drives the running API purely over HTTP, so it stays on modern .NET regardless of the service's own TFM and exercises the same artifact that ships. Key pieces:
 
 - `SecurityApiFixture` (`IAsyncLifetime` + `ICollectionFixture` via `SecurityApiCollection`) builds a Testcontainers network, starts the infra container, then builds the service image **from its real `Dockerfile`** (`ImageFromDockerfileBuilder`, context located by walking up from `AppContext.BaseDirectory` to the `.sln`) and wires it to the infra by network alias. Container config is overridden with `WithEnvironment` using the same keys as `docker-compose.yml`; readiness waits on `/swagger/index.html`. One fixture is shared by the whole collection — tests must not depend on each other's writes, so generate unique logins/emails per test (`Guid.NewGuid():N`) rather than reusing fixed ones.
 - Infra container image tags must stay in sync with `docker-compose.yml` (see the comments in the fixture about Mongo's wire version and why the plain `ContainerBuilder` is used instead of the `Testcontainers.MongoDb` module).
@@ -123,12 +123,12 @@ Databases, reachable from the host once `docker-compose up` is running (e.g. via
 | DB | Engine | Host:port | Database | Auth |
 |---|---|---|---|---|
 | security-db | MongoDB 8.3.8 | `localhost:27021` | `crnc_oms_security_db` | none |
-| sales-db | PostgreSQL 9.6.17 | `localhost:5433` | `crnc_oms_sales_db` | `postgres` / `docker` |
+| sales-db | PostgreSQL 18.6 | `localhost:5433` | `crnc_oms_sales_db` | `postgres` / `docker` |
 | production-db | PostgreSQL 9.6.17 | `localhost:5434` | `crnc_oms_production_db` | `postgres` / `docker` |
 
 These are the ports mapped in `docker-compose.yml`; inside the Docker network services reach each other by container name (`security-db`, `sales-db`, `production-db`) on the default port. Note: `Crnc.Oms.Production.WebApi/appsettings.json`'s local (non-Docker) connection string has `Port=5433` (copy-pasted from Sales) instead of `5434` — only matters if you run the Production API with `dotnet run` directly against the Dockerized `production-db`; fix the port locally or override `ConnectionStrings:OmsProductionDb` when doing so.
 
-### Backend (mixed: Security on .NET 10, others on .NET Core 3.1)
+### Backend (mixed: Security and Sales on .NET 10, Production and Notification.* on .NET Core 3.1)
 
 Each context is built/tested independently via its own `.sln`, e.g.:
 ```
@@ -138,12 +138,9 @@ dotnet test src/Server/src/Crnc.Oms.Sales/Crnc.Oms.Sales.Tests/Crnc.Oms.Sales.Te
 ```
 Other solutions: `Crnc.Oms.Security.sln`, `Crnc.Oms.Production.sln`, `Crnc.Oms.Notification.sln` (and per-sub-service `.sln` files under `Crnc.Oms.Notification/`). `src/Server/Crnc.Oms.sln` exists but individual context solutions are what map to the Docker builds.
 
-`Crnc.Oms.Security` was migrated to .NET 10 (`net10.0` across all 4 app projects) — the rest of the backend is still on `netcoreapp3.1`; building `Crnc.Oms.Security.sln` with the .NET 10 SDK is expected to show `NETSDK1138` warnings for the still-3.1 solutions, not for Security's own projects. Security's e2e test project runs on `net10.0` regardless of the API's own TFM (it drives the service over HTTP through a container, not via `ProjectReference`):
+`Crnc.Oms.Security` and `Crnc.Oms.Sales` were migrated to .NET 10 (`net10.0` across all app projects, including each service's own `.Tests` project) — Production and Notification.* are still on `netcoreapp3.1`; building either migrated `.sln` with the .NET 10 SDK is expected to show `NETSDK1138` warnings for the still-3.1 solutions, not for the migrated service's own projects. Both migrated services' e2e test projects run on `net10.0` regardless of the API's own TFM (they drive the service over HTTP through a container, not via `ProjectReference`), and both are members of their service's `.sln` (safe because each Dockerfile restores/publishes an explicit `.csproj`, not the whole solution):
 ```
 dotnet test src/Server/src/Crnc.Oms.Security/Crnc.Oms.Security.E2ETests/Crnc.Oms.Security.E2ETests.csproj
-```
-The same holds for Sales, which is still on `netcoreapp3.1` while its e2e project is `net10.0`. Neither e2e project is a member of its service's `.sln` — the Dockerfiles still `dotnet restore` by solution on `sdk:3.1`, and a `net10.0` project in the solution would break the image build (`NETSDK1045`), and with it the tests that build that image:
-```
 dotnet test src/Server/src/Crnc.Oms.Sales/Crnc.Oms.Sales.E2ETests/Crnc.Oms.Sales.E2ETests.csproj
 ```
 **On Windows, set `DOCKER_HOST=tcp://localhost:2375` first** (and enable "Expose daemon on tcp://localhost:2375 without TLS" in Docker Desktop) — Testcontainers doesn't pick up Docker Desktop's `desktop-linux` npipe context on its own and hangs instead of failing fast.
