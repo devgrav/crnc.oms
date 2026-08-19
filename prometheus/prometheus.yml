@@ -2,9 +2,9 @@ scrape_configs:
 - job_name: security_api_monitoring    
   metrics_path: /metrics  
   scheme: http  
-  static_configs:  
-  - targets:  
-    - security-api
+  static_configs:
+  - targets:
+    - security-api:8080
 - job_name: sales_api_monitoring    
   metrics_path: /metrics  
   scheme: http  
