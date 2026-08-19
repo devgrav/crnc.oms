@@ -128,7 +128,7 @@ Databases, reachable from the host once `docker-compose up` is running (e.g. via
 | sales-db | PostgreSQL 18.6 | `localhost:5433` | `crnc_oms_sales_db` | `postgres` / `docker` |
 | production-db | PostgreSQL 18.6 | `localhost:5434` | `crnc_oms_production_db` | `postgres` / `docker` |
 
-These are the ports mapped in `docker-compose.yml`; inside the Docker network services reach each other by container name (`security-db`, `sales-db`, `production-db`) on the default port. Note: `Crnc.Oms.Production.WebApi/appsettings.json`'s local (non-Docker) connection string has `Port=5433` (copy-pasted from Sales) instead of `5434` — only matters if you run the Production API with `dotnet run` directly against the Dockerized `production-db`; fix the port locally or override `ConnectionStrings:OmsProductionDb` when doing so.
+These are the ports mapped in `docker-compose.yml`; inside the Docker network services reach each other by container name (`security-db`, `sales-db`, `production-db`) on the default port.
 
 ### Backend (mixed: Security, Sales and Production on .NET 10, Notification.* on .NET Core 3.1)
 
