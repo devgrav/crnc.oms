@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Crnc.Oms.Notification.Gateway.Integration.Settings;
+using Crnc.Oms.Notification.Push.Client.Settings;
 using Crnc.Oms.Notification.Push.Client.Auth;
 using Crnc.Oms.Notification.Push.Client.Push;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -11,7 +11,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
-using Polly;
 
 namespace Crnc.Oms.Notification.Push.Client
 {

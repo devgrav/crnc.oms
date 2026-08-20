@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Prometheus;
 
-namespace Crnc.Oms.Sales.Not.Middlewares
+namespace Crnc.Oms.Notification.Push.WebApi.Middlewares
 {
     public class MonitoringRequestMiddleware
     {

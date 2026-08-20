@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Crnc.Oms.Messaging.Contract.Commands;
-using Crnc.Oms.Notification.Gateway.WebApi.Authorization;
+using Crnc.Oms.Notification.Push.WebApi.Authorization;
 using Crnc.Oms.Notification.Push.Application.Services;
 using Crnc.Oms.Notification.Push.Application.Services.Abstractions;
 using Crnc.Oms.Notification.Push.Integration.Gateways;

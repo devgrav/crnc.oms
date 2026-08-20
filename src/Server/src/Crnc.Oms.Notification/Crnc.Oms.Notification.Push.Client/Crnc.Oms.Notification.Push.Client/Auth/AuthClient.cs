@@ -2,7 +2,7 @@ using System;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using Crnc.Oms.Notification.Gateway.Integration.Settings;
+using Crnc.Oms.Notification.Push.Client.Settings;
 using Crnc.Oms.Notification.Push.Client.Auth;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
