@@ -542,7 +542,7 @@ RUN dotnet publish Crnc.Oms.Notification.Gateway.WebApi/Crnc.Oms.Notification.Ga
 | 5 | **`UseCors` после `MapHub`** в minimal hosting — SPA получает CORS-ошибку при подключении к хабу, а `Push.Client` (без CORS) при этом работает | Только браузером: ручная проверка SPA на шаге 14. Тестами не покрывается — тестовый SignalR-клиент CORS не проверяет |
 | 6 | `UseSwaggerUi3()` переименован в NSwag 14; `IServiceCollectionConfigurator` и `MassTransit.AspNetCoreIntegration` в 8.x отсутствуют | Ловится компилятором мгновенно |
 | 7 | **`DictionaryKeyPolicy` забыт** → ключи `ModelState` молча становятся PascalCase | Здесь **ловится тестом** (в отличие от Production): в Email и Gateway есть `[Required]`/`[EmailAddress]`, ответы 400 наблюдаемы (§4) |
-| 8 | **Email не поднимется на .NET 10** из-за `UseAuthentication()` без `AddAuthentication` | Шаг 2 фазы 0 показывает поведение на 3.1; на .NET 10 закрывается добавлением `AddAuthentication` в §3. Проявится на старте контейнера, то есть на первом же прогоне e2e |
+| 8 | **Поведение Email после добавления `AddAuthentication`.** На 3.1 измерено (фаза 0): `UseAuthentication()` без `AddAuthentication` безвреден, `POST /api/emailNotifications` отдаёт 200. На .NET 10 оставлять так нельзя, но добавление схемы — изменение, а не восстановление статус-кво | E2E-тест на HTTP-вход Email, зафиксированный на baseline как 200 без токена. Если после §3 он станет 401 — значит схема добавлена неверно (эндпойнт анонимен и должен таким остаться) |
 | 9 | **Смена TFM `Messaging.Contract` с `netcoreapp3.1` на `netstandard2.0`** ломает что-то неожиданное | Компилятором. Содержимое — три интерфейса без зависимостей, риск близок к нулю; парная копия в Gateway уже `netstandard2.0` и собирается |
 | 10 | **Порядок `UseHttpMetrics`/`UseRouting` в Email** — метрики без маршрута или пустая метка `endpoint` в prometheus-net 8 | Шаг 17 (таргет `UP`) + сравнение вывода `/metrics` с Gateway. Фикс — §3 |
 | 11 | Сужение толерантности входа: STJ строже Newtonsoft | Осознанное изменение (§4). Внешних потребителей у трёх HTTP-API нет |
@@ -577,4 +577,49 @@ RUN dotnet publish Crnc.Oms.Notification.Gateway.WebApi/Crnc.Oms.Notification.Ga
 
 ## Статус
 
-**Не начато.** План составлен 2026-08-20 по итогам инвентаризации кода и сборки baseline (`dotnet build Crnc.Oms.Notification.sln` на SDK 10.0.100 — 0 ошибок, 28 предупреждений). Следующий шаг — фаза 0: три проверки на живом стенде, результаты которых дописываются сюда до начала фазы 1.
+**Фаза 0 выполнена 2026-08-20.** План составлен по итогам инвентаризации кода и сборки baseline (`dotnet build Crnc.Oms.Notification.sln` на SDK 10.0.100 — 0 ошибок, 28 предупреждений), затем все три предположения проверены на живом стенде: `docker-compose --profile sales --profile notification up`, девять контейнеров, RabbitMQ и обе БД настоящие.
+
+### Что измерено
+
+**1. Цепочка уведомлений работает целиком — и по HTTP-входу, и по входу из шины.**
+
+Прямой вызов `POST :8100/api/notifications/user` с токеном `admin` вернул 200. По логам Gateway: сходил в Security за карточкой `shon_bean`, получил её, отправил обе команды. Полный round-trip через Sales — создание заказа и переход `Not sent → Need signoff` — дал то же самое: `MessageBrokerNotificationGateway` в Sales отправил две команды (обоим Main manager'ам), Gateway их съел, резолвил обоих пользователей и развёл по двум каналам. `notification-push-client`, залогиненный как `shon_bean`, получил ровно своё сообщение и не получил чужое — адресация SignalR по пользователю работает.
+
+Итоговое состояние очередей: четыре штуки, все пустые, **ни одной `_error`/`_skipped`**.
+
+| Очередь | messages | ack |
+|---|---|---|
+| `sendNotificationToUser` | 0 | 2 |
+| `sendEmailNotificationToReceiver` | 0 | 3 |
+| `sendPushNotificationToReceiver` | 0 | 3 |
+| `jobCreatedForOrder` | 0 | — |
+
+Заодно окончательно снят вопрос §«Фаза 0» про адресацию: Sales логирует `SEND rabbitmq://message-broker/commands/sendNotificationToUser`, а `ReceiveEndpoint("sendNotificationToUser")` Gateway это принимает. Сегмент `commands` действительно поглощается адресацией, и пара MassTransit 8 (Sales) → MassTransit 6 (Notification) работает вживую.
+
+**2. HTTP-вход Email работает — `AddAuthentication` не нужен на 3.1.**
+
+`POST :8104/api/emailNotifications` с валидным телом → 200 и `{"messageId":"…"}`. Контейнер поднимается штатно, `UseAuthentication()` без `AddAuthentication` пайплайн не роняет. Ожидание из плана было пессимистичнее реальности; на .NET 10 проверять всё равно придётся, но это уже не «сервис не поднимется», а «поведение может измениться» — риск 8 переформулирован.
+
+**Побочно измерен baseline §4**, и он именно тот, ради которого нужен `DictionaryKeyPolicy`. Тело без адресатов даёт 400 с ключами в camelCase:
+
+```json
+{"senderEmail":["The SenderEmail field is required."],
+ "receiverEmail":["The ReceiverEmail field is required."]}
+```
+
+**3. `/health` — 404 на всех трёх** (`:8100`, `:8104`, `:8107`), как и предполагалось: `AddHealthChecks()` есть, `MapHealthChecks` нет. Решение 13 в силе.
+
+### Дефект консьюмера Email подтверждён прямым наблюдением
+
+§9, группа B — теперь это не подозрение, а измеренный факт. Две строки из лога `notification-email-api`, одно и то же поле:
+
+```
+Email sent in EmailService with id 1111…, sender : notifications@crnc.ru to receiver shon_bean@crnc.com, message: phase0 direct http
+Email sent in EmailService with id d4a4…, sender :  to receiver , message: Status of order 0e223e3a changed from Not sent to Need signoff…
+```
+
+Первая строка — прямой HTTP, адресаты на месте. Вторая — тот же сервис через шину, адресаты пустые. Gateway их заполняет (в его логе `receiverEmail: shon_bean@crnc.com`), контракт их несёт, теряет их `SendEmailNotificationToReceiverConsumer`, который копирует в `SendEmailMessageInputDto` только `Message`.
+
+### Следующий шаг
+
+Фаза 1 — `.dockerignore` и e2e-набор на текущем `netcoreapp3.1`. Ожидания тестов теперь опираются на измеренное поведение, а не на вычитанное из кода.
