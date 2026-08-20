@@ -33,9 +33,12 @@ public sealed class NotificationApiFixture : IAsyncLifetime
     private const string SecurityStubNetworkAlias = "security-api";
     private const int SecurityStubContainerPort = 8080;
 
-    // Сервисы пока на netcoreapp3.1 (базовый образ dotnet/core/aspnet:3.1 слушает 80).
-    // После миграции на aspnet:10.0 здесь станет 8080 — см. §10.4 плана миграции.
-    private const int ApiContainerPort = 80;
+    // Порт у каждого юнита свой, потому что он берётся из его базового образа:
+    // dotnet/core/aspnet:3.1 слушает 80, dotnet/aspnet:10.0 — 8080 (§10.4 плана миграции).
+    // Юниты мигрируют по одному, поэтому какое-то время значения расходятся.
+    private const int EmailContainerPort = 8080;
+    private const int PushContainerPort = 80;
+    private const int GatewayContainerPort = 80;
 
     private const string BrokerEndpoint = "rabbitmq://message-broker";
 
@@ -112,9 +115,9 @@ public sealed class NotificationApiFixture : IAsyncLifetime
             .WithNetworkAliases("notification-email-api")
             .WithEnvironment("IntegrationEndpoints:MessageBrokerEndpoint", BrokerEndpoint)
             .WithEnvironment("Auth:JwtBase64SymmetricKey", SeedData.JwtBase64SymmetricKey)
-            .WithPortBinding(ApiContainerPort, true)
+            .WithPortBinding(EmailContainerPort, true)
             .WithWaitStrategy(Wait.ForUnixContainer().UntilHttpRequestIsSucceeded(
-                r => r.ForPort(ApiContainerPort).ForPath("/swagger/index.html")))
+                r => r.ForPort(EmailContainerPort).ForPath("/swagger/index.html")))
             .Build();
 
         _pushContainer = new ContainerBuilder(pushImage)
@@ -123,9 +126,9 @@ public sealed class NotificationApiFixture : IAsyncLifetime
             .WithEnvironment("IntegrationEndpoints:MessageBrokerEndpoint", BrokerEndpoint)
             .WithEnvironment("IntegrationEndpoints:UiEndpoint", "http://localhost:8092")
             .WithEnvironment("Auth:JwtBase64SymmetricKey", SeedData.JwtBase64SymmetricKey)
-            .WithPortBinding(ApiContainerPort, true)
+            .WithPortBinding(PushContainerPort, true)
             .WithWaitStrategy(Wait.ForUnixContainer().UntilHttpRequestIsSucceeded(
-                r => r.ForPort(ApiContainerPort).ForPath("/swagger/index.html")))
+                r => r.ForPort(PushContainerPort).ForPath("/swagger/index.html")))
             .Build();
 
         _gatewayContainer = new ContainerBuilder(gatewayImage)
@@ -139,9 +142,9 @@ public sealed class NotificationApiFixture : IAsyncLifetime
             .WithEnvironment("IntegrationEndpoints:PushNotificationServiceEndpoint",
                 "http://notification-push-api")
             .WithEnvironment("Auth:JwtBase64SymmetricKey", SeedData.JwtBase64SymmetricKey)
-            .WithPortBinding(ApiContainerPort, true)
+            .WithPortBinding(GatewayContainerPort, true)
             .WithWaitStrategy(Wait.ForUnixContainer().UntilHttpRequestIsSucceeded(
-                r => r.ForPort(ApiContainerPort).ForPath("/swagger/index.html")))
+                r => r.ForPort(GatewayContainerPort).ForPath("/swagger/index.html")))
             .Build();
 
         await Task.WhenAll(
@@ -149,12 +152,12 @@ public sealed class NotificationApiFixture : IAsyncLifetime
             _pushContainer.StartAsync(),
             _gatewayContainer.StartAsync());
 
-        GatewayClient = CreateClient(_gatewayContainer);
-        EmailClient = CreateClient(_emailContainer);
-        PushClient = CreateClient(_pushContainer);
+        GatewayClient = CreateClient(_gatewayContainer, GatewayContainerPort);
+        EmailClient = CreateClient(_emailContainer, EmailContainerPort);
+        PushClient = CreateClient(_pushContainer, PushContainerPort);
 
         PushHubUrl =
-            $"http://{_pushContainer.Hostname}:{_pushContainer.GetMappedPublicPort(ApiContainerPort)}/hubs/push";
+            $"http://{_pushContainer.Hostname}:{_pushContainer.GetMappedPublicPort(PushContainerPort)}/hubs/push";
     }
 
     public async Task DisposeAsync()
@@ -200,9 +203,9 @@ public sealed class NotificationApiFixture : IAsyncLifetime
         return stdout + stderr;
     }
 
-    private static HttpClient CreateClient(IContainer container) => new()
+    private static HttpClient CreateClient(IContainer container, int containerPort) => new()
     {
-        BaseAddress = new Uri($"http://{container.Hostname}:{container.GetMappedPublicPort(ApiContainerPort)}")
+        BaseAddress = new Uri($"http://{container.Hostname}:{container.GetMappedPublicPort(containerPort)}")
     };
 
     private static async Task<IImage> BuildImageAsync(string contextRoot, string unitFolder, string tag)

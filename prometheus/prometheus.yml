@@ -28,7 +28,7 @@ scrape_configs:
   scheme: http  
   static_configs:  
   - targets:  
-    - notification-email-api
+    - notification-email-api:8080
 - job_name: notification_push_api_monitoring    
   metrics_path: /metrics  
   scheme: http  

@@ -100,7 +100,7 @@ services:
     restart: always
     profiles: ["sales", "production", "notification", "client", "full"]
     ports:
-      - "8104:80"
+      - "8104:8080"
     environment:
       - "IntegrationEndpoints:MessageBrokerEndpoint=rabbitmq://message-broker"
 
