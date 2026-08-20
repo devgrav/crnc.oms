@@ -169,6 +169,8 @@ npm run build   # production bundle (webpack -p)
 ```
 TypeScript config: `tsconfig.json`; linting: `tslint.json` (tslint, not eslint). API base URLs are injected at Docker build time via args (`SECURITY_API_URL`, `SALES_API_URL`, `PRODUCTION_API_URL`, `PUSH_HUBS_URL`) — see `docker-compose.yml`.
 
+**The image build pins `node:16-alpine` deliberately** (`src/Client/Dockerfile`). The floating `node:alpine` tag now resolves to Node 26, which no longer ships yarn at all — `RUN yarn` fails with `yarn: not found` — and whose OpenSSL 3 dropped the `md4` hash that webpack 3 relies on. Node 16 is the last LTS of this frontend's era and carries yarn 1.22, matching the v1 `yarn.lock`. Don't unpin it without upgrading webpack first.
+
 ## Commit messages
 
 **No AI attribution in commits.** A commit message in this repository ends with its
