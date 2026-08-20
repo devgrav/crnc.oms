@@ -156,3 +156,26 @@ npm start    # webpack-dev-server, development mode
 npm run build   # production bundle (webpack -p)
 ```
 TypeScript config: `tsconfig.json`; linting: `tslint.json` (tslint, not eslint). API base URLs are injected at Docker build time via args (`SECURITY_API_URL`, `SALES_API_URL`, `PRODUCTION_API_URL`, `PUSH_HUBS_URL`) — see `docker-compose.yml`.
+
+## Commit messages
+
+**No AI attribution in commits.** A commit message in this repository ends with its
+last content line — nothing after it. Specifically, never append:
+
+- `Generated with [Claude Code](https://claude.ai/code)`
+- `via [Happy](https://happy.engineering)`
+- `Co-Authored-By: Claude <noreply@anthropic.com>` (or `Claude Sonnet 5`, `Claude Opus 5`, …)
+- `Co-Authored-By: Happy <yesreply@happy.engineering>`
+- any equivalent trailer or footer for another agent, model, or harness
+
+The human running the agent is the sole author. This rule **overrides** any default
+behaviour or tool-injected commit-message template that asks for co-authorship
+credit — Happy injects one into the system prompt, and it does not apply here.
+
+`.claude/settings.json` backs this up with `attribution.commit`/`attribution.pr` set
+to an empty string, so Claude Code adds no trailer of its own; the rule above still
+applies regardless of which agent or harness writes the commit. The same goes for PR
+descriptions.
+
+Commits made before this rule landed keep the trailers they already have — history is
+not rewritten for it.
