@@ -54,7 +54,7 @@ services:
       - "8091:8080"
     environment:
       - "ConnectionStrings:OmsSalesDb=Host=sales-db;Database=crnc_oms_sales_db;Username=postgres;Password=docker"
-      - "IntegrationEndpoints:NotificationServiceEndpoint=http://notification-gateway-api"
+      - "IntegrationEndpoints:NotificationServiceEndpoint=http://notification-gateway-api:8080"
       - "IntegrationEndpoints:SecurityServiceEndpoint=http://security-api:8080"
       - "IntegrationEndpoints:MessageBrokerEndpoint=rabbitmq://message-broker"
     depends_on:
@@ -121,10 +121,10 @@ services:
     restart: always
     profiles: ["sales", "production", "notification", "client", "full"]
     ports:
-      - "8100:80"
+      - "8100:8080"
     environment:
-      - "IntegrationEndpoints:EmailNotificationServiceEndpoint=http://notification-email-api"
-      - "IntegrationEndpoints:PushNotificationServiceEndpoint=http://notification-push-api"
+      - "IntegrationEndpoints:EmailNotificationServiceEndpoint=http://notification-email-api:8080"
+      - "IntegrationEndpoints:PushNotificationServiceEndpoint=http://notification-push-api:8080"
       - "IntegrationEndpoints:SecurityServiceEndpoint=http://security-api:8080"
       - "IntegrationEndpoints:MessageBrokerEndpoint=rabbitmq://message-broker"
     depends_on:
@@ -139,7 +139,7 @@ services:
     profiles: ["notification", "full"]
     environment:
       - "IntegrationEndpoints:SecurityServiceEndpoint=http://security-api:8080"
-      - "IntegrationEndpoints:PushNotificationServiceEndpoint=http://notification-push-api"
+      - "IntegrationEndpoints:PushNotificationServiceEndpoint=http://notification-push-api:8080"
     depends_on:
       - notification-push-api
       - security-api

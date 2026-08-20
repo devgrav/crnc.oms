@@ -38,7 +38,7 @@ public sealed class NotificationApiFixture : IAsyncLifetime
     // Юниты мигрируют по одному, поэтому какое-то время значения расходятся.
     private const int EmailContainerPort = 8080;
     private const int PushContainerPort = 8080;
-    private const int GatewayContainerPort = 80;
+    private const int GatewayContainerPort = 8080;
 
     private const string BrokerEndpoint = "rabbitmq://message-broker";
 
@@ -138,9 +138,9 @@ public sealed class NotificationApiFixture : IAsyncLifetime
             .WithEnvironment("IntegrationEndpoints:SecurityServiceEndpoint",
                 $"http://{SecurityStubNetworkAlias}:{SecurityStubContainerPort}")
             .WithEnvironment("IntegrationEndpoints:EmailNotificationServiceEndpoint",
-                "http://notification-email-api")
+                "http://notification-email-api:8080")
             .WithEnvironment("IntegrationEndpoints:PushNotificationServiceEndpoint",
-                "http://notification-push-api")
+                "http://notification-push-api:8080")
             .WithEnvironment("Auth:JwtBase64SymmetricKey", SeedData.JwtBase64SymmetricKey)
             .WithPortBinding(GatewayContainerPort, true)
             .WithWaitStrategy(Wait.ForUnixContainer().UntilHttpRequestIsSucceeded(
