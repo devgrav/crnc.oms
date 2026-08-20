@@ -1,5 +1,9 @@
 # => Build container
-FROM node:alpine as builder
+# Node 16 - последний LTS эпохи этого фронтенда (webpack 3, TypeScript 3.7).
+# Плавающий тег node:alpine сегодня даёт Node 26, где, во-первых, больше не
+# поставляется yarn (RUN yarn -> "yarn: not found"), а во-вторых, OpenSSL 3
+# убрал хеш md4, на который опирается webpack 3.
+FROM node:16-alpine AS builder
 
 ARG SECURITY_API_URL
 ARG SALES_API_URL
