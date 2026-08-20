@@ -5,12 +5,12 @@ WORKDIR /app
 COPY *.sln .
 COPY */*.csproj ./
 RUN for file in $(ls *.csproj); do mkdir -p ${file%.*} && mv $file ${file%.*}; done
-RUN dotnet restore
+RUN dotnet restore Crnc.Oms.Notification.Push.WebApi/Crnc.Oms.Notification.Push.WebApi.csproj
 
 # copy everything else and build app
 COPY . ./aspnetapp
 WORKDIR /app/aspnetapp
-RUN dotnet publish -c Release -o out
+RUN dotnet publish Crnc.Oms.Notification.Push.WebApi/Crnc.Oms.Notification.Push.WebApi.csproj -c Release -o out
 
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS runtime
 WORKDIR /app
