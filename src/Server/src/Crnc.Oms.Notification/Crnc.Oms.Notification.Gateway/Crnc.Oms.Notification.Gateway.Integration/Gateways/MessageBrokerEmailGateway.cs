@@ -5,11 +5,8 @@ using Crnc.Oms.Messaging.Contract.Commands;
 using Crnc.Oms.Notification.Gateway.Integration.Dto;
 using Crnc.Oms.Notification.Gateway.Integration.Gateways.Abstractions;
 using MassTransit;
-using MassTransit.Conductor.Server;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using RestSharp;
-using RestSharp.Authenticators;
 
 namespace Crnc.Oms.Notification.Gateway.Integration.Gateways
 {

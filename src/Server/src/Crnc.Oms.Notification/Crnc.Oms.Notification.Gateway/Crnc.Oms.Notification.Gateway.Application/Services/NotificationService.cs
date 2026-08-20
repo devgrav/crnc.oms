@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Crnc.Oms.Notification.Gateway.Integration.Gateways;
 using Crnc.Oms.Notification.Gateway.Integration.Dto;
-using Crnc.Oms.Notification.Email.Integration.Dto;
 using Crnc.Oms.Notification.Gateway.Application.Dto;
 using Crnc.Oms.Notification.Gateway.Application.Exceptions;
 using Crnc.Oms.Notification.Gateway.Application.Services.Abstractions;

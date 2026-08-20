@@ -8,8 +8,6 @@ using Crnc.Oms.Notification.Gateway.Integration.Settings;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using RestSharp;
-using RestSharp.Authenticators;
 
 namespace Crnc.Oms.Notification.Gateway.Integration.Gateways
 {

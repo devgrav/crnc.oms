@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using Crnc.Oms.Notification.Email.Application.Dto;
-using Crnc.Oms.Notification.Gateway.Integration.Dto;
+using Crnc.Oms.Notification.Email.Integration.Dto;
 using Crnc.Oms.Notification.Email.Application.Services.Abstractions;
 using Crnc.Oms.Notification.Email.Integration.Gateways.Abstractions;
 using Microsoft.Extensions.Logging;

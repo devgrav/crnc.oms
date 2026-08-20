@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Crnc.Oms.Notification.Email.Integration.Gateways.Abstractions;
-using Crnc.Oms.Notification.Gateway.Integration.Dto;
+using Crnc.Oms.Notification.Email.Integration.Dto;
 using Microsoft.Extensions.Logging;
 
 namespace Crnc.Oms.Notification.Email.Integration.Gateways
