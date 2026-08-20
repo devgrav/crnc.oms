@@ -37,7 +37,7 @@ public sealed class NotificationApiFixture : IAsyncLifetime
     // dotnet/core/aspnet:3.1 слушает 80, dotnet/aspnet:10.0 — 8080 (§10.4 плана миграции).
     // Юниты мигрируют по одному, поэтому какое-то время значения расходятся.
     private const int EmailContainerPort = 8080;
-    private const int PushContainerPort = 80;
+    private const int PushContainerPort = 8080;
     private const int GatewayContainerPort = 80;
 
     private const string BrokerEndpoint = "rabbitmq://message-broker";

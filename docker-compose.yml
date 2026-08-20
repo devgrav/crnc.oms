@@ -113,7 +113,7 @@ services:
       - "IntegrationEndpoints:UiEndpoint=http://localhost:8092"
       - "IntegrationEndpoints:MessageBrokerEndpoint=rabbitmq://message-broker"
     ports:
-      - "8107:80"
+      - "8107:8080"
 
   notification-gateway-api:
     build: src/Server/src/Crnc.Oms.Notification/Crnc.Oms.Notification.Gateway/
