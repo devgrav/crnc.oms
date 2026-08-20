@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Notification.Push.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Notification.Push.Integration", "Crnc.Oms.Notification.Push.Integration\Crnc.Oms.Notification.Push.Integration.csproj", "{CE77330F-1C74-4D44-9EFA-77696C8170E5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crnc.Oms.Notification.Push.Messaging.Contract", "Crnc.Oms.Notification.Push.Messaging.Contract\Crnc.Oms.Notification.Push.Messaging.Contract.csproj", "{915850B1-BF8C-4491-867A-244B1E111C38}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,9 +19,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{BD37F926-D92A-4CC6-8781-1C7478097816}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -58,5 +57,20 @@ Global
 		{CE77330F-1C74-4D44-9EFA-77696C8170E5}.Release|x64.Build.0 = Release|Any CPU
 		{CE77330F-1C74-4D44-9EFA-77696C8170E5}.Release|x86.ActiveCfg = Release|Any CPU
 		{CE77330F-1C74-4D44-9EFA-77696C8170E5}.Release|x86.Build.0 = Release|Any CPU
+		{915850B1-BF8C-4491-867A-244B1E111C38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{915850B1-BF8C-4491-867A-244B1E111C38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{915850B1-BF8C-4491-867A-244B1E111C38}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{915850B1-BF8C-4491-867A-244B1E111C38}.Debug|x64.Build.0 = Debug|Any CPU
+		{915850B1-BF8C-4491-867A-244B1E111C38}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{915850B1-BF8C-4491-867A-244B1E111C38}.Debug|x86.Build.0 = Debug|Any CPU
+		{915850B1-BF8C-4491-867A-244B1E111C38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{915850B1-BF8C-4491-867A-244B1E111C38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{915850B1-BF8C-4491-867A-244B1E111C38}.Release|x64.ActiveCfg = Release|Any CPU
+		{915850B1-BF8C-4491-867A-244B1E111C38}.Release|x64.Build.0 = Release|Any CPU
+		{915850B1-BF8C-4491-867A-244B1E111C38}.Release|x86.ActiveCfg = Release|Any CPU
+		{915850B1-BF8C-4491-867A-244B1E111C38}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal
