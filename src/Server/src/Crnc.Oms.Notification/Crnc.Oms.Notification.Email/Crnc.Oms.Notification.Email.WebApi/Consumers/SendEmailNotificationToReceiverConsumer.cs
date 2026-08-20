@@ -26,8 +26,10 @@ namespace Crnc.Oms.Notification.Email.WebApi.Consumers
 
                 await _notificationService.SendAsync(new SendEmailMessageInputDto()
                 {
-                    Message = notification.Message,
-                   
+                    MessageId = notification.MessageId,
+                    SenderEmail = notification.SenderEmail,
+                    ReceiverEmail = notification.ReceiverEmail,
+                    Message = notification.Message
                 });
             }
         }

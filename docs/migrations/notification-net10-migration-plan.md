@@ -643,6 +643,12 @@ Email sent in EmailService with id d4a4…, sender :  to receiver , message: Sta
 
 SPA в браузере не открывалась — её сборка падает на предсуществующей проблеме `yarn: not found` в `crnc-oms-ui`, как и при проверке миграций Sales и Production. Порядок `UseCors` до `MapHub` (риск 5) тем самым остался непроверенным вживую: тестовый SignalR-клиент CORS не проверяет. Внешний порт 8107 и `PUSH_HUBS_URL` не менялись, так что риск ограничен именно порядком middleware.
 
-### Следующий шаг
+---
 
-Фаза 5 — фикс `SendEmailNotificationToReceiverConsumer`, теряющего адресатов.
+## Фаза 5 выполнена, миграция завершена
+
+`SendEmailNotificationToReceiverConsumer` больше не теряет адресатов: в `SendEmailMessageInputDto` теперь переносятся `MessageId`, `SenderEmail` и `ReceiverEmail`, а не только `Message`. E2E-тест, фиксировавший старое поведение (`sender :  to receiver ,`), переписан на правильное тем же коммитом — как того требовало решение 14.
+
+Пункт 20 фазы 5 (подключение `MonitoringRequestMiddleware`, чистка мёртвых `IntegrationEndpoints` из compose) **сознательно не делался**: план описывал его как «по желанию», а подключение middleware меняет набор метрик и должно быть отдельным решением, а не хвостом миграции. Долг зафиксирован в AGENTS.md.
+
+**Итог миграции.** Четыре деплой-юнита на `net10.0`, MassTransit 8.5.10, minimal hosting, System.Text.Json, RestSharp и Polly убраны, `Startup.cs` в репозитории не осталось. `dotnet build Crnc.Oms.Notification.sln` — 0 ошибок, 0 предупреждений (было 28, из них четыре `NU1903` про уязвимость RestSharp). `Crnc.Oms.Notification.E2ETests` — 15/15 зелёных, стабильно на всех прогонах: на baseline `netcoreapp3.1`, после каждого из четырёх миграционных коммитов и после фикса фазы 5.
