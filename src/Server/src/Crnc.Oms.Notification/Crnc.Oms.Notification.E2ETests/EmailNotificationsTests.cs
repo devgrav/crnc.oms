@@ -74,14 +74,13 @@ public sealed class EmailNotificationsTests
     }
 
     [Fact]
-    public async Task SendEmailNotificationToReceiverCommand_FromBus_IsConsumedButLosesAddressees()
+    public async Task SendEmailNotificationToReceiverCommand_FromBus_KeepsAddresseesFromCommand()
     {
         //Arrange
-        // Фиксирует предсуществующий дефект, измеренный в фазе 0 (§9, группа B):
-        // SendEmailNotificationToReceiverConsumer копирует в SendEmailMessageInputDto только
-        // Message, а SenderEmail/ReceiverEmail из команды теряет — письмо «уходит» никому.
-        // Тест намеренно закрепляет текущее поведение как baseline; он переписывается тем же
-        // коммитом, что и фикс в фазе 5.
+        // Раньше здесь фиксировался дефект: SendEmailNotificationToReceiverConsumer копировал
+        // в SendEmailMessageInputDto только Message, теряя SenderEmail/ReceiverEmail, и письмо
+        // «уходило» никому. Дефект измерен в фазе 0 сравнением двух строк лога и починен в
+        // фазе 5 — тест переписан на правильное поведение тем же коммитом (§9, группа B).
         var marker = $"bus email probe {Guid.NewGuid():N}";
 
         //Act
@@ -100,9 +99,8 @@ public sealed class EmailNotificationsTests
         var logLine = await WaitForLogLineAsync(marker, BusTimeout);
 
         logLine.Should().NotBeNull("консьюмер обязан съесть команду и написать строку в лог");
-        logLine.Should().Contain("sender :  to receiver ,",
-            "адресаты теряются в консьюмере — baseline до фикса фазы 5");
-        logLine.Should().NotContain(SeedData.ReceiverEmail);
+        logLine.Should().Contain($"sender : {SeedData.GatewaySenderEmail} to receiver {SeedData.ReceiverEmail}",
+            "адресаты обязаны доехать из команды до сервиса");
     }
 
     private async Task<string?> WaitForLogLineAsync(string marker, TimeSpan timeout)
