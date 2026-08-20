@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /app
 
 # copy csproj and restore as distinct layers
@@ -12,7 +12,7 @@ COPY . ./dotnetapp
 WORKDIR /app/dotnetapp
 RUN dotnet publish Crnc.Oms.Notification.Push.Client/Crnc.Oms.Notification.Push.Client.csproj -c Release -o out
 
-FROM mcr.microsoft.com/dotnet/core/runtime:3.1 AS runtime
+FROM mcr.microsoft.com/dotnet/runtime:10.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/dotnetapp/out ./
 ENTRYPOINT ["dotnet", "Crnc.Oms.Notification.Push.Client.dll"]

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,7 +40,7 @@ namespace Crnc.Oms.Notification.Push.Client
 
                     services.AddHostedService<PushConnectorWorker>();
                     services.AddSingleton<IPushConnector, PushConnector>();
-                    services.AddSingleton<IAuthClient, AuthClient>();
+                    services.AddHttpClient<IAuthClient, AuthClient>();
                     
                     services.AddOptions();
                     services.Configure<AuthSettings>(config.GetSection("Auth"));
