@@ -185,6 +185,20 @@ TypeScript config: `tsconfig.json`; linting: `tslint.json` (tslint, not eslint).
 
 ## Commit messages
 
+**Keep them compact: subject ≤ 72 characters, body ≤ ~500 characters** — roughly 5–7 lines
+wrapped at 72 columns. The body answers *why*, in as few sentences as that takes; it is not
+a place to restate the diff, enumerate every decision, or narrate the work.
+
+The rule that actually enforces the budget: **never duplicate prose that already exists in
+the repository.** If the reasoning is written up under `docs/`, the commit cites the file
+and stops — one sentence of "why", then the pointer. Two or three paragraphs of design
+rationale in a commit body is a sign the text belongs in `docs/` instead. The same goes for
+PR descriptions: link the doc, don't paste it.
+
+A commit that genuinely needs more room — a tricky migration step, a non-obvious bug fix —
+may exceed the budget, but it should be the exception you can justify, not the default
+shape. Multi-paragraph bodies in the history predate this rule.
+
 **No AI attribution in commits.** A commit message in this repository ends with its
 last content line — nothing after it. Specifically, never append:
 
