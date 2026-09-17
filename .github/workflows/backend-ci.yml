@@ -160,7 +160,10 @@ jobs:
     needs: [changes, build]
     if: needs.changes.outputs.contexts != '[]'
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    # Measured on the first real run: 1:27 (Security) to 2:32 (Notification, three deploy
+    # units). 15 minutes is ~6x the slowest suite - enough slack for a cold image cache,
+    # tight enough that a container stuck on a readiness check fails fast.
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
