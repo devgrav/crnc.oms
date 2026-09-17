@@ -130,8 +130,8 @@ TRX-отчёты обоих видов тестов выкладываются �
 - **CD и публикация образов.** Сегодня ни один образ не тегируется и никуда не пушится, в
   `docker-compose.yml` нет ни одного ключа `image:` — схемы именования в реестре просто не
   существует. Когда дойдут руки, отправной точкой будет то же самое `outputs.contexts`:
-  матрица деплой-юнитов (их семь, а не четыре — Notification ships as Email, Push, Gateway
-  и Push.Client), `docker buildx` с кэшем в GHA и push в GHCR.
+  матрица деплой-юнитов (их семь, а не четыре — Notification едет четырьмя: Email, Push,
+  Gateway и Push.Client), `docker buildx` с кэшем в GHA и push в GHCR.
 - **`Crnc.Oms.Notification.Push.Client` не собирается в образ ни на одном шаге CI.** Его
   `.csproj` компилируется в составе `Crnc.Oms.Notification.sln`, но `Dockerfile` не трогает
   никто: e2e-фикстура Notification поднимает Email, Push и Gateway, а роль push-клиента
