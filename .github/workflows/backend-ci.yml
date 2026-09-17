@@ -1,0 +1,236 @@
+name: Backend CI
+
+# Design notes and the reasoning behind each choice: docs/ci/backend-ci.md
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: backend-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_VERSION: '10.0.x'
+  DOTNET_NOLOGO: 'true'
+  DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 'true'
+
+jobs:
+  # Contexts are self-contained under src/Server/src/Crnc.Oms.<Context>/ with no
+  # ProjectReference crossing that boundary, so a path check is enough. Keep it that way.
+  changes:
+    name: Detect changed contexts
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      contexts: ${{ steps.detect.outputs.contexts }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: detect
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          set -euo pipefail
+
+          BUILD_ALL=0
+          FILES=""
+
+          # Manual run, or a base commit we cannot resolve (new branch, force push).
+          if [ "$EVENT_NAME" = "workflow_dispatch" ] \
+            || [ -z "${BASE_SHA:-}" ] \
+            || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ] \
+            || ! git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
+            echo "No usable base commit - building every context."
+            BUILD_ALL=1
+          else
+            FILES=$(git diff --name-only "$BASE_SHA" HEAD)
+            echo "Changed files:"
+            printf '%s\n' "$FILES" | sed 's/^/  /'
+
+            # The pipeline must be exercised against everything it drives.
+            if printf '%s\n' "$FILES" | grep -q '^\.github/workflows/backend-ci\.yml$'; then
+              echo "The workflow itself changed - building every context."
+              BUILD_ALL=1
+            fi
+          fi
+
+          SELECTED=""
+          for ctx in Security Sales Production Notification; do
+            if [ "$BUILD_ALL" = "1" ] \
+              || printf '%s\n' "$FILES" | grep -q "^src/Server/src/Crnc\.Oms\.${ctx}/"; then
+              SELECTED="$SELECTED $ctx"
+            fi
+          done
+
+          if [ -z "$SELECTED" ]; then
+            CONTEXTS='[]'
+          else
+            CONTEXTS='['
+            separator=''
+            for ctx in $SELECTED; do
+              CONTEXTS="${CONTEXTS}${separator}\"${ctx}\""
+              separator=','
+            done
+            CONTEXTS="${CONTEXTS}]"
+          fi
+
+          echo "Selected contexts: $CONTEXTS"
+          echo "contexts=$CONTEXTS" >> "$GITHUB_OUTPUT"
+          echo "Contexts to build: \`$CONTEXTS\`" >> "$GITHUB_STEP_SUMMARY"
+
+  # Split from e2e so a compile error goes red in half a minute, not three.
+  build:
+    name: Build & unit tests (${{ matrix.context }})
+    needs: changes
+    if: needs.changes.outputs.contexts != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        context: ${{ fromJSON(needs.changes.outputs.contexts) }}
+    env:
+      # Per-context solution, never src/Server/Crnc.Oms.sln - that one carries just one of
+      # the four e2e projects and would silently skip three suites.
+      SLN: src/Server/src/Crnc.Oms.${{ matrix.context }}/Crnc.Oms.${{ matrix.context }}.sln
+      UNIT_TESTS: src/Server/src/Crnc.Oms.${{ matrix.context }}/Crnc.Oms.${{ matrix.context }}.Tests/Crnc.Oms.${{ matrix.context }}.Tests.csproj
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('src/Server/**/*.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Restore
+        run: dotnet restore "$SLN"
+
+      - name: Build
+        run: dotnet build "$SLN" --configuration Release --no-restore
+
+      # Picked up by convention: only Sales has one today, the others need no workflow edit.
+      - name: Unit tests
+        run: |
+          set -euo pipefail
+          if [ -f "$UNIT_TESTS" ]; then
+            dotnet test "$UNIT_TESTS" \
+              --configuration Release \
+              --no-build \
+              --logger "trx;LogFileName=unit-tests.trx" \
+              --results-directory artifacts/test-results
+          else
+            echo "::notice title=No unit tests::Crnc.Oms.${{ matrix.context }}.Tests does not exist yet - skipping."
+          fi
+
+      - name: Upload unit test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results-${{ matrix.context }}
+          path: artifacts/test-results
+          if-no-files-found: ignore
+
+  # Testcontainers builds the real service image from its own Dockerfile, so this needs the
+  # Docker daemon. Testing the e2e csproj alone is enough - it pulls in what it references.
+  e2e:
+    name: E2E tests (${{ matrix.context }})
+    needs: [changes, build]
+    if: needs.changes.outputs.contexts != '[]'
+    runs-on: ubuntu-latest
+    # Measured: 1:27 (Security) to 2:32 (Notification, three deploy units) on a cold cache.
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        context: ${{ fromJSON(needs.changes.outputs.contexts) }}
+    env:
+      E2E_TESTS: src/Server/src/Crnc.Oms.${{ matrix.context }}/Crnc.Oms.${{ matrix.context }}.E2ETests/Crnc.Oms.${{ matrix.context }}.E2ETests.csproj
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('src/Server/**/*.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      # No DOCKER_HOST: the tcp://localhost:2375 workaround in AGENTS.md is Docker Desktop
+      # only. Pre-pulling keeps the download out of the fixtures' readiness timeouts.
+      - name: Warm up Docker base images
+        run: |
+          set -euo pipefail
+          docker version
+          docker pull mcr.microsoft.com/dotnet/sdk:10.0
+          docker pull mcr.microsoft.com/dotnet/aspnet:10.0
+
+      - name: E2E tests
+        run: |
+          set -euo pipefail
+          dotnet test "$E2E_TESTS" \
+            --configuration Release \
+            --logger "trx;LogFileName=e2e-tests.trx" \
+            --results-directory artifacts/test-results
+
+      - name: Upload e2e test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-results-${{ matrix.context }}
+          path: artifacts/test-results
+          if-no-files-found: ignore
+
+  # The one status check to require in branch protection: the matrix jobs skip legitimately
+  # on client-only or docs-only PRs, and requiring those directly would hang such a PR.
+  backend-ci:
+    name: Backend CI
+    if: always()
+    needs: [changes, build, e2e]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check job results
+        env:
+          CHANGES_RESULT: ${{ needs.changes.result }}
+          BUILD_RESULT: ${{ needs.build.result }}
+          E2E_RESULT: ${{ needs.e2e.result }}
+        run: |
+          set -euo pipefail
+          echo "changes: $CHANGES_RESULT"
+          echo "build:   $BUILD_RESULT"
+          echo "e2e:     $E2E_RESULT"
+
+          failed=0
+          for result in "$CHANGES_RESULT" "$BUILD_RESULT" "$E2E_RESULT"; do
+            case "$result" in
+              success|skipped) ;;
+              *) failed=1 ;;
+            esac
+          done
+
+          if [ "$failed" = "1" ]; then
+            echo "::error title=Backend CI failed::At least one upstream job did not succeed."
+            exit 1
+          fi
+
+          echo "All backend CI jobs succeeded or were skipped."
