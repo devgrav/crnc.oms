@@ -22,6 +22,8 @@ Each backend service is its own independently buildable/deployable solution and 
 - `prometheus/`, `grafana/` — Docker build contexts for the monitoring stack.
 - `docker-compose.yml` (repo root) — wires every service, its DB, and the monitoring stack together for local runs.
 - `docs/migrations/` — written-up plans for cross-cutting migrations (e.g. `security-net10-migration-plan.md`). Put a plan here before starting a multi-service migration, and update it as steps land.
+- `docs/ci/` — how the pipelines are put together and why (`backend-ci.md`). Read it before changing `.github/workflows/`.
+- `.github/workflows/` — CI. Today just `backend-ci.yml` (see "CI" under Commands).
 - `README.md` (Russian) — the product-level spec: what each bounded context is supposed to do, the messaging flows in prose, and links to the architecture diagrams / Miro context map. Read it for intent; this file for mechanics.
 
 ## Architecture (per backend service)
@@ -149,7 +151,7 @@ dotnet build src/Server/src/Crnc.Oms.Sales/Crnc.Oms.Sales.sln
 dotnet test src/Server/src/Crnc.Oms.Sales/Crnc.Oms.Sales.Tests/Crnc.Oms.Sales.Tests.csproj
 dotnet test src/Server/src/Crnc.Oms.Sales/Crnc.Oms.Sales.Tests/Crnc.Oms.Sales.Tests.csproj --filter FullyQualifiedName~<TestName>
 ```
-Other solutions: `Crnc.Oms.Security.sln`, `Crnc.Oms.Production.sln`, `Crnc.Oms.Notification.sln` (and per-sub-service `.sln` files under `Crnc.Oms.Notification/`). `src/Server/Crnc.Oms.sln` exists but individual context solutions are what map to the Docker builds.
+Other solutions: `Crnc.Oms.Security.sln`, `Crnc.Oms.Production.sln`, `Crnc.Oms.Notification.sln` (and per-sub-service `.sln` files under `Crnc.Oms.Notification/`). `src/Server/Crnc.Oms.sln` exists but individual context solutions are what map to the Docker builds — and it is **not a superset of them**: it carries only one of the four e2e projects (`Crnc.Oms.Security.E2ETests`), so building or testing through it silently skips the Sales, Production and Notification suites. Always drive CI and scripted runs from the per-context solutions.
 
 All four contexts are on `net10.0` — Security, Sales, Production and Notification; `netcoreapp3.1` is gone from the repository, and so are the `NETSDK1138` warnings that used to come with it. `.Messaging.Contract` projects stay on `netstandard2.0` by design. Every e2e test project is `net10.0`, drives its context over HTTP/messaging through containers rather than via `ProjectReference` to the service (see "Test conventions" above for Production's one narrow exception), and is a member of its context's `.sln` — safe because each Dockerfile restores/publishes an explicit `.csproj`, not the whole solution:
 ```
@@ -158,7 +160,17 @@ dotnet test src/Server/src/Crnc.Oms.Sales/Crnc.Oms.Sales.E2ETests/Crnc.Oms.Sales
 dotnet test src/Server/src/Crnc.Oms.Production/Crnc.Oms.Production.E2ETests/Crnc.Oms.Production.E2ETests.csproj
 dotnet test src/Server/src/Crnc.Oms.Notification/Crnc.Oms.Notification.E2ETests/Crnc.Oms.Notification.E2ETests.csproj
 ```
-**On Windows, set `DOCKER_HOST=tcp://localhost:2375` first** (and enable "Expose daemon on tcp://localhost:2375 without TLS" in Docker Desktop) — Testcontainers doesn't pick up Docker Desktop's `desktop-linux` npipe context on its own and hangs instead of failing fast.
+**On Windows, set `DOCKER_HOST=tcp://localhost:2375` first** (and enable "Expose daemon on tcp://localhost:2375 without TLS" in Docker Desktop) — Testcontainers doesn't pick up Docker Desktop's `desktop-linux` npipe context on its own and hangs instead of failing fast. This is a Docker Desktop quirk only; on a Linux CI runner Testcontainers finds the socket by itself, which is why `backend-ci.yml` does not set `DOCKER_HOST`.
+
+### CI (`.github/workflows/backend-ci.yml`)
+
+Backend only — the SPA has no pipeline yet. Runs on pushes to `master`, on every PR, and on manual dispatch. Design notes and the reasoning behind each choice live in `docs/ci/backend-ci.md`; the mechanics worth knowing before touching anything:
+
+- **Path-filtered.** A `changes` job diffs against the PR base (or `github.event.before` on a push) and emits a JSON array of the bounded contexts that were touched; `build` and `e2e` are matrices over that array. Contexts are self-contained under `src/Server/src/Crnc.Oms.<Context>/` with no `ProjectReference` crossing that boundary, which is what makes a pure path check sound — **keep it that way, or the filter starts lying**. A change to `backend-ci.yml` itself, a manual dispatch, or an unresolvable base commit all force the full set.
+- **Everything is derived from the context name.** `Crnc.Oms.<C>.sln`, `Crnc.Oms.<C>.Tests` and `Crnc.Oms.<C>.E2ETests` are looked up by convention, and the unit-test step is skipped when the project doesn't exist (only Sales has one today). Add a `Crnc.Oms.<C>.Tests` project per the "Test conventions" above and CI picks it up with no workflow edit.
+- **`backend-ci` is the one job to require in branch protection.** The matrix jobs are conditional and legitimately skip on client-only or docs-only PRs; requiring them directly would hang such a PR forever. The summary job treats `success` and `skipped` as green.
+- **No third-party actions** — `actions/checkout`, `setup-dotnet`, `cache`, `upload-artifact` only. Keep it that way.
+- TRX results for both test kinds are uploaded as artifacts on every run, pass or fail.
 
 ### Frontend (`src/Client`)
 
@@ -172,6 +184,14 @@ TypeScript config: `tsconfig.json`; linting: `tslint.json` (tslint, not eslint).
 **The image build pins `node:16-alpine` deliberately** (`src/Client/Dockerfile`). The floating `node:alpine` tag now resolves to Node 26, which no longer ships yarn at all — `RUN yarn` fails with `yarn: not found` — and whose OpenSSL 3 dropped the `md4` hash that webpack 3 relies on. Node 16 is the last LTS of this frontend's era and carries yarn 1.22, matching the v1 `yarn.lock`. Don't unpin it without upgrading webpack first.
 
 ## Commit messages
+
+**Keep them compact: subject ≤ 72 characters, body ≤ ~500 characters** — roughly 5–7 lines
+wrapped at 72 columns. The body answers *why*, in as few sentences as that takes; it is not
+a place to restate the diff, enumerate every decision, or narrate the work.
+
+A commit that genuinely needs more room — a tricky migration step, a non-obvious bug fix —
+may exceed the budget, but it should be the exception you can justify, not the default
+shape. Multi-paragraph bodies in the history predate this rule.
 
 **No AI attribution in commits.** A commit message in this repository ends with its
 last content line — nothing after it. Specifically, never append:
