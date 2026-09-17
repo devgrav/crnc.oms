@@ -189,12 +189,6 @@ TypeScript config: `tsconfig.json`; linting: `tslint.json` (tslint, not eslint).
 wrapped at 72 columns. The body answers *why*, in as few sentences as that takes; it is not
 a place to restate the diff, enumerate every decision, or narrate the work.
 
-The rule that actually enforces the budget: **never duplicate prose that already exists in
-the repository.** If the reasoning is written up under `docs/`, the commit cites the file
-and stops — one sentence of "why", then the pointer. Two or three paragraphs of design
-rationale in a commit body is a sign the text belongs in `docs/` instead. The same goes for
-PR descriptions: link the doc, don't paste it.
-
 A commit that genuinely needs more room — a tricky migration step, a non-obvious bug fix —
 may exceed the budget, but it should be the exception you can justify, not the default
 shape. Multi-paragraph bodies in the history predate this rule.
