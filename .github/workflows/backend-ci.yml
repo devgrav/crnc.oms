@@ -1,0 +1,244 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+# A new push to the same branch supersedes the previous run - the e2e jobs are the
+# expensive part of this pipeline and there is no point finishing a stale one.
+concurrency:
+  group: backend-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_VERSION: '10.0.x'
+  DOTNET_NOLOGO: 'true'
+  DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 'true'
+
+jobs:
+  # Each bounded context lives entirely under src/Server/src/Crnc.Oms.<Context>/ and has no
+  # ProjectReference crossing that boundary, so "which contexts changed" is a pure path
+  # question - no build graph analysis needed.
+  changes:
+    name: Detect changed contexts
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      contexts: ${{ steps.detect.outputs.contexts }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: detect
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          set -euo pipefail
+
+          BUILD_ALL=0
+          FILES=""
+
+          if [ "$EVENT_NAME" = "workflow_dispatch" ] \
+            || [ -z "${BASE_SHA:-}" ] \
+            || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ] \
+            || ! git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
+            # Manual run, or a brand-new branch whose base commit we cannot resolve.
+            echo "No usable base commit - building every context."
+            BUILD_ALL=1
+          else
+            FILES=$(git diff --name-only "$BASE_SHA" HEAD)
+            echo "Changed files:"
+            printf '%s\n' "$FILES" | sed 's/^/  /'
+
+            # A change to the pipeline itself must be exercised against everything it drives.
+            if printf '%s\n' "$FILES" | grep -q '^\.github/workflows/backend-ci\.yml$'; then
+              echo "The workflow itself changed - building every context."
+              BUILD_ALL=1
+            fi
+          fi
+
+          SELECTED=""
+          for ctx in Security Sales Production Notification; do
+            if [ "$BUILD_ALL" = "1" ] \
+              || printf '%s\n' "$FILES" | grep -q "^src/Server/src/Crnc\.Oms\.${ctx}/"; then
+              SELECTED="$SELECTED $ctx"
+            fi
+          done
+
+          # Hand-rolled JSON rather than jq: the values come from the fixed list above, so
+          # there is nothing to escape, and the step stays independent of runner tooling.
+          if [ -z "$SELECTED" ]; then
+            CONTEXTS='[]'
+          else
+            CONTEXTS='['
+            separator=''
+            for ctx in $SELECTED; do
+              CONTEXTS="${CONTEXTS}${separator}\"${ctx}\""
+              separator=','
+            done
+            CONTEXTS="${CONTEXTS}]"
+          fi
+
+          echo "Selected contexts: $CONTEXTS"
+          echo "contexts=$CONTEXTS" >> "$GITHUB_OUTPUT"
+          echo "Contexts to build: \`$CONTEXTS\`" >> "$GITHUB_STEP_SUMMARY"
+
+  # Fast signal: does the context compile, and do its unit tests pass. Deliberately kept
+  # separate from e2e so a compile error goes red in a couple of minutes instead of twenty.
+  build:
+    name: Build & unit tests (${{ matrix.context }})
+    needs: changes
+    if: needs.changes.outputs.contexts != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        context: ${{ fromJSON(needs.changes.outputs.contexts) }}
+    env:
+      # Per-context solutions are what map to the Docker builds; src/Server/Crnc.Oms.sln is
+      # NOT a superset of them (it carries only one of the four e2e projects).
+      SLN: src/Server/src/Crnc.Oms.${{ matrix.context }}/Crnc.Oms.${{ matrix.context }}.sln
+      UNIT_TESTS: src/Server/src/Crnc.Oms.${{ matrix.context }}/Crnc.Oms.${{ matrix.context }}.Tests/Crnc.Oms.${{ matrix.context }}.Tests.csproj
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('src/Server/**/*.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Restore
+        run: dotnet restore "$SLN"
+
+      - name: Build
+        run: dotnet build "$SLN" --configuration Release --no-restore
+
+      - name: Unit tests
+        run: |
+          set -euo pipefail
+          # Only Sales has a Domain unit-test project today; AGENTS.md expects the other
+          # contexts to grow one, so this picks it up by convention, not by a hardcoded list.
+          if [ -f "$UNIT_TESTS" ]; then
+            dotnet test "$UNIT_TESTS" \
+              --configuration Release \
+              --no-build \
+              --logger "trx;LogFileName=unit-tests.trx" \
+              --results-directory artifacts/test-results
+          else
+            echo "::notice title=No unit tests::Crnc.Oms.${{ matrix.context }}.Tests does not exist yet - skipping."
+          fi
+
+      - name: Upload unit test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results-${{ matrix.context }}
+          path: artifacts/test-results
+          if-no-files-found: ignore
+
+  # The e2e suites drive the real Docker image built from the service's own Dockerfile via
+  # Testcontainers, so this job needs the Docker daemon (present on ubuntu-latest) and a lot
+  # more wall clock than the build job. It deliberately does not build the whole solution:
+  # `dotnet test` on the e2e csproj alone pulls in everything that project references.
+  e2e:
+    name: E2E tests (${{ matrix.context }})
+    needs: [changes, build]
+    if: needs.changes.outputs.contexts != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        context: ${{ fromJSON(needs.changes.outputs.contexts) }}
+    env:
+      E2E_TESTS: src/Server/src/Crnc.Oms.${{ matrix.context }}/Crnc.Oms.${{ matrix.context }}.E2ETests/Crnc.Oms.${{ matrix.context }}.E2ETests.csproj
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('src/Server/**/*.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      # DOCKER_HOST is deliberately not set here: the tcp://localhost:2375 workaround in
+      # AGENTS.md is a Windows/Docker Desktop thing. On a Linux runner Testcontainers finds
+      # the socket on its own. Pre-pulling the base images keeps that download out of the
+      # fixture's own readiness timeouts.
+      - name: Warm up Docker base images
+        run: |
+          set -euo pipefail
+          docker version
+          docker pull mcr.microsoft.com/dotnet/sdk:10.0
+          docker pull mcr.microsoft.com/dotnet/aspnet:10.0
+
+      - name: E2E tests
+        run: |
+          set -euo pipefail
+          dotnet test "$E2E_TESTS" \
+            --configuration Release \
+            --logger "trx;LogFileName=e2e-tests.trx" \
+            --results-directory artifacts/test-results
+
+      - name: Upload e2e test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-results-${{ matrix.context }}
+          path: artifacts/test-results
+          if-no-files-found: ignore
+
+  # Single stable status check for branch protection. The matrix jobs are conditional, so
+  # requiring them directly would block any PR that touches only one context, or none.
+  backend-ci:
+    name: Backend CI
+    if: always()
+    needs: [changes, build, e2e]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check job results
+        env:
+          CHANGES_RESULT: ${{ needs.changes.result }}
+          BUILD_RESULT: ${{ needs.build.result }}
+          E2E_RESULT: ${{ needs.e2e.result }}
+        run: |
+          set -euo pipefail
+          echo "changes: $CHANGES_RESULT"
+          echo "build:   $BUILD_RESULT"
+          echo "e2e:     $E2E_RESULT"
+
+          failed=0
+          for result in "$CHANGES_RESULT" "$BUILD_RESULT" "$E2E_RESULT"; do
+            case "$result" in
+              success|skipped) ;;
+              *) failed=1 ;;
+            esac
+          done
+
+          if [ "$failed" = "1" ]; then
+            echo "::error title=Backend CI failed::At least one upstream job did not succeed."
+            exit 1
+          fi
+
+          echo "All backend CI jobs succeeded or were skipped."
