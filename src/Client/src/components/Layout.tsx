@@ -2,6 +2,7 @@ import { ActionIcon, Container, Group, Image, Text, Tooltip } from "@mantine/cor
 import { NavLink, Outlet, useNavigate } from "react-router";
 import logo from "@/assets/images/logo.png";
 import NotificationsBell from "@/components/NotificationsBell";
+import { formatAppVersion } from "@/appVersion";
 import { useAuth } from "@/hooks/useAuth";
 import { Roles } from "@/types/auth.types";
 import classes from "./Layout.module.css";
@@ -56,6 +57,11 @@ export default function Layout() {
             </header>
             <Container size="xl" py="md" component="main">
                 <Outlet />
+            </Container>
+            <Container size="xl" pb="sm" component="footer">
+                <Text size="xs" c="dimmed" ta="right" data-testid="app-version">
+                    {formatAppVersion()}
+                </Text>
             </Container>
         </>
     );

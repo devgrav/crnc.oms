@@ -168,6 +168,10 @@ services:
     # в docs/migrations/client-modern-stack-migration-plan.md).
     build:
       context: "src/Client/"
+      args:
+        # Не задан - в UI показывается "dev". Пайплайн сборки образа может
+        # передать сюда реальный коммит: GIT_COMMIT=$(git rev-parse HEAD).
+        GIT_COMMIT: "${GIT_COMMIT:-}"
     container_name: 'crnc-oms-ui'
     restart: always
     profiles: ["client", "full"]
