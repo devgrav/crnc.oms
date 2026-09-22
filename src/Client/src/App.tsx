@@ -7,8 +7,6 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import AppRoutes from "@/routes";
 import "@mantine/core/styles.css";
 
-// Серверные данные живут в кэше React Query, а не в сторах: загрузка, isLoading,
-// инвалидация после мутаций - его работа. См. §3.2 плана миграции.
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {

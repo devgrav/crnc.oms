@@ -11,8 +11,7 @@ export interface OrderFormProps {
     statuses: TextValue[];
     materialSources: TextValue[];
     signoffTypes: TextValue[];
-    // Поля статуса, источника материала и типа подписи есть только у существующего
-    // заказа: новый создаётся без них. Один компонент с конфигом вместо двух форм.
+    // Статус, источник материала и тип подписи есть только у существующего заказа.
     isEdit: boolean;
     disabled: boolean;
     dateSentToCustomer?: string;

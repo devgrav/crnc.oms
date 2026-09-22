@@ -1,5 +1,6 @@
 import { use } from "react";
 import { ActionIcon, Badge, Group, List, Popover, Text } from "@mantine/core";
+import { IconBell } from "@tabler/icons-react";
 import { NotificationsContext } from "@/notifications/NotificationsContext";
 
 export default function NotificationsBell() {
@@ -10,7 +11,7 @@ export default function NotificationsBell() {
             <Popover.Target>
                 <Group gap={4}>
                     <ActionIcon variant="subtle" aria-label="Notifications" data-testid="notifications-bell">
-                        🔔
+                        <IconBell size={18} />
                     </ActionIcon>
                     {messages.length > 0 && (
                         <Badge color="blue" data-testid="notifications-count">

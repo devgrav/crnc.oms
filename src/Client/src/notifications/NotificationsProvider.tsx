@@ -8,16 +8,12 @@ interface NotificationsProviderProps {
     children: ReactNode;
 }
 
-// Подключение к хабу одно на сессию и живёт на уровне приложения, а не внутри
-// колокольчика: в старом коде HubConnection лежал в state компонента и
-// пересоздавался при каждом его перемонтировании (§8 плана миграции).
 export default function NotificationsProvider({ children }: NotificationsProviderProps) {
     const { isAuthenticated } = useAuth();
     const [messages, setMessages] = useState<string[]>([]);
 
-    // Сброс накопленных сообщений при выходе делается в рендере, а не эффектом:
-    // это подстройка состояния под изменившийся вход, а не синхронизация с внешней
-    // системой. Внешняя система - само подключение к хабу - живёт в эффекте ниже.
+    // Подстройка состояния под изменившийся вход, а не синхронизация с внешней
+    // системой: сама подписка живёт в эффекте ниже.
     const [wasAuthenticated, setWasAuthenticated] = useState(isAuthenticated);
 
     if (wasAuthenticated !== isAuthenticated) {
@@ -34,8 +30,6 @@ export default function NotificationsProvider({ children }: NotificationsProvide
         }
 
         // Адрес относительный: хаб проксирует тот же nginx, что и API.
-        // accessTokenFactory читает токен на момент подключения - адресация
-        // на сервере идёт по claim nameid из этого JWT.
         const connection: HubConnection = new HubConnectionBuilder()
             .withUrl("/hubs/push", { accessTokenFactory: () => getStoredToken() ?? "" })
             .withAutomaticReconnect()

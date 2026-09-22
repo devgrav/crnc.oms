@@ -17,8 +17,7 @@ Object.defineProperty(window, "matchMedia", {
     }),
 });
 
-// Глобальный cleanup: без него компонент из предыдущего теста остаётся в DOM
-// и следующий тест ищет элементы в чужом дереве.
+// Без глобального cleanup компонент предыдущего теста остаётся в DOM.
 afterEach(() => {
     cleanup();
     sessionStorage.clear();

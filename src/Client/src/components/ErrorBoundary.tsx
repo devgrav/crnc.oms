@@ -1,4 +1,4 @@
-import { Component, type ErrorInfo, type ReactNode } from "react";
+import { Component, type ReactNode } from "react";
 
 interface ErrorBoundaryProps {
     children: ReactNode;
@@ -8,20 +8,12 @@ interface ErrorBoundaryState {
     hasError: boolean;
 }
 
-// Единственный классовый компонент в приложении: хуковой замены componentDidCatch
-// в React 19 нет. Без него упавший компонент даёт белый экран - §7.1 плана.
+// Единственный классовый компонент: хуковой замены componentDidCatch в React 19 нет.
 export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     public state: ErrorBoundaryState = { hasError: false };
 
     public static getDerivedStateFromError(): ErrorBoundaryState {
         return { hasError: true };
-    }
-
-    public componentDidCatch(error: Error, info: ErrorInfo): void {
-        // Логирование пойдёт в отдельный слой, когда он появится; пока ошибка
-        // не должна исчезать бесследно.
-        void error;
-        void info;
     }
 
     public render(): ReactNode {

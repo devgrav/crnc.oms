@@ -13,8 +13,7 @@ export interface OrderRow {
     statusEnum: OrderStatus;
 }
 
-// Поля формы заказа. Имена совпадают с ключами fieldErrors, которые отдаёт
-// Sales — это контракт между фронтом и бэком, см. §4.3 плана миграции.
+// Имена полей совпадают с ключами fieldErrors, которые отдаёт Sales.
 export interface OrderFormValues {
     jobType: number;
     jobDescription: string;
@@ -29,12 +28,10 @@ export interface OrderFormValues {
     signoffType?: number | null;
 }
 
-// GET /api/orders/new — пустая форма плюс справочник типов работ.
 export interface NewOrderResponse extends OrderFormValues {
     jobTypes: TextValue[];
 }
 
-// GET /api/orders/{id} — то же плюс остальные справочники и данные о конверсии.
 export interface EditOrderResponse extends OrderFormValues {
     id: string;
     jobTypes: TextValue[];
@@ -56,12 +53,10 @@ export const OrderStatus = {
 
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
 
-// Заказ, уже ушедший в работу или закрытый, редактировать нельзя.
 export function isOrderReadOnly(status: number | undefined): boolean {
     return status === OrderStatus.ConvertedToJob || status === OrderStatus.Closed;
 }
 
-// PUT /api/orders принимает ту же форму плюс идентификатор.
 export interface UpdateOrderPayload extends OrderFormValues {
     id: string;
 }

@@ -1,6 +1,3 @@
-// Контракт Security/AccountsController.Authenticate -> CurrentUserDto.
-// Поле id старый клиент не объявлял, хотя бэкенд его отдаёт; оно нужно, чтобы
-// сопоставлять адресата push-уведомлений с текущим пользователем.
 export interface CurrentUser {
     id: string;
     login: string;

@@ -25,8 +25,6 @@ const emptyValues: OrderFormValues = {
     customerContactPersonPhone: "",
 };
 
-// Одна карточка на создание и редактирование: отличаются набором видимых полей
-// и вызываемым сервисом. См. §6.4 плана миграции.
 export default function OrderCardPage() {
     const { id } = useParams<{ id: string }>();
     const isEdit = id !== undefined && id !== "new";
@@ -45,9 +43,8 @@ export default function OrderCardPage() {
 
     const loaded = query.data;
 
-    // Состояние формы подстраивается под пришедшие данные прямо в рендере, а не
-    // эффектом: эффект здесь дал бы лишний каскад рендеров. React Query отдаёт
-    // стабильную ссылку на закэшированный объект, поэтому срабатывает один раз.
+    // Подстройка состояния под загруженные данные - в рендере, а не эффектом:
+    // React Query отдаёт стабильную ссылку, поэтому срабатывает один раз.
     const [syncedFrom, setSyncedFrom] = useState<object | null>(null);
 
     if (loaded && loaded !== syncedFrom) {
@@ -84,8 +81,11 @@ export default function OrderCardPage() {
         validation.setFromResult(result);
     }
 
-    const readOnly = isEdit && isOrderReadOnly(values.status ?? undefined);
     const editResponse = loaded && "statuses" in loaded ? loaded : undefined;
+
+    // Считать по values.status нельзя: выбор "Converted to job" погасил бы форму
+    // вместе с кнопкой Save, и сохранить перевод стало бы невозможно.
+    const readOnly = isOrderReadOnly(editResponse?.status ?? undefined);
 
     return (
         <Modal
@@ -94,8 +94,7 @@ export default function OrderCardPage() {
             size="lg"
             title={isEdit ? `Edit order ${id ?? ""}` : "Add new order"}
         >
-            {/* testid висит на содержимом, а не на Modal: его корневой элемент -
-                обёртка без собственного бокса, и тест не считает её видимой. */}
+            {/* testid на содержимом: корень Mantine Modal не имеет своего бокса. */}
             <div data-testid="order-card">
             <LoadingOverlay visible={query.isLoading || isSaving} />
             <form onSubmit={(event) => void handleSubmit(event)} id="orderForm">

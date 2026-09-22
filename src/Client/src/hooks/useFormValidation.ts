@@ -11,8 +11,6 @@ export interface FormValidation {
     clearAllErrors: () => void;
 }
 
-// Одна реализация на всё приложение. В старом коде эта логика жила дважды:
-// MobX-классом ValidationInfo и руками в UserCardEdit.onChange.
 export function useFormValidation(): FormValidation {
     const [errors, setErrors] = useState<FieldErrors>({});
     const [generalError, setGeneralError] = useState("");
@@ -22,8 +20,7 @@ export function useFormValidation(): FormValidation {
         setGeneralError(result.generalError ?? "");
     }, []);
 
-    // Ошибка поля гаснет при первом же вводе пользователя - иначе подсветка
-    // держится до следующего сабмита и врёт.
+    // Ошибка поля гаснет при первом вводе, а не держится до следующего сабмита.
     const clearFieldError = useCallback((field: string) => {
         setErrors((current) => {
             if (!(field in current)) {

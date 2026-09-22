@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import {
     Alert,
+    Avatar,
     Button,
     Card,
     Group,
@@ -12,11 +13,13 @@ import {
     Stack,
     Text,
 } from "@mantine/core";
+import { IconPencil, IconSearch, IconUser, IconUserPlus, IconX } from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, Outlet } from "react-router";
 import UserFilterForm from "./UserFilterForm";
 import { useServiceQuery } from "@/hooks/useServiceQuery";
 import { filterUsers } from "./filterUsers";
+import { photoSrc } from "./userPhoto";
 import { deleteUser, getUsers } from "@/services/users.service";
 import type { UserFilter, UserItem } from "@/types/users.types";
 
@@ -72,13 +75,19 @@ export default function UsersPage() {
             {error && <Alert color="red" mb="sm">{error.message}</Alert>}
 
             <Group justify="flex-end" mb="sm">
-                <Button component={Link} to="/users/new" data-testid="users-add">
+                <Button
+                    component={Link}
+                    to="/users/new"
+                    leftSection={<IconUserPlus size={16} />}
+                    data-testid="users-add"
+                >
                     Add user
                 </Button>
                 <Popover opened={isFilterOpen} onChange={setIsFilterOpen} position="bottom-end" withArrow>
                     <Popover.Target>
                         <Button
                             variant="light"
+                            leftSection={<IconSearch size={16} />}
                             onClick={() => { setIsFilterOpen((open) => !open); }}
                             data-testid="users-search-open"
                         >
@@ -129,9 +138,14 @@ function UserCard({ user, onDelete }: { user: UserItem; onDelete: (user: UserIte
     return (
         <Card withBorder padding="sm" data-testid="user-card">
             <Stack gap={4}>
-                <Group justify="space-between">
-                    <Text fw={600} data-testid="user-fullname">{user.fullName}</Text>
-                    <Group gap={4}>
+                <Group justify="space-between" wrap="nowrap">
+                    <Group gap="xs" wrap="nowrap">
+                        <Avatar src={photoSrc(user)} alt={user.fullName} radius="sm" data-testid="user-photo">
+                            <IconUser size={18} />
+                        </Avatar>
+                        <Text fw={600} data-testid="user-fullname">{user.fullName}</Text>
+                    </Group>
+                    <Group gap={4} wrap="nowrap">
                         <Button
                             component={Link}
                             to={`/users/${user.id}`}
@@ -140,7 +154,7 @@ function UserCard({ user, onDelete }: { user: UserItem; onDelete: (user: UserIte
                             data-testid="user-edit"
                             aria-label={`Edit ${user.login ?? ""}`}
                         >
-                            ✎
+                            <IconPencil size={14} />
                         </Button>
                         <Button
                             size="compact-xs"
@@ -150,7 +164,7 @@ function UserCard({ user, onDelete }: { user: UserItem; onDelete: (user: UserIte
                             data-testid="user-delete"
                             aria-label={`Delete ${user.login ?? ""}`}
                         >
-                            ✕
+                            <IconX size={14} />
                         </Button>
                     </Group>
                 </Group>

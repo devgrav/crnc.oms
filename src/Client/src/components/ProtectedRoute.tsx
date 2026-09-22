@@ -15,8 +15,7 @@ export default function ProtectedRoute({ roles }: ProtectedRouteProps) {
         return <Navigate to="/login" replace state={{ from: location.pathname }} />;
     }
 
-    // Админ проходит на любой маршрут независимо от объявленных roles. Поведение
-    // намеренное и перенесено из старого PrivateRoute как есть - см. §5.3 плана.
+    // Админ проходит на любой маршрут независимо от объявленных roles - намеренно.
     if (user.role === Roles.Admin) {
         return <Outlet />;
     }

@@ -11,8 +11,6 @@ import UsersPage from "@/pages/users/UsersPage";
 import UserCardPage from "@/pages/users/UserCardPage";
 import { Roles } from "@/types/auth.types";
 
-// Карточка заказа - самый тяжёлый экран и единственный кандидат на ленивую
-// загрузку: три подформы и четыре справочника.
 const OrderCardPage = lazy(() => import("@/pages/orders/OrderCardPage"));
 
 const managerRoles = [Roles.Manager, Roles.MainManager];
