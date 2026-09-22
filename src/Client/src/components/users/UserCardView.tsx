@@ -38,7 +38,7 @@ export default class UserCardView extends React.Component<UserCardViewProps>{
 
     public render(){
         return (
-            <Card color="blue">
+            <Card data-testid="user-card" color="blue">
                 <Card.Content>
                     <Image
                         floated="left"
@@ -51,16 +51,16 @@ export default class UserCardView extends React.Component<UserCardViewProps>{
                     <Button.Group floated="right" size="mini" basic>
                         <Button
                             as={Link}
-                            to={`/users/${this.props.userItem.id}`}                   
+                            data-testid="user-edit" to={`/users/${this.props.userItem.id}`}
                             icon="pencil"
                         />             
                         <Button                                                       
-                            icon={{name: "cancel", color: "red"}}
+                            data-testid="user-delete" icon={{name: "cancel", color: "red"}}
                             onClick={this.onDeleteClick}
                         />          
                     </Button.Group>
                     <Card.Header>
-                        {this.props.userItem.fullName}
+                        <span data-testid="user-fullname">{this.props.userItem.fullName}</span>
                     </Card.Header>
                     <Card.Meta>
                         {this.props.userItem.role}

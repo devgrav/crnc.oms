@@ -53,10 +53,11 @@ export default class OrderCard<TModel extends BaseOrderModel> extends React.Comp
             return <Redirect to="/orders"/>
 
         return (
-            <Modal open={true} closeIcon onClose={this.onClose}>
-                <Modal.Header>{headerText}</Modal.Header>
+            <Modal data-testid="order-card" open={true} closeIcon onClose={this.onClose}>
+                <Modal.Header data-testid="order-card-header">{headerText}</Modal.Header>
                 <Modal.Content as={Segment} basic clearing loading={isLoading}>
                     {validationInfo && validationInfo.hasAnyValidationInfo && <Message
+                        data-testid="order-validation-summary"
                         error
                         header="There was some errors with your submission"
                         list={validationInfo.validationMessages}
@@ -92,9 +93,9 @@ export default class OrderCard<TModel extends BaseOrderModel> extends React.Comp
                     </Form>
                 </Modal.Content>
                 <Modal.Actions>
-                    {!model.isDisabledForEdit && 
-                        <Button basic color="green" type="submit" content="Save" form="orderForm"/>}
-                        <Button basic color="red" type="reset" content="Cancel" onClick={this.onCancel}/>
+                    {!model.isDisabledForEdit &&
+                        <Button data-testid="order-save" basic color="green" type="submit" content="Save" form="orderForm"/>}
+                        <Button data-testid="order-cancel" basic color="red" type="reset" content="Cancel" onClick={this.onCancel}/>
                 </Modal.Actions>
             </Modal>
         );
