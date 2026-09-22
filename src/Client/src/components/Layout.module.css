@@ -1,0 +1,15 @@
+.header {
+    border-bottom: 1px solid var(--mantine-color-default-border);
+    background: var(--mantine-color-body);
+}
+
+.link {
+    color: var(--mantine-color-text);
+    text-decoration: none;
+    font-size: var(--mantine-font-size-sm);
+    padding: 0.25rem 0;
+}
+
+.link:hover {
+    color: var(--mantine-primary-color-filled);
+}

@@ -1,5 +1,34 @@
-// Каркас приложения. Роутинг, layout и экраны появляются на следующих шагах
-// миграции (§5 и §6 плана в docs/migrations/client-modern-stack-migration-plan.md).
+import { MantineProvider } from "@mantine/core";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter } from "react-router";
+import AuthProvider from "@/auth/AuthProvider";
+import ErrorBoundary from "@/components/ErrorBoundary";
+import AppRoutes from "@/routes";
+import "@mantine/core/styles.css";
+
+// Серверные данные живут в кэше React Query, а не в сторах: загрузка, isLoading,
+// инвалидация после мутаций - его работа. См. §3.2 плана миграции.
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            retry: 1,
+            refetchOnWindowFocus: false,
+        },
+    },
+});
+
 export default function App() {
-    return <h1>Order management system</h1>;
+    return (
+        <ErrorBoundary>
+            <MantineProvider>
+                <QueryClientProvider client={queryClient}>
+                    <BrowserRouter>
+                        <AuthProvider>
+                            <AppRoutes />
+                        </AuthProvider>
+                    </BrowserRouter>
+                </QueryClientProvider>
+            </MantineProvider>
+        </ErrorBoundary>
+    );
 }
