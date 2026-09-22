@@ -114,9 +114,12 @@ docker-compose --profile sales up         # sales + its real deps: security, not
 docker-compose --profile production up
 docker-compose --profile notification up  # all 3 notification sub-services + push-client + security
 docker-compose --profile client up        # the SPA + the whole backend it talks to
+docker-compose --profile server up        # everything except the SPA - see below
 docker-compose --profile monitoring up    # prometheus + grafana only
 ```
-Available profiles: `security`, `sales`, `production`, `notification`, `client`, `monitoring`, `full`. Docker Compose does **not** auto-activate a dependency's own profile via `depends_on` — every service lists every context profile that can reach it transitively, so e.g. `security-api` carries `security`, `sales`, `production`, `notification`, and `client` (every context that ends up depending on it), not just `security`. Keep this in sync when changing `depends_on` edges or adding services.
+**`server` is `full` minus `crnc-oms-ui`**: every backend service, both databases, the broker, the push console client and the monitoring stack, with no SPA image built or started. That is what you want while working on the frontend with `npm run dev` — Vite serves the UI on the same port 8092 and proxies to the backends, so leaving the containerised SPA out avoids two builds of the same thing and a port clash.
+
+Available profiles: `security`, `sales`, `production`, `notification`, `client`, `server`, `monitoring`, `full`. Docker Compose does **not** auto-activate a dependency's own profile via `depends_on` — every service lists every context profile that can reach it transitively, so e.g. `security-api` carries `security`, `sales`, `production`, `notification`, and `client` (every context that ends up depending on it), not just `security`. Keep this in sync when changing `depends_on` edges or adding services.
 
 Service endpoints once running:
 | Service | URL |
