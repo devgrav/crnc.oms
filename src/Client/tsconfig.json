@@ -1,15 +1,7 @@
 {
-    "compilerOptions": {
-      "module": "commonjs",
-      "target": "es2015", 
-      "allowSyntheticDefaultImports": true, 
-      "sourceMap": true, 
-      "outDir": "ts-build",
-      "jsx": "preserve", 
-      "strict": true,
-      "experimentalDecorators": true
-    },
-    "exclude": [
-      "node_modules" 
-    ]
-  }
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
+}
