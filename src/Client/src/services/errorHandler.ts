@@ -76,11 +76,12 @@ function parseBadRequest<T>(data: unknown): ServiceResult<T> {
 function toFieldErrors(source: Record<string, unknown>): FieldErrors {
     const result: FieldErrors = {};
 
+    // Ошибкой поля считается только массив строк. Скалярные свойства сюда попадать
+    // не должны: иначе ProblemDetails без errors (type/title/status) превращается
+    // в подсветку несуществующих полей вместо общего сообщения.
     for (const [field, messages] of Object.entries(source)) {
         if (Array.isArray(messages) && messages.every((m) => typeof m === "string")) {
             result[field] = messages;
-        } else if (typeof messages === "string") {
-            result[field] = [messages];
         }
     }
 

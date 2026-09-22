@@ -16,6 +16,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Link, Outlet } from "react-router";
 import UserFilterForm from "./UserFilterForm";
 import { useServiceQuery } from "@/hooks/useServiceQuery";
+import { filterUsers } from "./filterUsers";
 import { deleteUser, getUsers } from "@/services/users.service";
 import type { UserFilter, UserItem } from "@/types/users.types";
 
@@ -38,7 +39,7 @@ export default function UsersPage() {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState<UserItem | null>(null);
 
-    const visibleUsers = useMemo(() => applyFilter(users, appliedFilter), [users, appliedFilter]);
+    const visibleUsers = useMemo(() => filterUsers(users, appliedFilter), [users, appliedFilter]);
     const totalPages = Math.max(1, Math.ceil(visibleUsers.length / usersPerPage));
     const pageUsers = visibleUsers.slice((page - 1) * usersPerPage, page * usersPerPage);
 
@@ -161,29 +162,4 @@ function UserCard({ user, onDelete }: { user: UserItem; onDelete: (user: UserIte
             </Stack>
         </Card>
     );
-}
-
-// Поиск клиентский, по уже загруженному списку. Роль участвует в фильтре только
-// когда она действительно выбрана: старый экран сравнивал roleId с Guid.EMPTY,
-// который истинен, и поэтому поиск по логину всегда возвращал пусто (§6.3 плана).
-function applyFilter(users: UserItem[], filter: UserFilter): UserItem[] {
-    return users.filter((user) => {
-        if (filter.fullName && !includes(user.fullName, filter.fullName)) {
-            return false;
-        }
-
-        if (filter.login && !includes(user.login, filter.login)) {
-            return false;
-        }
-
-        if (filter.roleId && user.roleId !== filter.roleId) {
-            return false;
-        }
-
-        return user.isActive === filter.isActive;
-    });
-}
-
-function includes(value: string | undefined, search: string): boolean {
-    return (value ?? "").toLowerCase().includes(search.toLowerCase());
 }
