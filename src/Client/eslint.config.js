@@ -37,4 +37,12 @@ export default tseslint.config(
         files: ["vite.config.ts", "eslint.config.js"],
         languageOptions: { globals: globals.node },
     },
+    {
+        files: ["**/__tests__/**", "src/test/**"],
+        rules: {
+            // Передача замоканного метода в expect() - нормальная практика, а не
+            // потеря this: vi.mocked возвращает ту же функцию, привязки здесь нет.
+            "@typescript-eslint/unbound-method": "off",
+        },
+    },
 );

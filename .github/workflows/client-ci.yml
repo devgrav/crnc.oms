@@ -1,0 +1,166 @@
+name: Client CI
+
+# Design notes and the reasoning behind each choice: docs/ci/client-ci.md
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'src/Client/**'
+      - '.github/workflows/client-ci.yml'
+  pull_request:
+    paths:
+      - 'src/Client/**'
+      - '.github/workflows/client-ci.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: client-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '22.x'
+
+jobs:
+  # Split from e2e so a type error goes red in under a minute instead of waiting
+  # for the whole backend stack to come up.
+  build:
+    name: Lint, types & unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: src/Client
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: src/Client/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      # `npm run build` is `tsc -b && vite build`, so types break the build here,
+      # not only in the editor.
+      - name: Build
+        run: npm run build
+
+      - name: Unit tests
+        run: npx vitest run --reporter=default --reporter=junit --outputFile=artifacts/test-results/unit-tests.xml
+
+      - name: Upload unit test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-unit-test-results
+          path: src/Client/artifacts/test-results
+          if-no-files-found: ignore
+
+  # The suite drives the real image through the browser, so the whole client
+  # profile has to be up: SPA, its nginx proxy, and every backend it talks to.
+  e2e:
+    name: E2E tests
+    needs: build
+    runs-on: ubuntu-latest
+    # Measured locally: ~16s of tests on a warm stand; the budget is the stack build.
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: src/Client/e2e/package-lock.json
+
+      - name: Start the stack
+        run: docker compose --profile client up -d --build
+
+      - name: Install test dependencies
+        working-directory: src/Client/e2e
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      # No E2E_BROWSER_CHANNEL: the system-Chrome fallback exists for machines
+      # where the browser download is blocked, which a runner is not.
+      - name: Wait for the SPA
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 60); do
+            if curl -fsS http://localhost:8092 >/dev/null; then
+              echo "SPA is up after ${attempt}s."
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error title=SPA never came up::http://localhost:8092 did not answer in 60s."
+          docker compose ps
+          exit 1
+
+      - name: E2E tests
+        working-directory: src/Client/e2e
+        run: npm test
+
+      - name: Collect container logs
+        if: failure()
+        run: |
+          mkdir -p src/Client/e2e/results
+          docker compose logs --no-color > src/Client/e2e/results/docker-logs.txt || true
+
+      - name: Upload e2e results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-e2e-results
+          path: |
+            src/Client/e2e/results
+            src/Client/e2e/playwright-report
+            src/Client/e2e/test-results
+          if-no-files-found: ignore
+
+      - name: Stop the stack
+        if: always()
+        run: docker compose --profile client down -v
+
+  # The one status check to require in branch protection: both jobs skip on a
+  # backend-only or docs-only PR, and requiring them directly would hang it.
+  client-ci:
+    name: Client CI
+    if: always()
+    needs: [build, e2e]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check job results
+        env:
+          BUILD_RESULT: ${{ needs.build.result }}
+          E2E_RESULT: ${{ needs.e2e.result }}
+        run: |
+          set -euo pipefail
+          echo "build: $BUILD_RESULT"
+          echo "e2e:   $E2E_RESULT"
+
+          failed=0
+          for result in "$BUILD_RESULT" "$E2E_RESULT"; do
+            case "$result" in
+              success|skipped) ;;
+              *) failed=1 ;;
+            esac
+          done
+
+          if [ "$failed" = "1" ]; then
+            echo "::error title=Client CI failed::At least one upstream job did not succeed."
+            exit 1
+          fi
+
+          echo "All client CI jobs succeeded or were skipped."
