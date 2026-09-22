@@ -1,0 +1,15 @@
+{
+  "name": "crnc.oms.web.client.e2e",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Playwright baseline for the SPA, kept deliberately outside src/Client/package.json - see README.md",
+  "scripts": {
+    "test": "playwright test",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^22.13.1",
+    "typescript": "^5.9.3"
+  }
+}

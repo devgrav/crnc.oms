@@ -32,14 +32,14 @@ export default class TopMenu
                     <Menu.Item as={Link} to="/">
                         <img src={Logo}/>
                     </Menu.Item>
-                    {CurrentUserContext.user.role === Roles.Admin && 
-                        <Menu.Item as={NavLink} to="/users" name="users" link>
+                    {CurrentUserContext.user.role === Roles.Admin &&
+                        <Menu.Item data-testid="nav-users" as={NavLink} to="/users" name="users" link>
                             Users
                         </Menu.Item>}
-                    <Menu.Item as={NavLink} isActive={this.isActiveForDefault} to="/orders" name="orders" link>
+                    <Menu.Item data-testid="nav-orders" as={NavLink} isActive={this.isActiveForDefault} to="/orders" name="orders" link>
                         Orders
                     </Menu.Item>
-                    <Menu.Item as={NavLink} to="/jobs" name="jobs" link>
+                    <Menu.Item data-testid="nav-jobs" as={NavLink} to="/jobs" name="jobs" link>
                         Jobs
                     </Menu.Item>
                     <Menu.Menu position="right">

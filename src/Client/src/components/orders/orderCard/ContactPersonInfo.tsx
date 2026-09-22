@@ -18,7 +18,7 @@ export default class ContactPersonInfo extends React.Component<ContactPersonInfo
         return (
             <React.Fragment> 
                 <Form.Input
-                    name={nameof<BaseOrderModel>(x => x.customerContactPersonFirstName)}  
+                    data-testid="order-contactFirstName" name={nameof<BaseOrderModel>(x => x.customerContactPersonFirstName)}  
                     placeholder="John"   
                     className="required"
                     onChange={onChange}                                            
@@ -29,7 +29,7 @@ export default class ContactPersonInfo extends React.Component<ContactPersonInfo
                     disabled = {model.isDisabledForEdit}
                 />
                 <Form.Input
-                    name={nameof<BaseOrderModel>(x => x.customerContactPersonLastName)}    
+                    data-testid="order-contactLastName" name={nameof<BaseOrderModel>(x => x.customerContactPersonLastName)}    
                     placeholder="Smith"                        
                     className="required"
                     onChange={onChange}                                                                        
@@ -40,7 +40,7 @@ export default class ContactPersonInfo extends React.Component<ContactPersonInfo
                     disabled = {model.isDisabledForEdit}
                 />
                 <Form.Input
-                    name={nameof<BaseOrderModel>(x => x.customerContactPersonEmail)}
+                    data-testid="order-contactEmail" name={nameof<BaseOrderModel>(x => x.customerContactPersonEmail)}
                     placeholder="john_smith@crnc.com"
                     error={validationInfo.hasFieldValidationError(nameof<BaseOrderModel>(x => x.customerContactPersonEmail))}
                     className="required"
@@ -51,7 +51,7 @@ export default class ContactPersonInfo extends React.Component<ContactPersonInfo
                     disabled = {model.isDisabledForEdit}
                 />
                 <Form.Input
-                    name={nameof<BaseOrderModel>(x => x.customerContactPersonPhone)}
+                    data-testid="order-contactPhone" name={nameof<BaseOrderModel>(x => x.customerContactPersonPhone)}
                     placeholder="89161234567"
                     error={validationInfo.hasFieldValidationError(nameof<BaseOrderModel>(x => x.customerContactPersonPhone))}
                     className="required"

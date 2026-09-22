@@ -17,11 +17,11 @@ const JobsGridRow: React.StatelessComponent<JobsGridRowProps> = (props) => {
             color = "grey";
 
         return (
-                <Table.Row>
+                <Table.Row data-testid="job-row">
                     <Table.Cell>
                     </Table.Cell>
                     <Table.Cell>
-                        <div>{item.number}</div>
+                        <div data-testid="job-number">{item.number}</div>
                     </Table.Cell>
                     <Table.Cell>
                         <div>{item.dateCreated}</div>

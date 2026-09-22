@@ -253,7 +253,7 @@ export default class UserCards extends React.Component<any, UserCardsState>{
             <div>
                 <Segment loading={this.state.isLoading} basic>
                     <Confirm 
-                        open={this.state.isDeleteConfirmOpen} 
+                        data-testid="user-delete-confirm" open={this.state.isDeleteConfirmOpen} 
                         onCancel={this.handleCloseDeleteConfirm} 
                         onConfirm={this.handleDeleteConfirmed}
                         header={`Delete of user ${deletedUser}`} 
@@ -269,7 +269,7 @@ export default class UserCards extends React.Component<any, UserCardsState>{
                     <Button.Group size="big" floated="right" vertical>
                         <Button
                             as={Link}
-                            to="/users/new"
+                            data-testid="users-add" to="/users/new"
                             icon="plus"
                             title="Add new user"
                             primary
@@ -278,7 +278,7 @@ export default class UserCards extends React.Component<any, UserCardsState>{
                         <Popup
                             trigger={
                                 <Button
-                                    icon="search"
+                                    data-testid="users-search-open" icon="search"
                                     title="Search of user"
                                     primary
                                     attached="left"
@@ -295,7 +295,7 @@ export default class UserCards extends React.Component<any, UserCardsState>{
                             position="bottom right"
                         />
                     </Button.Group>
-                    <Card.Group>
+                    <Card.Group data-testid="users-cards">
                         {                            
                             this.getUsersPerPage(this.state.usersForShow,this.state.activePage).map((u) => {
                                 return <UserCardView key={u.id.toString()} userItem={u} onUserDelete={this.handleOpenDeleteConfirm}/>;

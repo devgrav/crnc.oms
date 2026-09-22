@@ -49,7 +49,7 @@ export default class RoleSelect extends React.Component<RoleSelectProps, RoleSel
     }
 
     public render() {
-        const {onChange, name, error, className} = this.props;
+        const {onChange, name, error, className, testId} = this.props;
         const {roles, isLoading} = this.state;
 
         let selectedRoleId = this.props.selectedRoleId;
@@ -59,6 +59,7 @@ export default class RoleSelect extends React.Component<RoleSelectProps, RoleSel
 
         return (
             <Form.Select
+                data-testid={testId}
                 value={selectedRoleId}
                 options={roles}
                 loading={isLoading}
@@ -74,7 +75,10 @@ export default class RoleSelect extends React.Component<RoleSelectProps, RoleSel
 
 interface RoleSelectProps{
     selectedRoleId?: string;
-    name: string;    
+    name: string;
+    // Semantic UI пробрасывает неизвестные пропсы в DOM, но RoleSelect перечисляет
+    // их явно, поэтому data-testid приходит отдельным полем и вешается на Form.Select.
+    testId?: string;
     onChange(event: React.SyntheticEvent<HTMLElement>, data: any): void;
     error?: boolean;
     className?: string;
