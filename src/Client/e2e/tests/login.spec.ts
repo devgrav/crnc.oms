@@ -24,7 +24,7 @@ test.describe("Login", () => {
         await loginAs(page, SeedUsers.admin);
 
         //Assert
-        await expect(page.getByTestId("user-login")).toHaveText(SeedUsers.admin.login);
+        await expect(page.getByTestId("current-user-login")).toHaveText(SeedUsers.admin.login);
     });
 
     test("SignOut_AuthenticatedUser_ReturnsToLogin", async ({ page }) => {

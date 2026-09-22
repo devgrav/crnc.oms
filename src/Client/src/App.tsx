@@ -2,6 +2,7 @@ import { MantineProvider } from "@mantine/core";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router";
 import AuthProvider from "@/auth/AuthProvider";
+import NotificationsProvider from "@/notifications/NotificationsProvider";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import AppRoutes from "@/routes";
 import "@mantine/core/styles.css";
@@ -24,7 +25,9 @@ export default function App() {
                 <QueryClientProvider client={queryClient}>
                     <BrowserRouter>
                         <AuthProvider>
-                            <AppRoutes />
+                            <NotificationsProvider>
+                                <AppRoutes />
+                            </NotificationsProvider>
                         </AuthProvider>
                     </BrowserRouter>
                 </QueryClientProvider>
