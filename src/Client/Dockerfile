@@ -3,6 +3,11 @@
 # когда апстрим переезжает на следующий мажор. Vite 8 требует ^20.19 || >=22.12.
 FROM node:22-alpine AS builder
 
+# Коммит сборки: версия приложения берётся из package.json, а хеш знает только
+# тот, кто собирает. Не передали - в UI останется "dev", и это честно.
+ARG GIT_COMMIT=""
+ENV GITHUB_SHA=$GIT_COMMIT
+
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci

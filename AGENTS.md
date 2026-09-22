@@ -194,6 +194,8 @@ npm run lint     # eslint 10, flat config
 npm test         # vitest run
 npm run e2e      # playwright, needs a running stand
 ```
+The app version comes from one place — `version` in `src/Client/package.json`, baked into the bundle by `define` in `vite.config.ts` and shown in the layout footer. The commit beside it comes from `GITHUB_SHA`, or from the `GIT_COMMIT` build arg for the image (`GIT_COMMIT=$(git rev-parse HEAD) docker-compose build crnc-oms-ui`); unset, the UI honestly says `dev`. Don't hardcode a version anywhere else.
+
 React 19 + TypeScript 5.9 (strict) + Mantine 9 + TanStack Query, bundled by Vite 8. TypeScript config is split (`tsconfig.app.json` / `tsconfig.node.json`); linting is ESLint 10 flat config with typed rules — tslint and webpack are gone. Path alias `@/` maps to `src/`.
 
 **The SPA knows no backend host.** It calls relative paths (`/api/security/...`, `/api/sales/...`, `/api/production/...`, `/hubs/push`), and its own nginx proxies them to the services (`src/Client/conf/conf.d/default.conf`); `vite.config.ts` mirrors the same mapping for `npm run dev`. There are no build args baking URLs into the bundle any more. Two traps live in that config and are commented there: with a variable in `proxy_pass` nginx does not strip the location prefix (an explicit `rewrite` is required), and the hub location needs the `Upgrade`/`Connection` headers or SignalR silently falls back to long polling.
