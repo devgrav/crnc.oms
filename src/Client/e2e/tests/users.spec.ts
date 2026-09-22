@@ -35,7 +35,7 @@ test.describe("Users", () => {
 
         //Assert
         await expect(page.getByTestId("user-card-edit")).toBeVisible();
-        await expect(page.locator(".ui.error.message")).toBeVisible();
+        await expect(page.getByTestId("user-validation-summary")).toBeVisible();
     });
 
     test("DeleteUser_Confirmed_RemovesCard", async ({ page }) => {
@@ -47,7 +47,7 @@ test.describe("Users", () => {
 
         //Act
         await userCard(page, login).getByTestId("user-delete").click();
-        await page.getByRole("button", { name: "OK" }).click();
+        await page.getByTestId("user-delete-confirm").getByRole("button", { name: "OK", exact: true }).click();
 
         //Assert
         await expect(userCard(page, login)).toHaveCount(0);

@@ -1,0 +1,72 @@
+import { ActionIcon, Container, Group, Image, Text, Tooltip } from "@mantine/core";
+import { IconLogout } from "@tabler/icons-react";
+import { NavLink, Outlet, useNavigate } from "react-router";
+import logo from "@/assets/images/logo.png";
+import NotificationsBell from "@/components/NotificationsBell";
+import { formatAppVersion } from "@/appVersion";
+import { useAuth } from "@/hooks/useAuth";
+import { Roles } from "@/types/auth.types";
+import classes from "./Layout.module.css";
+
+export default function Layout() {
+    const { user, signOut } = useAuth();
+    const navigate = useNavigate();
+
+    function handleSignOut() {
+        signOut();
+        void navigate("/login", { replace: true });
+    }
+
+    return (
+        <>
+            <header className={classes.header}>
+                <Container size="xl">
+                    <Group justify="space-between" h={56}>
+                        <Group gap="lg">
+                            <NavLink to="/orders">
+                                <Image src={logo} alt="CRNC OMS" h={28} w="auto" />
+                            </NavLink>
+                            {user?.role === Roles.Admin && (
+                                <NavLink to="/users" className={navClass} data-testid="nav-users">
+                                    Users
+                                </NavLink>
+                            )}
+                            <NavLink to="/orders" className={navClass} data-testid="nav-orders">
+                                Orders
+                            </NavLink>
+                            <NavLink to="/jobs" className={navClass} data-testid="nav-jobs">
+                                Jobs
+                            </NavLink>
+                        </Group>
+                        <Group gap="xs">
+                            <NotificationsBell />
+                            <Text size="sm" data-testid="current-user-login">{user?.login}</Text>
+                            <Tooltip label="Sign out">
+                                <ActionIcon
+                                    variant="subtle"
+                                    aria-label="Sign out"
+                                    onClick={handleSignOut}
+                                    data-testid="user-signout"
+                                >
+                                    <IconLogout size={18} />
+                                </ActionIcon>
+                            </Tooltip>
+                        </Group>
+                    </Group>
+                </Container>
+            </header>
+            <Container size="xl" py="md" component="main">
+                <Outlet />
+            </Container>
+            <Container size="xl" pb="sm" component="footer">
+                <Text size="xs" c="dimmed" ta="right" data-testid="app-version">
+                    {formatAppVersion()}
+                </Text>
+            </Container>
+        </>
+    );
+}
+
+function navClass({ isActive }: { isActive: boolean }): string {
+    return isActive ? `${classes.link} ${classes.linkActive}` : classes.link;
+}

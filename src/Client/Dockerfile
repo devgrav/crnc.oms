@@ -1,21 +1,18 @@
 # => Build container
-# Node 16 - последний LTS эпохи этого фронтенда (webpack 3, TypeScript 3.7).
-# Плавающий тег node:alpine сегодня даёт Node 26, где, во-первых, больше не
-# поставляется yarn (RUN yarn -> "yarn: not found"), а во-вторых, OpenSSL 3
-# убрал хеш md4, на который опирается webpack 3.
-FROM node:16-alpine AS builder
+# Мажор ноды прибит намеренно: плавающий тег node:alpine ломает сборку в момент,
+# когда апстрим переезжает на следующий мажор. Vite 8 требует ^20.19 || >=22.12.
+FROM node:22-alpine AS builder
 
-ARG SECURITY_API_URL
-ARG SALES_API_URL
-ARG PRODUCTION_API_URL
-ARG PUSH_HUBS_URL
+# Коммит сборки: версия приложения берётся из package.json, а хеш знает только
+# тот, кто собирает. Не передали - в UI останется "dev", и это честно.
+ARG GIT_COMMIT=""
+ENV GITHUB_SHA=$GIT_COMMIT
 
 WORKDIR /app
-COPY package.json .
-COPY yarn.lock .
-RUN yarn
+COPY package.json package-lock.json ./
+RUN npm ci
 COPY . .
-RUN yarn build --env.NODE_ENV=production --env.REACT_APP_SECURITY_API_URL=$SECURITY_API_URL --env.REACT_APP_SALES_API_URL=$SALES_API_URL --env.REACT_APP_PRODUCTION_API_URL=$PRODUCTION_API_URL --env.REACT_APP_NOTIFICATION_PUSH_HUBS_URL=$PUSH_HUBS_URL
+RUN npm run build
 
 # => Run container
 FROM nginx

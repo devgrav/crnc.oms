@@ -47,15 +47,17 @@ Monitoring: Prometheus scrapes each service's `/metrics` endpoint every 5s (via 
 
 ## Architecture (frontend, `src/Client`)
 
-React + TypeScript + Mobx + Semantic UI, bundled with Webpack (no CRA). Entry point `src/index.tsx` → `src/app.tsx`.
+React 19 + TypeScript + Mantine + TanStack Query, bundled by Vite. Entry point `src/main.tsx` → `src/App.tsx`. Files group by feature (`src/pages/<feature>/`), not by file type; one component per file, PascalCase, `export default`, no barrel files. The migration that produced this shape is written up in `docs/migrations/client-modern-stack-migration-plan.md` — read it before re-litigating any of the choices below.
 
-- **Routing & auth guard** (`src/routes.tsx`) — `react-router` v5 `Switch` of routes, each wrapped in a `PrivateRoute` that checks `CurrentUserContext.isAuthentificated` (redirects to `/login`) and then checks the route's declared `roles` against `CurrentUserContext.user.role` (renders `Forbidden` otherwise). Roles: `Admin`, `MainManager`, `Manager` (`src/auth/CurrentUserRole.ts`).
-- **Current user** (`src/auth/`) — `CurrentUserContext` is a static singleton holding the logged-in `CurrentUser` (id, jwt, role); persisted to/restored from `sessionStorage` under key `crnc.oms.currentUser` (restored in `App`'s constructor in `app.tsx`).
-- **Services** (`src/services/`) — one static class per backend aggregate (`OrderService`, `JobService`, `UserService`, `RoleService`, `AuthService`), each a thin wrapper of `axios` calls to a base URL from `src/config.ts`. `AxiosProxy` is a lazily-created singleton `axios` instance that stamps the `Authorization: Bearer <jwt>` header from `CurrentUserContext`; call `AxiosProxy.clear()` on logout/user-switch to force a fresh instance with the new token.
-- **Config** (`src/config.ts`) — reads API base URLs from `process.env.REACT_APP_*` (set as Docker build args in `docker-compose.yml`: `SECURITY_API_URL`, `SALES_API_URL`, `PRODUCTION_API_URL`, `PUSH_HUBS_URL`) and derives per-resource endpoint URLs (`ordersUrl`, `jobsUrl`, `usersUrl`, etc.) — baked in at build time, not runtime-configurable.
-- **Feature/store pattern** (`src/components/<feature>/`, e.g. `orders`, `jobs`, `users`) — each screen has a `*Container` component that constructs a per-mount tree of Mobx `RootStore`/`Store` objects and injects them via `mobx-react`'s `<Provider>`; child components are `@inject`/`@observer`-connected to read from those stores rather than props drilling. Stores call the matching `*Service` for I/O and expose `@observable` state + `@action` methods (loading flags, models, CRUD operations). This container→root store→feature store layering is repeated per feature (e.g. `OrdersGridContainer` → `OrdersGridRootStore` → `OrdersGridStore`; same shape for `orderCard`, `jobsGrid`).
-- **Push notifications** (`src/components/layout/Notifications.tsx`) — connects directly to the Push service's SignalR hub (`APP_CONFIG.pushUrl`) using `@microsoft/signalr`, authenticating via `accessTokenFactory` (the current JWT), and appends incoming `ReceivePushMessageAsync` messages to local component state (not a Mobx store).
-- **Layout** (`src/components/layout/`) — `Layout`/`Content`/`TopMenu`/`UserInfo` wrap every authenticated page (applied inside `PrivateRoute`); `Notifications` (the bell icon) lives in the top menu.
+- **No global store.** MobX is gone and nothing replaced it: server data lives in TanStack Query (`useServiceQuery` in `src/hooks/`, invalidated by key after mutations), form state in local `useState`, and the only application-wide state is the current user. Redux/Zustand were considered and declined — after those two moves there is nothing global left to keep. Don't reintroduce a store "for later".
+- **Routing & auth guard** (`src/routes.tsx`) — `react-router` v8, the whole map in one place, a layout route with `<Outlet/>` instead of per-page wrappers, `index` redirect and a catch-all `*` → `NotFound`. `ProtectedRoute` redirects to `/login` when unauthenticated and renders `Forbidden` on a role mismatch. **`Admin` passes every route regardless of the declared `roles`** — deliberate, carried over from the old guard, and covered by a test. The order card is the one `React.lazy` route.
+- **Current user** (`src/auth/`) — a real React context: `AuthContext` + `AuthProvider` + `useAuth()`. `tokenStorage.ts` owns `sessionStorage` under the key `crnc.oms.currentUser` and validates the shape on read. The API client reads the token from there on every request rather than from the context, because interceptors live outside the component tree.
+- **Services** (`src/services/`) — one configured `apiClient` (relative `baseURL`, request interceptor stamping `Authorization`) plus one module of operations per aggregate. **Services never throw**: every operation returns `{ success, data?, fieldErrors?, generalError? }`, which is why no component has a `try/catch`. `errorHandler.ts` is the single place that normalizes failures, and it must keep handling all three 400 shapes the backends produce — `ValidationProblemDetails` with an `errors` wrapper (Sales), a flat `SerializableError` dictionary (Security's `UsersController`, which has no `[ApiController]`), and a bare string (`AccountsController`) — plus network errors, 5xx, and JSON hidden inside a binary response.
+- **Forms** (`src/hooks/useFormValidation.ts`) — `errors`, `generalError`, `getErrorMessage(field)`, `clearFieldError`, `clearAllErrors`; a field's error clears on the user's first keystroke. `fieldErrors` keys are the form field names — both backends emit camelCase dictionary keys, and that is a contract, not a coincidence.
+- **Screens** (`src/pages/`) — `orders` (grid + one card component serving both create and edit, rendered over the grid through an `Outlet`), `jobs` (read-only grid), `users` (cards, client-side filter in `filterUsers.ts`, paged at 8), `login`. Cards are routes, not local state: `/orders/new`, `/orders/:id`, `/users/new`, `/users/:id`. Note that `/…/new` has no `:id` param at all, so `undefined` there means "create".
+- **Push notifications** (`src/notifications/`) — one SignalR connection per session, opened by `NotificationsProvider` at app level (not by the bell component, which used to rebuild it on every remount). The hub URL is relative (`/hubs/push`); `accessTokenFactory` supplies the JWT, and the server addresses clients by the `nameid` claim. `NotificationsBell` in the layout reads the collected messages from context.
+- **Layout** (`src/components/`) — `Layout` is a route element wrapping every authenticated page; it holds the nav, the bell and sign-out. `ErrorBoundary` at the root is the only class component in the codebase — React 19 still has no hook equivalent of `componentDidCatch`.
+- **React Compiler lint rules are on.** `react-hooks` v7 rejects `setState` inside an effect; state that has to follow loaded data is adjusted during render against a stored source reference instead. Three places do this — copy that pattern rather than reaching for `useEffect`.
 
 ## Test conventions
 
@@ -112,9 +114,12 @@ docker-compose --profile sales up         # sales + its real deps: security, not
 docker-compose --profile production up
 docker-compose --profile notification up  # all 3 notification sub-services + push-client + security
 docker-compose --profile client up        # the SPA + the whole backend it talks to
+docker-compose --profile server up        # everything except the SPA - see below
 docker-compose --profile monitoring up    # prometheus + grafana only
 ```
-Available profiles: `security`, `sales`, `production`, `notification`, `client`, `monitoring`, `full`. Docker Compose does **not** auto-activate a dependency's own profile via `depends_on` — every service lists every context profile that can reach it transitively, so e.g. `security-api` carries `security`, `sales`, `production`, `notification`, and `client` (every context that ends up depending on it), not just `security`. Keep this in sync when changing `depends_on` edges or adding services.
+**`server` is `full` minus `crnc-oms-ui`**: every backend service, both databases, the broker, the push console client and the monitoring stack, with no SPA image built or started. That is what you want while working on the frontend with `npm run dev` — Vite serves the UI on the same port 8092 and proxies to the backends, so leaving the containerised SPA out avoids two builds of the same thing and a port clash.
+
+Available profiles: `security`, `sales`, `production`, `notification`, `client`, `server`, `monitoring`, `full`. Docker Compose does **not** auto-activate a dependency's own profile via `depends_on` — every service lists every context profile that can reach it transitively, so e.g. `security-api` carries `security`, `sales`, `production`, `notification`, and `client` (every context that ends up depending on it), not just `security`. Keep this in sync when changing `depends_on` edges or adding services.
 
 Service endpoints once running:
 | Service | URL |
@@ -164,7 +169,7 @@ dotnet test src/Server/src/Crnc.Oms.Notification/Crnc.Oms.Notification.E2ETests/
 
 ### CI (`.github/workflows/backend-ci.yml`)
 
-Backend only — the SPA has no pipeline yet. Runs on pushes to `master`, on every PR, and on manual dispatch. Design notes and the reasoning behind each choice live in `docs/ci/backend-ci.md`; the mechanics worth knowing before touching anything:
+Backend only — the SPA has its own pipeline, `client-ci.yml` (see below). Runs on pushes to `master`, on every PR, and on manual dispatch. Design notes and the reasoning behind each choice live in `docs/ci/backend-ci.md`; the mechanics worth knowing before touching anything:
 
 - **Path-filtered.** A `changes` job diffs against the PR base (or `github.event.before` on a push) and emits a JSON array of the bounded contexts that were touched; `build` and `e2e` are matrices over that array. Contexts are self-contained under `src/Server/src/Crnc.Oms.<Context>/` with no `ProjectReference` crossing that boundary, which is what makes a pure path check sound — **keep it that way, or the filter starts lying**. A change to `backend-ci.yml` itself, a manual dispatch, or an unresolvable base commit all force the full set.
 - **Everything is derived from the context name.** `Crnc.Oms.<C>.sln`, `Crnc.Oms.<C>.Tests` and `Crnc.Oms.<C>.E2ETests` are looked up by convention, and the unit-test step is skipped when the project doesn't exist (only Sales has one today). Add a `Crnc.Oms.<C>.Tests` project per the "Test conventions" above and CI picks it up with no workflow edit.
@@ -172,29 +177,50 @@ Backend only — the SPA has no pipeline yet. Runs on pushes to `master`, on eve
 - **No third-party actions** — `actions/checkout`, `setup-dotnet`, `cache`, `upload-artifact` only. Keep it that way.
 - TRX results for both test kinds are uploaded as artifacts on every run, pass or fail.
 
+### CI (`.github/workflows/client-ci.yml`)
+
+The SPA's own pipeline. Reasoning lives in `docs/ci/client-ci.md`; the mechanics:
+
+- **Declaratively path-filtered** via `paths:` on the triggers (`src/Client/**` plus the workflow), not through a computed `changes` job like the backend has — there is one client project, so there is nothing to select.
+- **`build` runs lint, `npm run build` (which is `tsc -b && vite build`, so types break CI) and Vitest**; `e2e` brings up `docker compose --profile client`, waits for `http://localhost:8092` to answer, and runs Playwright against the real image. Split so a type error fails in under a minute.
+- **`client-ci` is the one job to require in branch protection**, same reasoning as `backend-ci`: both jobs skip on backend-only or docs-only PRs.
+- **No third-party actions**; npm caching comes from `setup-node` with two `cache-dependency-path`s, since the app and the e2e suite have separate lockfiles.
+- The stack is torn down with `down -v` on every exit — the suite writes to the stand's real databases.
+
 ### Frontend (`src/Client`)
 
 ```
 npm install
-npm start    # webpack-dev-server, development mode
-npm run build   # production bundle (webpack -p)
+npm run dev      # vite dev server on :8092, proxies /api and /hubs to the backends
+npm run build    # tsc -b && vite build
+npm run lint     # eslint 10, flat config
+npm test         # vitest run
+npm run e2e      # playwright, needs a running stand
 ```
-TypeScript config: `tsconfig.json`; linting: `tslint.json` (tslint, not eslint). API base URLs are injected at Docker build time via args (`SECURITY_API_URL`, `SALES_API_URL`, `PRODUCTION_API_URL`, `PUSH_HUBS_URL`) — see `docker-compose.yml`.
+The app version comes from one place — `version` in `src/Client/package.json`, baked into the bundle by `define` in `vite.config.ts` and shown in the layout footer. The commit beside it comes from `GITHUB_SHA`, or from the `GIT_COMMIT` build arg for the image (`GIT_COMMIT=$(git rev-parse HEAD) docker-compose build crnc-oms-ui`); unset, the UI honestly says `dev`. Don't hardcode a version anywhere else.
 
-**The image build pins `node:16-alpine` deliberately** (`src/Client/Dockerfile`). The floating `node:alpine` tag now resolves to Node 26, which no longer ships yarn at all — `RUN yarn` fails with `yarn: not found` — and whose OpenSSL 3 dropped the `md4` hash that webpack 3 relies on. Node 16 is the last LTS of this frontend's era and carries yarn 1.22, matching the v1 `yarn.lock`. Don't unpin it without upgrading webpack first.
+React 19 + TypeScript 5.9 (strict) + Mantine 9 + TanStack Query, bundled by Vite 8. TypeScript config is split (`tsconfig.app.json` / `tsconfig.node.json`); linting is ESLint 10 flat config with typed rules — tslint and webpack are gone. Path alias `@/` maps to `src/`.
 
-**E2E tests for the SPA (`src/Client/e2e`)** — a Playwright suite (18 tests) driving the running SPA through the browser. It is the baseline for the modern-stack migration (`docs/migrations/client-modern-stack-migration-plan.md`, §0): it was written against the *current* React 16 / MobX / Semantic UI app so the rewrite can be checked against behaviour rather than markup. Run it against a live stand:
+**The SPA knows no backend host.** It calls relative paths (`/api/security/...`, `/api/sales/...`, `/api/production/...`, `/hubs/push`), and its own nginx proxies them to the services (`src/Client/conf/conf.d/default.conf`); `vite.config.ts` mirrors the same mapping for `npm run dev`. There are no build args baking URLs into the bundle any more. Two traps live in that config and are commented there: with a variable in `proxy_pass` nginx does not strip the location prefix (an explicit `rewrite` is required), and the hub location needs the `Upgrade`/`Connection` headers or SignalR silently falls back to long polling.
+
+TypeScript 7 is deliberately not used yet: `typescript-eslint` caps at `<6.1.0`, and typed linting is a requirement.
+
+**The image build pins `node:22-alpine`** (`src/Client/Dockerfile`) and installs with `npm ci`. The major is pinned on purpose — a floating `node:alpine` breaks the build the day upstream moves on — and 22 is what Vite 8 asks for (`^20.19 || >=22.12`). Keep it in step with `NODE_VERSION` in `client-ci.yml`.
+
+**E2E tests for the SPA (`src/Client/e2e`)** — a Playwright suite (18 tests) driving the running SPA through the browser. It was written against the *old* React 16 / MobX / Semantic UI app as the baseline for the modern-stack migration (`docs/migrations/client-modern-stack-migration-plan.md`, §0), and passes unchanged — bar the shims noted below — on the rewritten one. That is the point: it checks behaviour, not markup. Run it against a live stand:
 ```
 docker-compose --profile client up -d
 cd src/Client/e2e && npm install && npx playwright install chromium
 npm test
 ```
 Details worth knowing before touching it:
-- **It has its own `package.json`, deliberately not `src/Client`'s.** The image build runs `yarn` on `node:16-alpine`, which would install devDependencies — and Playwright needs Node 18+ and downloads browsers on postinstall. `e2e/` is also excluded in `src/Client/.dockerignore` so it never enters the build context.
-- **Selectors are `data-testid` only** — added to the current components for this purpose, and meant to be carried into the rewritten ones. Semantic UI puts an unknown prop in different places per control (`Form.Input` → the `div.ui.input` wrapper, `Form.TextArea` → the `<textarea>` itself), which is why `support/form.ts` wraps filling and dropdown selection. `RoleSelect` lists its props explicitly, so it takes a `testId` prop instead.
+- **It has its own `package.json`, deliberately not `src/Client`'s.** It was split off when the image build still ran `yarn` on `node:16-alpine` and would have installed Playwright as a devDependency; the split stayed because the browser download has no business in an image build. `e2e/` is also excluded in `src/Client/.dockerignore` so it never enters the build context.
+- **Selectors are `data-testid` only.** Where a kit puts an unknown prop is its own business and changes with the kit, so `support/form.ts` wraps filling and dropdown selection: Mantine's dropdown renders its options in a portal, outside the control's own element. Two component-side consequences to keep: a modal's testid goes on its *content*, because Mantine's modal root has no layout box and would never count as visible, and `RoleSelect` takes an explicit `testId` prop since it lists its props rather than spreading them.
 - **`workers: 1`, no parallelism.** One shared stand, one shared database, and the grids count rows; tests generate unique logins/descriptions (`unique()`) and must not depend on each other's writes — the same rule as the backend e2e suites.
 - If Playwright's browser download is blocked, `E2E_BROWSER_CHANNEL=chrome npm test` runs it on the system Chrome instead. CI uses the bundled browser.
-- Two defects of the current SPA are documented in the suite rather than asserted as correct: user search filters on `roleId === Guid.EMPTY` when no role is picked (so login-only search always returns nothing), and the user grid pages at 8 cards with no way to reach a freshly created user except via search.
+- Two defects the suite found in the old SPA are fixed in the rewritten one and now guarded by tests: user search filtered on `roleId === Guid.EMPTY` when no role was picked, so a login-only search always returned nothing, and a freshly created user landed on a page the UI could not reach.
+
+**Unit tests for the SPA (`src/Client/src/**/__tests__/`)** — Vitest + Testing Library + jsdom, run with `npm test` from `src/Client`. They test the brains, not the markup: the error normalizer (all three 400 shapes, network, 5xx, blob), `useFormValidation`, `tokenStorage`, the API client's interceptor, the users filter, and — the one exception, because the behaviour is non-obvious — the route guard's admin bypass. Conventions: same `Method_Condition_ExpectedResult` naming and `//Arrange`/`//Act`/`//Assert` blocks as the backend suites, data built through factories with overrides (`src/test/factories.ts`), global `cleanup()` in `src/test/setup.ts`. Note that setup also stubs `window.matchMedia`, which jsdom lacks and Mantine calls on init.
 
 ## Commit messages
 

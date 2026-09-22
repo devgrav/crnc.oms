@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { loginAs } from "../support/auth";
 import { selectOption } from "../support/form";
 import { createOrder, orderRow } from "../support/orders";
@@ -60,4 +60,47 @@ test.describe("Orders", () => {
         await expect(orderRow(page, order.jobDescription).getByTestId("order-status"))
             .toHaveText("Need signoff");
     });
+
+    test("ConvertOrderToJob_SignedOrder_ReachesProduction", async ({ page }) => {
+        //Arrange - конверсия идёт цепочкой статусов, разрешённой доменом Sales:
+        //Not sent -> Need signoff -> Signed -> Converted to job.
+        const order = await createOrder(page);
+        await setStatus(page, order.jobDescription, "Need signoff", true);
+        await setStatus(page, order.jobDescription, "Signed");
+
+        //Act - карточка не должна блокироваться в момент выбора статуса,
+        //иначе сохранить перевод нечем: кнопка Save исчезает вместе с формой.
+        await setStatus(page, order.jobDescription, "Converted to job");
+
+        //Assert
+        await expect(orderRow(page, order.jobDescription).getByTestId("order-status"))
+            .toHaveText("Converted to job");
+
+        //Job создаётся Production'ом асинхронно, по событию из шины, а сетка jobs
+        //сама не перезапрашивается - поэтому опрашиваем её перезагрузкой страницы.
+        await page.getByTestId("nav-jobs").click();
+        await expect(page.getByTestId("jobs-grid")).toBeVisible();
+        await expect.poll(
+            async () => {
+                await page.reload();
+                return page.getByTestId("job-row").filter({ hasText: order.jobDescription }).count();
+            },
+            { timeout: 30_000, intervals: [1_000, 2_000, 3_000] },
+        ).toBeGreaterThan(0);
+    });
 });
+
+async function setStatus(page: Page, jobDescription: string, status: string, withDetails = false) {
+    await orderRow(page, jobDescription).getByTestId("order-edit").click();
+    await expect(page.getByTestId("order-card")).toBeVisible();
+
+    await selectOption(page, "order-status-select", status);
+
+    if (withDetails) {
+        await selectOption(page, "order-materialSource", "Stock");
+        await selectOption(page, "order-signoffType", "Email");
+    }
+
+    await page.getByTestId("order-save").click();
+    await expect(page.getByTestId("order-card")).toBeHidden();
+}
