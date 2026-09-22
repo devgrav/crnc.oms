@@ -83,27 +83,29 @@ export default class Notifications extends React.Component<any, NotificationsSta
                 <Popup
                     trigger={
                         <div>
-                            <Icon 
-                                name="bell" 
+                            <Icon
+                                data-testid="notifications-bell"
+                                name="bell"
                                 title="Notifications"
-                                onClick={onClick}  
-                                size="big"  
-                                style={{marginRight: 0}}                                         
+                                onClick={onClick}
+                                size="big"
+                                style={{marginRight: 0}}
                             />
                             {messages.length > 0 &&
-                                <Label color='blue'>
+                                <Label data-testid="notifications-count" color='blue'>
                                     {messages.length}
                                 </Label>
                             }
-                        </div>            
+                        </div>
                     }
                     content={
-                        messages && messages.length > 0 
-                        ? 
+                        messages && messages.length > 0
+                        ?
                             <Message
+                                data-testid="notifications-list"
                                 list = {messages}
-                            />                        
-                        :   <div>No notifications!</div>}
+                            />
+                        :   <div data-testid="notifications-empty">No notifications!</div>}
                     on='click'
                     open={isShow}
                     onClose={hideNotifications}

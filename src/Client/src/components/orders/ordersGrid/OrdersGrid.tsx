@@ -38,16 +38,17 @@ export default class OrdersGrid extends React.Component<OrdersGridProps> {
                 <Dimmer active={isLoading} inverted>
                     <Loader>Loading</Loader>
                 </Dimmer>
-                <Table celled selectable striped definition>
+                <Table data-testid="orders-grid" celled selectable striped definition>
                     <Table.Header fullWidth>
                         <Table.Row>
                             <Table.HeaderCell colSpan="9">
-                                <Button 
+                                <Button
+                                    data-testid="orders-add"
                                     as={Link}
                                     to="/orders/new"
-                                    floated="right" 
-                                    primary 
-                                    content="Add order" 
+                                    floated="right"
+                                    primary
+                                    content="Add order"
                                     icon="plus"
                                 />
                             </Table.HeaderCell>

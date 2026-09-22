@@ -98,11 +98,11 @@ export default class Login extends React.Component<any, LoginState> {
                 <Grid.Column>
                     <Segment attached="top"><Image centered src={Logo} size="tiny"/></Segment>
                     <Segment attached >
-                        {errorMessage && <Message error content={errorMessage}/>}
+                        {errorMessage && <Message data-testid="login-error" error content={errorMessage}/>}
                         <Form loading={isLoading} onSubmit={this.onSignIn}>
-                            <Form.Input label="Login" value={login} onChange={this.onLoginChange}/>
-                            <Form.Input label="Password" value={password} onChange={this.onPasswordChange} type="password"/>
-                            <Button primary type="submit" content="Sign In" disabled={this.isSignInDisabled()}/>
+                            <Form.Input data-testid="login-login" label="Login" value={login} onChange={this.onLoginChange}/>
+                            <Form.Input data-testid="login-password" label="Password" value={password} onChange={this.onPasswordChange} type="password"/>
+                            <Button data-testid="login-submit" primary type="submit" content="Sign In" disabled={this.isSignInDisabled()}/>
                         </Form>
                     </Segment>
                 </Grid.Column>

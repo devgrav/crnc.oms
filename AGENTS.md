@@ -183,6 +183,19 @@ TypeScript config: `tsconfig.json`; linting: `tslint.json` (tslint, not eslint).
 
 **The image build pins `node:16-alpine` deliberately** (`src/Client/Dockerfile`). The floating `node:alpine` tag now resolves to Node 26, which no longer ships yarn at all — `RUN yarn` fails with `yarn: not found` — and whose OpenSSL 3 dropped the `md4` hash that webpack 3 relies on. Node 16 is the last LTS of this frontend's era and carries yarn 1.22, matching the v1 `yarn.lock`. Don't unpin it without upgrading webpack first.
 
+**E2E tests for the SPA (`src/Client/e2e`)** — a Playwright suite (18 tests) driving the running SPA through the browser. It is the baseline for the modern-stack migration (`docs/migrations/client-modern-stack-migration-plan.md`, §0): it was written against the *current* React 16 / MobX / Semantic UI app so the rewrite can be checked against behaviour rather than markup. Run it against a live stand:
+```
+docker-compose --profile client up -d
+cd src/Client/e2e && npm install && npx playwright install chromium
+npm test
+```
+Details worth knowing before touching it:
+- **It has its own `package.json`, deliberately not `src/Client`'s.** The image build runs `yarn` on `node:16-alpine`, which would install devDependencies — and Playwright needs Node 18+ and downloads browsers on postinstall. `e2e/` is also excluded in `src/Client/.dockerignore` so it never enters the build context.
+- **Selectors are `data-testid` only** — added to the current components for this purpose, and meant to be carried into the rewritten ones. Semantic UI puts an unknown prop in different places per control (`Form.Input` → the `div.ui.input` wrapper, `Form.TextArea` → the `<textarea>` itself), which is why `support/form.ts` wraps filling and dropdown selection. `RoleSelect` lists its props explicitly, so it takes a `testId` prop instead.
+- **`workers: 1`, no parallelism.** One shared stand, one shared database, and the grids count rows; tests generate unique logins/descriptions (`unique()`) and must not depend on each other's writes — the same rule as the backend e2e suites.
+- If Playwright's browser download is blocked, `E2E_BROWSER_CHANNEL=chrome npm test` runs it on the system Chrome instead. CI uses the bundled browser.
+- Two defects of the current SPA are documented in the suite rather than asserted as correct: user search filters on `roleId === Guid.EMPTY` when no role is picked (so login-only search always returns nothing), and the user grid pages at 8 cards with no way to reach a freshly created user except via search.
+
 ## Commit messages
 
 **Keep them compact: subject ≤ 72 characters, body ≤ ~500 characters** — roughly 5–7 lines

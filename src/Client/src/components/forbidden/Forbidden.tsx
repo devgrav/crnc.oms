@@ -5,7 +5,7 @@ const Forbidden: React.StatelessComponent = () => {
     return (
         <Container>
             <Segment color="blue">
-                <Header as="h1" content="You have not access to this page"/>
+                <Header data-testid="forbidden" as="h1" content="You have not access to this page"/>
             </Segment>  
         </Container>      
     );

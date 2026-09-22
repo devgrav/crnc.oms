@@ -5,7 +5,7 @@ const NotFound: React.StatelessComponent = () => {
     return (
         <Container>
             <Segment color="blue">
-                <Header as="h1" content="Page not found"/>
+                <Header data-testid="not-found" as="h1" content="Page not found"/>
             </Segment>  
         </Container>  
     );

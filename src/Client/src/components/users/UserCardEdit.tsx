@@ -138,7 +138,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
 
     public render(){
         return (
-            <Modal open={true} closeIcon onClose={this.onClose}>
+            <Modal data-testid="user-card-edit" open={true} closeIcon onClose={this.onClose}>
                 <Modal.Header>{this.props.user.id === Guid.EMPTY ? "Add new user" : "Edit user"}</Modal.Header>
                 <Modal.Content as={Segment} basic clearing loading={this.state.isLoading}>
                     {this.state.validationInfo && <Message
@@ -177,7 +177,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                             <Grid.Column  width={11}>
                                 <Form.Group widths="equal">
                                     <Form.Input
-                                        name="login"
+                                        data-testid="user-login" name="login"
                                         className="required"
                                         onChange={this.onChange}
                                         error={this.hasFieldValidationError("login")}
@@ -186,7 +186,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                         autoComplete="off"
                                     />
                                     <Form.Input
-                                        name="password"
+                                        data-testid="user-password" name="password"
                                         className="required"
                                         onChange={this.onChange}
                                         error={this.hasFieldValidationError("password")}
@@ -197,6 +197,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                     />
                                 </Form.Group>
                                 <RoleSelect
+                                    testId="user-role"
                                     name="roleId"     
                                     className="required"
                                     onChange={this.onChange}
@@ -205,7 +206,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                 />
                                 <Form.Group widths="equal">
                                     <Form.Input
-                                        name="firstName"
+                                        data-testid="user-firstName" name="firstName"
                                         className="required"
                                         onChange={this.onChange}
                                         error={this.hasFieldValidationError("firstName")}
@@ -214,7 +215,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                         autoComplete="off"
                                     />
                                     <Form.Input
-                                        name="lastName"
+                                        data-testid="user-lastName" name="lastName"
                                         className="required"
                                         onChange={this.onChange}
                                         error={this.hasFieldValidationError("lastName")}
@@ -225,7 +226,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                 </Form.Group>
                                 <Form.Group widths="equal">
                                     <Form.Input
-                                        name="email"
+                                        data-testid="user-email" name="email"
                                         className="required"
                                         onChange={this.onChange}
                                         error={this.hasFieldValidationError("email")}
@@ -235,7 +236,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                         autoComplete="off"
                                     />
                                     <Form.Input
-                                        name="phone"
+                                        data-testid="user-phone" name="phone"
                                         onChange={this.onChange}
                                         error={this.hasFieldValidationError("phone")}
                                         label="Phone"
@@ -244,7 +245,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                                     />
                                 </Form.Group>
                                 <Form.Checkbox
-                                    name="isActive"
+                                    data-testid="user-isActive" name="isActive"
                                     onChange={this.onChange}
                                     label="Active"
                                     checked={this.state.user.isActive}
@@ -256,7 +257,7 @@ export default class UserCardEdit extends React.Component<UserCardEditProps, Use
                     </Form>
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button basic color="green" type="submit" content="Save" form="userForm"/>
+                    <Button data-testid="user-save" basic color="green" type="submit" content="Save" form="userForm"/>
                     <Button basic color="red" type="reset" content="Cancel" onClick={this.onCancel}/>
                 </Modal.Actions>
             </Modal>

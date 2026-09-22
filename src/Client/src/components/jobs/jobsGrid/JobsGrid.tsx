@@ -40,7 +40,7 @@ export default class JobsGrid extends React.Component<JobsGridProps> {
                 <Dimmer active={isLoading} inverted>
                     <Loader>Loading</Loader>
                 </Dimmer>
-                <Table celled selectable striped definition>
+                <Table data-testid="jobs-grid" celled selectable striped definition>
                     <Table.Header fullWidth>
                         <Table.Row>
                             <Table.HeaderCell width={1}/>
