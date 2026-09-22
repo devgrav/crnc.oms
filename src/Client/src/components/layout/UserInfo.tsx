@@ -30,11 +30,12 @@ export default class UserInfo extends React.Component<any, UserInfoState> {
 
         return (
             <Header>
-                <Icon 
-                    link name="sign out" 
-                    title="logout" 
+                <Icon
+                    data-testid="user-signout"
+                    link name="sign out"
+                    title="logout"
                     onClick={this.onSignOut}/>
-                {CurrentUserContext.user.login}
+                <span data-testid="user-login">{CurrentUserContext.user.login}</span>
             </Header>
         )
     }

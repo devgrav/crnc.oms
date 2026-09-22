@@ -21,7 +21,7 @@ export default class OrderInfo extends React.Component<OrderInfoProps>{
         return (
             <React.Fragment> 
                 <Form.Select
-                    name={nameof<BaseOrderModel>(x => x.jobType)}     
+                    data-testid="order-jobType" name={nameof<BaseOrderModel>(x => x.jobType)}     
                     className="required"
                     onChange={onChange}
                     label = "Job type"
@@ -31,7 +31,7 @@ export default class OrderInfo extends React.Component<OrderInfoProps>{
                     disabled = {model.isDisabledForEdit}
                 />
                 <Form.TextArea
-                    name={nameof<BaseOrderModel>(x => x.jobDescription)}   
+                    data-testid="order-jobDescription" name={nameof<BaseOrderModel>(x => x.jobDescription)}   
                     placeholder="E.g. produce new detail"  
                     className="required"
                     onChange={onChange}                                        
@@ -43,7 +43,7 @@ export default class OrderInfo extends React.Component<OrderInfoProps>{
                 />   
                 {isEdit && <React.Fragment>
                     <Form.Select
-                        name={nameof<EditOrderModel>(x => x.status)}
+                        data-testid="order-status-select" name={nameof<EditOrderModel>(x => x.status)}
                         onChange={onChange}
                         label = "Status"
                         value = {model.status || orderStatuses[0].value}
@@ -61,7 +61,7 @@ export default class OrderInfo extends React.Component<OrderInfoProps>{
                     />
                     }
                     <Form.Select
-                        name={nameof<EditOrderModel>(x => x.materialSource)}     
+                        data-testid="order-materialSource" name={nameof<EditOrderModel>(x => x.materialSource)}     
                         className="required"
                         onChange={onChange}
                         label = "Material source"
@@ -71,7 +71,7 @@ export default class OrderInfo extends React.Component<OrderInfoProps>{
                         disabled = {model.isDisabledForEdit}
                     />
                     <Form.Select
-                        name={nameof<EditOrderModel>(x => x.signoffType)}     
+                        data-testid="order-signoffType" name={nameof<EditOrderModel>(x => x.signoffType)}     
                         className="required"
                         onChange={onChange}
                         label = "Sign off type"

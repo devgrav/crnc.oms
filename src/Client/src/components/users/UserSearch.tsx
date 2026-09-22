@@ -30,17 +30,18 @@ export default class UserSearch
                     value={this.props.search.fullName}
                     onChange={this.props.onChange}
                     label="Full name"
-                    name="fullName"
+                    data-testid="user-search-fullName" name="fullName"
                     autoComplete="off"
                 />
                 <Form.Input
                     value={this.props.search.login}
                     onChange={this.props.onChange}
                     label="Login"
-                    name="login"
+                    data-testid="user-search-login" name="login"
                     autoComplete="off"
                 />
                 <RoleSelect
+                    testId="user-search-role"
                     selectedRoleId={this.props.search.role}                                        
                     onChange={this.props.onChange}      
                     name="role"                                  
@@ -56,7 +57,7 @@ export default class UserSearch
                     basic
                     color="red"
                     type="reset"
-                    content="Clear"
+                    data-testid="user-search-clear" content="Clear"
                     icon="cancel"
                     onClick={this.onClear}
                 />
@@ -65,7 +66,7 @@ export default class UserSearch
                     basic
                     color="green"
                     type="submit"
-                    content="Search"
+                    data-testid="user-search-submit" content="Search"
                     icon="search"
                     form="searchForm"
                 />

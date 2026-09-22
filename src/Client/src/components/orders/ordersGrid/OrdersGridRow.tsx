@@ -14,18 +14,19 @@ const OrdersGridRow: React.StatelessComponent<OrdersGridRowProps> = (props) => {
             color = "red";
 
         return (
-                <Table.Row>
+                <Table.Row data-testid="order-row" data-order-number={item.number}>
                     <Table.Cell>
-                    <Button 
+                    <Button
+                        data-testid="order-edit"
                         as={Link}
-                        to={`/orders/${item.id}`}                                    
-                        primary 
-                        icon="pencil" 
+                        to={`/orders/${item.id}`}
+                        primary
+                        icon="pencil"
                         size="tiny"
                     />
                     </Table.Cell>
                     <Table.Cell>
-                        <div>{item.number}</div>
+                        <div data-testid="order-number">{item.number}</div>
                     </Table.Cell>
                     <Table.Cell>
                         <div>{item.createdDate}</div>
@@ -37,7 +38,7 @@ const OrdersGridRow: React.StatelessComponent<OrdersGridRowProps> = (props) => {
                         <div>{item.jobType}</div>
                     </Table.Cell>
                     <Table.Cell>
-                        <div>{item.jobDescription}</div>
+                        <div data-testid="order-description">{item.jobDescription}</div>
                     </Table.Cell>
                     <Table.Cell>
                         <div>{item.dateSentToCustomer}</div>
@@ -46,7 +47,7 @@ const OrdersGridRow: React.StatelessComponent<OrdersGridRowProps> = (props) => {
                         <div>{item.customerSignOffType}</div>
                     </Table.Cell>
                     <Table.Cell>
-                        <Label color={color}>{item.status}</Label>
+                        <Label data-testid="order-status" color={color}>{item.status}</Label>
                     </Table.Cell>
                 </Table.Row>
         );

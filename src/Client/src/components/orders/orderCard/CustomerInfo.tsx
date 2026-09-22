@@ -18,7 +18,7 @@ export default class CustomerInfo extends React.Component<CustomerInfoProps>{
         return (
             <React.Fragment> 
                 <Form.Input
-                    name={nameof<BaseOrderModel>(x => x.customerTitle)}
+                    data-testid="order-customerTitle" name={nameof<BaseOrderModel>(x => x.customerTitle)}
                     className="required"
                     onChange={onChange}                                            
                     label="Title"      
@@ -29,7 +29,7 @@ export default class CustomerInfo extends React.Component<CustomerInfoProps>{
                     disabled = {model.isDisabledForEdit}
                 />
                 <Form.Input
-                    name={nameof<BaseOrderModel>(x => x.customerAbbreviation)}
+                    data-testid="order-customerAbbreviation" name={nameof<BaseOrderModel>(x => x.customerAbbreviation)}
                     className="required"
                     onChange={onChange}                                            
                     label="Abbreviation"  
