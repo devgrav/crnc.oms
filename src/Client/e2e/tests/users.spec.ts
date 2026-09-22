@@ -35,7 +35,7 @@ test.describe("Users", () => {
 
         //Assert
         await expect(page.getByTestId("user-card-edit")).toBeVisible();
-        await expect(page.locator(".ui.error.message")).toBeVisible();
+        await expect(page.getByTestId("user-validation-summary")).toBeVisible();
     });
 
     test("DeleteUser_Confirmed_RemovesCard", async ({ page }) => {

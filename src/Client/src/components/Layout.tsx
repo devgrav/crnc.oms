@@ -1,6 +1,7 @@
 import { ActionIcon, Container, Group, Image, Text, Tooltip } from "@mantine/core";
 import { NavLink, Outlet, useNavigate } from "react-router";
 import logo from "@/assets/images/logo.png";
+import NotificationsBell from "@/components/NotificationsBell";
 import { useAuth } from "@/hooks/useAuth";
 import { Roles } from "@/types/auth.types";
 import classes from "./Layout.module.css";
@@ -37,7 +38,8 @@ export default function Layout() {
                             </NavLink>
                         </Group>
                         <Group gap="xs">
-                            <Text size="sm" data-testid="user-login">{user?.login}</Text>
+                            <NotificationsBell />
+                            <Text size="sm" data-testid="current-user-login">{user?.login}</Text>
                             <Tooltip label="Sign out">
                                 <ActionIcon
                                     variant="subtle"

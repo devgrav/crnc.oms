@@ -1,9 +1,7 @@
 import type { Page } from "@playwright/test";
 
-// Semantic UI раскладывает data-testid по-разному в зависимости от контрола:
-// Form.Input вешает его на обёртку <div class="ui input">, а Form.TextArea - прямо
-// на <textarea>. Хелпер скрывает это различие, чтобы тесты не зависели от верстки
-// кита, который всё равно уедет при миграции.
+// data-testid у Mantine садится прямо на <input>/<textarea>, но помощник оставлен
+// терпимым к обёрткам: так он переживает и точечные замены контролов.
 export async function fillField(page: Page, testId: string, value: string): Promise<void> {
     const root = page.getByTestId(testId);
     const inner = root.locator("input, textarea");
@@ -11,10 +9,9 @@ export async function fillField(page: Page, testId: string, value: string): Prom
     await target.fill(value);
 }
 
-// Semantic UI Dropdown: клик по корню раскрывает меню, опции рендерятся как
-// role="option" внутри того же корня.
+// Выпадающий список Mantine рендерит меню в портале, вне корня самого контрола,
+// поэтому опция ищется на уровне страницы, а не внутри элемента с testid.
 export async function selectOption(page: Page, testId: string, optionText: string): Promise<void> {
-    const dropdown = page.getByTestId(testId);
-    await dropdown.click();
-    await dropdown.getByRole("option", { name: optionText, exact: true }).click();
+    await page.getByTestId(testId).click();
+    await page.getByRole("option", { name: optionText, exact: true }).click();
 }
