@@ -8,9 +8,6 @@ interface AuthProviderProps {
     children: ReactNode;
 }
 
-// Единственное по-настоящему общее состояние приложения. Старый CurrentUserContext
-// был статическим синглтоном, который мутировали вне React, из-за чего смена
-// пользователя не вызывала перерисовку - см. §5.3 плана миграции.
 export default function AuthProvider({ children }: AuthProviderProps) {
     const [user, setUser] = useState<CurrentUser | null>(() => readStoredUser());
 

@@ -8,8 +8,15 @@
     text-decoration: none;
     font-size: var(--mantine-font-size-sm);
     padding: 0.25rem 0;
+    border-bottom: 2px solid transparent;
 }
 
 .link:hover {
     color: var(--mantine-primary-color-filled);
+}
+
+.linkActive {
+    color: var(--mantine-primary-color-filled);
+    font-weight: 600;
+    border-bottom-color: var(--mantine-primary-color-filled);
 }

@@ -2,8 +2,6 @@ import type { CurrentUser } from "@/types/auth.types";
 import type { OrderRow } from "@/types/orders.types";
 import type { UserItem } from "@/types/users.types";
 
-// Фабрики с overrides вместо ручной сборки объектов в каждом тесте: тест
-// называет только то, что для него существенно.
 export function makeCurrentUser(overrides: Partial<CurrentUser> = {}): CurrentUser {
     return {
         id: "2a89985f-f013-4f2a-9545-395efb43a142",

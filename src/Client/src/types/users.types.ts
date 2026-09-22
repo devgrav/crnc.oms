@@ -17,8 +17,7 @@ export interface UserItem {
 export interface UserFilter {
     fullName: string;
     login: string;
-    // undefined, а не пустой guid: старый экран хранил здесь Guid.EMPTY, который
-    // истинен, и из-за этого поиск всегда фильтровал по несуществующей роли.
+    // undefined, а не пустой guid: пустой guid истинен и ломал фильтр по роли.
     roleId?: string;
     isActive: boolean;
 }

@@ -1,11 +1,10 @@
 import { Alert, Badge, Button, Group, LoadingOverlay, Table } from "@mantine/core";
+import { IconPencil, IconPlus } from "@tabler/icons-react";
 import { Link, Outlet } from "react-router";
 import { useServiceQuery } from "@/hooks/useServiceQuery";
 import { getOrders } from "@/services/orders.service";
 import { OrderStatus, type OrderRow } from "@/types/orders.types";
 
-// Layout-роут: карточка заказа (/orders/new, /orders/:id) рендерится через Outlet
-// поверх этого же списка, а не вместо него.
 export default function OrdersPage() {
     const { data: orders = [], isLoading, error } = useServiceQuery(["orders"], getOrders);
 
@@ -14,7 +13,7 @@ export default function OrdersPage() {
             <LoadingOverlay visible={isLoading} />
             {error && <Alert color="red" mb="sm">{error.message}</Alert>}
             <Group justify="flex-end" mb="sm">
-                <Button component={Link} to="/orders/new" data-testid="orders-add">
+                <Button component={Link} to="/orders/new" leftSection={<IconPlus size={16} />} data-testid="orders-add">
                     Add order
                 </Button>
             </Group>
@@ -44,7 +43,7 @@ export default function OrdersPage() {
                                     data-testid="order-edit"
                                     aria-label={`Edit order ${order.number}`}
                                 >
-                                    ✎
+                                    <IconPencil size={14} />
                                 </Button>
                             </Table.Td>
                             <Table.Td data-testid="order-number">{order.number}</Table.Td>

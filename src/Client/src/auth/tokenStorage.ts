@@ -1,7 +1,5 @@
 import type { CurrentUser } from "@/types/auth.types";
 
-// Ключ и хранилище те же, что в старом клиенте: смена схемы хранения токена -
-// отдельный разговор про безопасность, в объём миграции она не входит.
 const STORAGE_KEY = "crnc.oms.currentUser";
 
 export function readStoredUser(): CurrentUser | null {
@@ -27,8 +25,7 @@ export function clearStoredUser(): void {
     sessionStorage.removeItem(STORAGE_KEY);
 }
 
-// Интерцептор apiClient читает токен здесь, а не из React-контекста: он живёт
-// вне дерева компонентов и должен видеть актуальное значение на каждом запросе.
+// Интерцептор apiClient читает токен отсюда: он живёт вне дерева компонентов.
 export function getStoredToken(): string | null {
     return readStoredUser()?.jwt ?? null;
 }

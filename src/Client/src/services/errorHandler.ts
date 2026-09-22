@@ -5,16 +5,9 @@ const NETWORK_ERROR = "Cannot reach the server. Check your connection and try ag
 const SERVER_ERROR = "The server failed to process the request. Try again later.";
 const UNKNOWN_ERROR = "Something went wrong.";
 
-// Единственное место, где ошибка транспорта превращается в результат операции.
-// Бэкенд отдаёт 400 в трёх разных формах, и все три обязаны разбираться здесь:
-//
-//   1. ValidationProblemDetails - { errors: { jobType: [...] } }. Контроллеры
-//      с [ApiController], например Sales/OrdersController.
-//   2. Плоский SerializableError - { firstName: [...] }, без обёртки errors.
-//      Security/UsersController: там BadRequest(ModelState) без [ApiController].
-//   3. Голая строка - "Not valid login or password" из Security/AccountsController.
-//
-// Плюс сетевой сбой, 5xx и ошибка, приехавшая внутри бинарного ответа.
+// Бэкенды отдают 400 в трёх разных формах, и все три разбираются здесь:
+// ValidationProblemDetails с обёрткой errors (Sales), плоский SerializableError
+// (Security/UsersController, без [ApiController]) и голая строка (AccountsController).
 export function toFailure<T>(error: unknown): ServiceResult<T> {
     if (!axios.isAxiosError(error)) {
         return { success: false, generalError: UNKNOWN_ERROR };
@@ -24,8 +17,6 @@ export function toFailure<T>(error: unknown): ServiceResult<T> {
         return { success: false, generalError: NETWORK_ERROR };
     }
 
-    // response.data у axios типизирован как any; наружу он должен уходить только
-    // как unknown, дальше его сужает parseBadRequest.
     const status: number = error.response.status;
     const data: unknown = error.response.data;
 
@@ -76,9 +67,8 @@ function parseBadRequest<T>(data: unknown): ServiceResult<T> {
 function toFieldErrors(source: Record<string, unknown>): FieldErrors {
     const result: FieldErrors = {};
 
-    // Ошибкой поля считается только массив строк. Скалярные свойства сюда попадать
-    // не должны: иначе ProblemDetails без errors (type/title/status) превращается
-    // в подсветку несуществующих полей вместо общего сообщения.
+    // Ошибкой поля считается только массив строк: иначе ProblemDetails без errors
+    // подсвечивает несуществующие поля вместо общего сообщения.
     for (const [field, messages] of Object.entries(source)) {
         if (Array.isArray(messages) && messages.every((m) => typeof m === "string")) {
             result[field] = messages;
@@ -92,8 +82,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-// responseType: "blob" - классическая дыра: ошибка приезжает JSON'ом внутри
-// бинарного ответа, и без разбора превращается в "скачался битый файл".
+// Ошибка внутри бинарного ответа - классическая дыра responseType: "blob".
 export async function readBlobError(blob: Blob): Promise<unknown> {
     const text = await blob.text();
 

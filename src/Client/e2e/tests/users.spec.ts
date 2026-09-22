@@ -47,7 +47,7 @@ test.describe("Users", () => {
 
         //Act
         await userCard(page, login).getByTestId("user-delete").click();
-        await page.getByRole("button", { name: "OK" }).click();
+        await page.getByTestId("user-delete-confirm").getByRole("button", { name: "OK", exact: true }).click();
 
         //Assert
         await expect(userCard(page, login)).toHaveCount(0);

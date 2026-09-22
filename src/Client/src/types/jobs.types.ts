@@ -1,4 +1,3 @@
-// Контракт Production/JobsController: GET /api/jobs -> { items: [...] }.
 export interface JobRow {
     id: string;
     number: string;

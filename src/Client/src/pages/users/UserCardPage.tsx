@@ -1,8 +1,10 @@
 import { useState, type FormEvent } from "react";
 import {
     Alert,
+    Avatar,
     Button,
     Checkbox,
+    FileButton,
     Group,
     List,
     LoadingOverlay,
@@ -12,9 +14,11 @@ import {
     Stack,
     TextInput,
 } from "@mantine/core";
+import { IconUpload, IconUser } from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router";
 import RoleSelect from "./RoleSelect";
+import { photoSrc, readPhoto } from "./userPhoto";
 import { useFormValidation } from "@/hooks/useFormValidation";
 import { useServiceQuery } from "@/hooks/useServiceQuery";
 import { createUser, getUsers, updateUser } from "@/services/users.service";
@@ -24,8 +28,7 @@ const emptyUser: UserItem = { id: EMPTY_GUID, isActive: true };
 
 export default function UserCardPage() {
     const { id } = useParams<{ id: string }>();
-    // У маршрута /users/new параметра :id нет вовсе, поэтому undefined здесь
-    // означает создание, а не «id ещё не загрузился».
+    // У маршрута /users/new параметра :id нет вовсе: undefined здесь значит создание.
     const isNew = id === undefined || id === "new";
 
     const navigate = useNavigate();
@@ -35,13 +38,10 @@ export default function UserCardPage() {
     const [user, setUser] = useState<UserItem>(emptyUser);
     const [isSaving, setIsSaving] = useState(false);
 
-    // Карточка открывается поверх уже загруженного списка, поэтому редактируемый
-    // пользователь берётся из того же кэша, а не отдельным запросом.
     const { data: users = [], isLoading } = useServiceQuery(["users"], getUsers);
 
-    // Подстройка состояния под источник делается в рендере, а не эффектом: так
-    // не возникает каскада рендеров, а ссылки (emptyUser и объект из кэша
-    // React Query) стабильны, поэтому ветка срабатывает один раз на источник.
+    // Подстройка состояния под источник - в рендере, а не эффектом: ссылки
+    // стабильны, поэтому ветка срабатывает один раз на источник.
     const source = isNew ? emptyUser : users.find((candidate) => candidate.id === id);
     const [syncedFrom, setSyncedFrom] = useState<UserItem | null>(null);
 
@@ -57,6 +57,15 @@ export default function UserCardPage() {
     function change<K extends keyof UserItem>(field: K, value: UserItem[K]) {
         setUser((current) => ({ ...current, [field]: value }));
         validation.clearFieldError(field);
+    }
+
+    async function handlePhotoSelected(file: File | null) {
+        if (!file) {
+            return;
+        }
+
+        const photo = await readPhoto(file);
+        setUser((current) => ({ ...current, ...photo }));
     }
 
     async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -89,6 +98,23 @@ export default function UserCardPage() {
             <LoadingOverlay visible={isLoading || isSaving} />
             <form onSubmit={(event) => void handleSubmit(event)}>
                 <Stack gap="sm">
+                    <Group gap="md">
+                        <Avatar src={photoSrc(user)} alt={user.login ?? ""} size={96} radius="sm" data-testid="user-photo">
+                            <IconUser size={40} />
+                        </Avatar>
+                        <FileButton accept="image/*" onChange={(file) => { void handlePhotoSelected(file); }}>
+                            {(props) => (
+                                <Button
+                                    {...props}
+                                    variant="default"
+                                    leftSection={<IconUpload size={16} />}
+                                    data-testid="user-photo-upload"
+                                >
+                                    Upload photo
+                                </Button>
+                            )}
+                        </FileButton>
+                    </Group>
                     {validation.hasErrors && (
                         <Alert color="red" data-testid="user-validation-summary"
                             title="There was some errors with your submission">

@@ -1,8 +1,7 @@
 import type { UserFilter, UserItem } from "@/types/users.types";
 
-// Поиск клиентский, по уже загруженному списку. Роль участвует в фильтре только
-// когда она действительно выбрана: старый экран сравнивал roleId с Guid.EMPTY,
-// который истинен, и поэтому поиск по логину всегда возвращал пусто (§6.3 плана).
+// Роль участвует в фильтре только когда она выбрана: пустой guid истинен, и
+// из-за этого поиск по логину раньше всегда возвращал пусто.
 export function filterUsers(users: UserItem[], filter: UserFilter): UserItem[] {
     return users.filter((user) => {
         if (filter.fullName && !includes(user.fullName, filter.fullName)) {
