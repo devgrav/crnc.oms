@@ -163,13 +163,11 @@ services:
 
   # UI
   crnc-oms-ui:
+    # Адреса бэкендов больше не запекаются в бандл build-аргументами: SPA ходит
+    # в API относительными путями через собственный nginx (см. §4.1 плана миграции
+    # в docs/migrations/client-modern-stack-migration-plan.md).
     build:
       context: "src/Client/"
-      args:
-        SECURITY_API_URL: "http://localhost:8090/api"
-        SALES_API_URL: "http://localhost:8091/api"
-        PRODUCTION_API_URL: "http://localhost:8098/api"
-        PUSH_HUBS_URL: "http://localhost:8107/hubs"
     container_name: 'crnc-oms-ui'
     restart: always
     profiles: ["client", "full"]
