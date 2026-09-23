@@ -4,5 +4,6 @@ export interface TextValue {
 }
 
 export interface ItemsResponse<T> {
-    items: T[];
+    // Пустая сетка приезжает без items вовсе.
+    items?: T[];
 }

@@ -33,7 +33,7 @@ export function useFormValidation(): FormValidation {
     }, []);
 
     const clearAllErrors = useCallback(() => {
-        setErrors({});
+        setErrors((current) => (Object.keys(current).length > 0 ? {} : current));
         setGeneralError("");
     }, []);
 

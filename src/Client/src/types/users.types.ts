@@ -27,7 +27,3 @@ export interface RoleOption {
 }
 
 export const EMPTY_GUID = "00000000-0000-0000-0000-000000000000";
-
-export function isNewUser(user: UserItem): boolean {
-    return user.id === EMPTY_GUID;
-}

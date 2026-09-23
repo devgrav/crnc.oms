@@ -1,4 +1,4 @@
-import { Alert, Badge, LoadingOverlay, Table } from "@mantine/core";
+import { Alert, Badge, Box, LoadingOverlay, Table } from "@mantine/core";
 import { useServiceQuery } from "@/hooks/useServiceQuery";
 import { getJobs } from "@/services/jobs.service";
 import { Priority, type JobRow } from "@/types/jobs.types";
@@ -6,13 +6,10 @@ import { Priority, type JobRow } from "@/types/jobs.types";
 export default function JobsPage() {
     const { data: jobs = [], isLoading, error } = useServiceQuery(["jobs"], getJobs);
 
-    if (error) {
-        return <Alert color="red">{error.message}</Alert>;
-    }
-
     return (
-        <div style={{ position: "relative" }}>
+        <Box pos="relative">
             <LoadingOverlay visible={isLoading} />
+            {error && <Alert color="red" mb="sm">{error.message}</Alert>}
             <Table striped highlightOnHover withTableBorder data-testid="jobs-grid">
                 <Table.Thead>
                     <Table.Tr>
@@ -47,7 +44,7 @@ export default function JobsPage() {
                     ))}
                 </Table.Tbody>
             </Table>
-        </div>
+        </Box>
     );
 }
 

@@ -5,7 +5,4 @@ export interface NotificationsContextValue {
     clear: () => void;
 }
 
-export const NotificationsContext = createContext<NotificationsContextValue>({
-    messages: [],
-    clear: () => undefined,
-});
+export const NotificationsContext = createContext<NotificationsContextValue | null>(null);
