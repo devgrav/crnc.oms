@@ -23,9 +23,6 @@ services:
     build: src/Server/src/Crnc.Oms.Security/
     container_name: 'crnc-oms-security-api'
     restart: always
-    # depends_on does NOT auto-activate another service's profile in Docker Compose -
-    # every context whose services (transitively) reach security-api must list it here,
-    # or `docker-compose --profile <that context> up` fails with "undefined service".
     profiles: ["security", "sales", "production", "notification", "client", "server", "full"]
     ports:
       - "8090:8080"
@@ -84,9 +81,6 @@ services:
       - "ConnectionStrings:OmsProductionDb=Host=production-db;Database=crnc_oms_production_db;Username=postgres;Password=docker"
       - "IntegrationEndpoints:MessageBrokerEndpoint=rabbitmq://message-broker"
     depends_on:
-      # sales-db here looks like a copy-paste leftover (Production's own connection
-      # string only references production-db) - pre-existing, out of scope to "fix" here,
-      # but it does mean sales-db must carry the production/client profiles too.
       - sales-db
       - security-api
       - production-db
@@ -145,8 +139,6 @@ services:
       - security-api
       - message-broker
 
-  # Конфиг монтируется, а не запекается в образ: правка prometheus.yml подхватывается
-  # перезапуском контейнера, пересборка не нужна.
   prometheus:
     image: prom/prometheus:v3.5.5
     container_name: 'crnc-oms-prometheus'
@@ -157,7 +149,6 @@ services:
     ports:
       - "9090:9090"
 
-  # Как и у prometheus: конфиг и дашборды монтируются, а не запекаются в образ.
   grafana:
     image: grafana/grafana:12.4.11
     container_name: 'crnc-oms-grafana'
@@ -166,31 +157,16 @@ services:
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=p@ssw0rd
     volumes:
-      # Каталог провижининга монтируется целиком - так новый вид провижининга
-      # (alerting, plugins) не окажется забытым в списке volumes. Пустые alerting/
-      # и plugins/ держатся в репозитории заглушкой empty.yaml: без них Grafana
-      # пишет level=error на каждый отсутствующий каталог, а .gitkeep она ругает
-      # как файл с неизвестным расширением.
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
       - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
       - ./grafana/config.ini:/etc/grafana/grafana.ini:ro
     ports:
       - '3000:3000'
-
-  # UI
-  # Единственный сервис без профиля "server": он и есть та разница между
-  # "server" и "full". Профиль "server" поднимает всё, кроме SPA, - это то,
-  # что нужно при работе над фронтом через `npm run dev`, который сам занимает
-  # порт 8092 и проксирует в бэкенды.
+  #UI
   crnc-oms-ui:
-    # Адреса бэкендов больше не запекаются в бандл build-аргументами: SPA ходит
-    # в API относительными путями через собственный nginx (см. §4.1 плана миграции
-    # в docs/migrations/client-modern-stack-migration-plan.md).
     build:
       context: "src/Client/"
       args:
-        # Не задан - в UI показывается "dev". Пайплайн сборки образа может
-        # передать сюда реальный коммит: GIT_COMMIT=$(git rev-parse HEAD).
         GIT_COMMIT: "${GIT_COMMIT:-}"
     container_name: 'crnc-oms-ui'
     restart: always
