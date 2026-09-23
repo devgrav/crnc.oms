@@ -166,11 +166,12 @@ services:
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=p@ssw0rd
     volumes:
-      # Монтируются только свои подкаталоги провижининга: если подменить весь
-      # /etc/grafana/provisioning, пропадут пустые alerting/ и plugins/ из образа,
-      # и Grafana напишет level=error на каждый отсутствующий каталог.
-      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
-      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      # Каталог провижининга монтируется целиком - так новый вид провижининга
+      # (alerting, plugins) не окажется забытым в списке volumes. Пустые alerting/
+      # и plugins/ держатся в репозитории заглушкой empty.yaml: без них Grafana
+      # пишет level=error на каждый отсутствующий каталог, а .gitkeep она ругает
+      # как файл с неизвестным расширением.
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
       - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
       - ./grafana/config.ini:/etc/grafana/grafana.ini:ro
     ports:
