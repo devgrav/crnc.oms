@@ -145,19 +145,35 @@ services:
       - security-api
       - message-broker
 
+  # Конфиг монтируется, а не запекается в образ: правка prometheus.yml подхватывается
+  # перезапуском контейнера, пересборка не нужна.
   prometheus:
-    build: prometheus/
+    image: prom/prometheus:v3.5.5
+    container_name: 'crnc-oms-prometheus'
     restart: always
     profiles: ["monitoring", "server", "full"]
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     ports:
       - "9090:9090"
 
+  # Как и у prometheus: конфиг и дашборды монтируются, а не запекаются в образ.
   grafana:
-    build: './grafana'
+    image: grafana/grafana:12.4.11
     container_name: 'crnc-oms-grafana'
+    restart: always
     profiles: ["monitoring", "server", "full"]
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=p@ssw0rd
+    volumes:
+      # Каталог провижининга монтируется целиком - так новый вид провижининга
+      # (alerting, plugins) не окажется забытым в списке volumes. Пустые alerting/
+      # и plugins/ держатся в репозитории заглушкой empty.yaml: без них Grafana
+      # пишет level=error на каждый отсутствующий каталог, а .gitkeep она ругает
+      # как файл с неизвестным расширением.
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - ./grafana/config.ini:/etc/grafana/grafana.ini:ro
     ports:
       - '3000:3000'
 

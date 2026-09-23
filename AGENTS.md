@@ -19,9 +19,9 @@ Each backend service is its own independently buildable/deployable solution and 
 
 - `src/Server/` — all backend microservices (see contexts above), each under `src/Server/src/Crnc.Oms.<Context>/`.
 - `src/Client/` — the React SPA (single frontend project, source under `src/Client/src/`).
-- `prometheus/`, `grafana/` — Docker build contexts for the monitoring stack.
+- `prometheus/`, `grafana/` — configuration for the monitoring stack, mounted into pinned upstream images. Neither has a Dockerfile any more: edit a file and restart the container, no rebuild.
 - `docker-compose.yml` (repo root) — wires every service, its DB, and the monitoring stack together for local runs.
-- `docs/migrations/` — written-up plans for cross-cutting migrations (e.g. `security-net10-migration-plan.md`). Put a plan here before starting a multi-service migration, and update it as steps land.
+- `docs/migrations/` — written-up plans for cross-cutting migrations (e.g. `security-net10-migration-plan.md`, `monitoring-stack-upgrade-plan.md`). Put a plan here before starting a multi-service migration, and update it as steps land.
 - `docs/ci/` — how the pipelines are put together and why (`backend-ci.md`). Read it before changing `.github/workflows/`.
 - `.github/workflows/` — CI. Today just `backend-ci.yml` (see "CI" under Commands).
 - `README.md` (Russian) — the product-level spec: what each bounded context is supposed to do, the messaging flows in prose, and links to the architecture diagrams / Miro context map. Read it for intent; this file for mechanics.
@@ -43,7 +43,62 @@ Cross-service integration is two-pronged:
 
 Test coverage today: `Crnc.Oms.Sales.Tests` (Sales `Domain` unit tests), plus `Crnc.Oms.Security.E2ETests`, `Crnc.Oms.Sales.E2ETests`, `Crnc.Oms.Production.E2ETests` and `Crnc.Oms.Notification.E2ETests` (those contexts over HTTP/messaging, via Testcontainers). Production has no `Domain` unit test project yet (the convention below expects one eventually). Notification has e2e but **cannot** have domain unit tests — it has no domain layer; that is a property of the context, not a debt. See "Test conventions" below.
 
-Monitoring: Prometheus scrapes each service's `/metrics` endpoint every 5s (via `prometheus-net`); Grafana ships with a default dashboard. Not collected for infra containers (Mongo/Postgres/RabbitMQ).
+Monitoring: Prometheus scrapes each service's `/metrics` endpoint every 5s (via `prometheus-net`); Grafana ships with a default dashboard. Not collected for infra containers (Mongo/Postgres/RabbitMQ). See "Monitoring" below before changing any of it.
+
+## Monitoring
+
+`prom/prometheus` and `grafana/grafana` run as **pinned upstream images** — the versions
+live in `docker-compose.yml` and nowhere else, so don't restate them in prose. Neither has
+a Dockerfile: `prometheus/` and `grafana/` are configuration mounted into the containers,
+and a config edit takes `docker-compose restart <service>`, never a rebuild. Both sit in
+the `monitoring`, `server` and `full` profiles.
+
+**Scrape interval is declared in three places and they must agree**: `global.scrape_interval`
+in `prometheus/prometheus.yml`, `jsonData.timeInterval` on the Grafana datasource (Grafana
+derives the minimum step and `$__rate_interval` from it), and the sentence in README. It is
+5s. The config carried no `global` section at all until the stack was upgraded, so Prometheus
+silently used its own 1m default while both documents promised 5s — if you change the
+interval, change all three. Note `scrape_timeout` must stay `<=` the interval; the 10s
+default alone would make a 5s interval invalid.
+
+**Provisioning is mounted as a whole directory**, the way Grafana's own examples do it.
+Mounting subdirectories one by one is how people end up adding `alerting/` on the host and
+silently never provisioning it. The cost is that `alerting/` and `plugins/` must exist even
+though this repo provisions neither — replacing `/etc/grafana/provisioning` hides the empty
+directories the image ships, and Grafana logs a `level=error` per missing one. They are kept
+with an `empty.yaml` holding just `apiVersion: 1`; a `.gitkeep` gets flagged as a file with
+an unknown suffix.
+
+**The dashboard is code.** `grafana/dashboards/defaultdashboard.json` is the only source of
+truth, and the provider sets `allowUiUpdates: false` — editing a panel in the browser is a
+scratchpad, nothing you do there survives. To change a panel, change the file; Grafana picks
+it up within `updateIntervalSeconds` (10s), no restart needed. Two properties of that file
+are load-bearing:
+
+- **Grafana serves the JSON verbatim.** Schema migration is a frontend concern, so the API
+  returns whatever `schemaVersion` and panel types the file declares. A panel type the
+  running version dropped renders blank instead of being migrated for you — that is exactly
+  what the upgrade from Grafana 5 had to fix, where all nine panels were Angular `graph`.
+  Today they are eight `timeseries` and one `heatmap` at `schemaVersion: 41`.
+- **Two uids are pinned.** The datasource is `prometheus` (every panel, target and template
+  variable references it), and the dashboard itself is `zyAf4i4Zz`, linked from README.md
+  and from the endpoint table below. Keep both. The dashboard's own `id` must stay `null`,
+  and an exported `${DS_PROMETHEUS}` placeholder must be expanded back to the fixed uid, or
+  provisioning refuses the file.
+
+Units belong in the panel, not the query: the memory panels read `*_bytes` directly and set
+`unit: bytes`, rather than dividing by 1024 twice and labelling the axis `short`.
+
+Known gap, deliberately left alone: `prometheus_request_total` only has series for Security,
+Sales and Production. `MonitoringRequestMiddleware` exists in the three Notification WebApi
+projects too but is wired up in none of them, so the "Total count of requests for routes"
+panel is blank for those three. Switching it on changes the metric set and belongs to its
+own ticket.
+
+To check the stack is healthy: all six targets `up` at `http://localhost:9090/targets`, and
+the dashboard at `http://localhost:3000/d/zyAf4i4Zz/prometheus-net` drawing data. Panels
+stay empty until something actually generates traffic — running the SPA Playwright suite
+against the stand fills every one of them, including the notification counters.
 
 ## Architecture (frontend, `src/Client`)
 
@@ -146,7 +201,7 @@ Databases, reachable from the host once `docker-compose up` is running (e.g. via
 
 These are the ports mapped in `docker-compose.yml`; inside the Docker network services reach each other by container name (`security-db`, `sales-db`, `production-db`) on the default port.
 
-**Inside the Docker network every API now listens on 8080**, not 80 — that is the default baked into `mcr.microsoft.com/dotnet/aspnet:10.0`. Host-side ports in the table above are unchanged, so the SPA and README need nothing, but any container-to-container URL must carry `:8080` explicitly, and so must every target in `prometheus/prometheus.yml`. Note that `prometheus.yml` is `ADD`ed at image build time: after editing it, `docker-compose build prometheus` is required or the targets keep the old config.
+**Inside the Docker network every API now listens on 8080**, not 80 — that is the default baked into `mcr.microsoft.com/dotnet/aspnet:10.0`. Host-side ports in the table above are unchanged, so the SPA and README need nothing, but any container-to-container URL must carry `:8080` explicitly, and so must every target in `prometheus/prometheus.yml`. Note that `prometheus.yml` is mounted into the container, not baked into an image: after editing it, `docker-compose restart prometheus` is enough (it used to need a rebuild). The same goes for Grafana's provisioning and dashboards.
 
 ### Backend (all contexts on .NET 10)
 
@@ -221,6 +276,19 @@ Details worth knowing before touching it:
 - Two defects the suite found in the old SPA are fixed in the rewritten one and now guarded by tests: user search filtered on `roleId === Guid.EMPTY` when no role was picked, so a login-only search always returned nothing, and a freshly created user landed on a page the UI could not reach.
 
 **Unit tests for the SPA (`src/Client/src/**/__tests__/`)** — Vitest + Testing Library + jsdom, run with `npm test` from `src/Client`. They test the brains, not the markup: the error normalizer (all three 400 shapes, network, 5xx, blob), `useFormValidation`, `tokenStorage`, the API client's interceptors (the `Authorization` header and the 401 sign-out), the users filter, and — the one exception, because the behaviour is non-obvious — the route guard's admin bypass. Conventions: same `Method_Condition_ExpectedResult` naming and `//Arrange`/`//Act`/`//Assert` blocks as the backend suites, data built through factories with overrides (`src/test/factories.ts`), global `cleanup()` in `src/test/setup.ts`. Note that setup also stubs `window.matchMedia`, which jsdom lacks and Mantine calls on init.
+
+## Branching
+
+**Work on a ticket happens on a branch, never on `master`.** Before the first edit, check
+which branch you are on; if the ticket has no branch yet, create one and switch to it.
+Branches are named `<issue-number>-<slugified-issue-title>` (`9-migrate-spa-to-modern-stack`,
+`18-update-prometeus-and-grafana`) — the same shape GitHub's "create a branch" button
+produces, typos in the issue title included, so the branch stays greppable from the issue.
+Work with no ticket behind it still gets a branch; name it after what it does.
+
+`master` takes changes through a pull request. GitHub deletes the head branch once the PR
+is merged, so a branch that is gone from the remote usually means its work already landed —
+check `master` before recreating it.
 
 ## Commit messages
 

@@ -1,6 +1,14 @@
-- name: 'default'
-  org_id: 1
-  folder: ''
-  type: 'file'
-  options:
-    folder: '/var/lib/grafana/dashboards'
+apiVersion: 1
+
+providers:
+  - name: default
+    orgId: 1
+    folder: ''
+    type: file
+    # Дашборд - это код в репозитории: правки из UI не сохраняются, чтобы файл и
+    # то, что видно в Grafana, не разъезжались. Менять - через defaultdashboard.json.
+    allowUiUpdates: false
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    options:
+      path: /var/lib/grafana/dashboards

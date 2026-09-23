@@ -1,3 +1,10 @@
+# Интервал сбора задан явно: без секции global Prometheus берёт своё умолчание в 1m,
+# и стенд молча расходился с README и AGENTS.md, где обещаны 5 секунд. scrape_timeout
+# обязан быть не больше интервала, поэтому тоже задан явно - дефолтные 10s его нарушают.
+global:
+  scrape_interval: 5s
+  scrape_timeout: 4s
+
 scrape_configs:  
 - job_name: security_api_monitoring    
   metrics_path: /metrics  
