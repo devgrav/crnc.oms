@@ -43,7 +43,11 @@ Cross-service integration is two-pronged:
 
 Test coverage today: `Crnc.Oms.Sales.Tests` (Sales `Domain` unit tests), plus `Crnc.Oms.Security.E2ETests`, `Crnc.Oms.Sales.E2ETests`, `Crnc.Oms.Production.E2ETests` and `Crnc.Oms.Notification.E2ETests` (those contexts over HTTP/messaging, via Testcontainers). Production has no `Domain` unit test project yet (the convention below expects one eventually). Notification has e2e but **cannot** have domain unit tests — it has no domain layer; that is a property of the context, not a debt. See "Test conventions" below.
 
-Monitoring: Prometheus scrapes each service's `/metrics` endpoint every 5s (via `prometheus-net`); Grafana ships with a default dashboard. Not collected for infra containers (Mongo/Postgres/RabbitMQ).
+Monitoring: Prometheus scrapes each service's `/metrics` endpoint every 5s (via `prometheus-net`); Grafana ships with a default dashboard. Not collected for infra containers (Mongo/Postgres/RabbitMQ). Both run as pinned upstream images with their config mounted from `prometheus/` and `grafana/` — no Dockerfiles, so a config edit needs a container restart, not a rebuild. Three things to know before touching Grafana:
+
+- **Only `provisioning/datasources` and `provisioning/dashboards` are mounted, one by one.** Mounting the whole `/etc/grafana/provisioning` hides the empty `alerting/`, `plugins/`, `notifiers/` and `access-control/` directories the image ships, and Grafana logs a `level=error` for each missing one.
+- **The dashboard JSON on disk is what Grafana serves — verbatim.** Schema migration is a frontend concern, so the API returns whatever `schemaVersion` and panel types the file declares. A panel type the running version dropped (Angular `graph`, removed in 12) renders as a blank panel rather than being migrated for you: fix the file.
+- **The datasource's `uid` is pinned to `prometheus` in provisioning**, and every panel, target and template variable references it. The dashboard's own `uid` is `zyAf4i4Zz` and is linked from README.md and from the table below — keep both stable.
 
 ## Architecture (frontend, `src/Client`)
 
