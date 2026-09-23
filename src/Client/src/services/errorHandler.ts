@@ -67,8 +67,7 @@ function parseBadRequest<T>(data: unknown): ServiceResult<T> {
 function toFieldErrors(source: Record<string, unknown>): FieldErrors {
     const result: FieldErrors = {};
 
-    // Ошибкой поля считается только массив строк: иначе ProblemDetails без errors
-    // подсвечивает несуществующие поля вместо общего сообщения.
+    // Ошибка поля - только массив строк: иначе ProblemDetails подсветит несуществующие поля.
     for (const [field, messages] of Object.entries(source)) {
         if (Array.isArray(messages) && messages.every((m) => typeof m === "string")) {
             result[field] = messages;

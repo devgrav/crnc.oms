@@ -4,9 +4,7 @@ import { selectOption } from "../support/form";
 import { createOrder, orderRow } from "../support/orders";
 import { SeedUsers } from "../support/seed";
 
-// Самый хрупкий сценарий набора и одновременно самый ценный: сегодня это
-// единственное доказательство, что цепочка Sales -> шина -> Gateway -> Push ->
-// SignalR -> колокольчик вообще жива. См. §0 и §8 плана миграции.
+// Единственная проверка цепочки Sales -> шина -> Gateway -> Push -> SignalR -> колокольчик.
 test.describe("Push notifications", () => {
     test("OrderStatusChanged_MainManagerConnected_ShowsBellBadge", async ({ browser }) => {
         test.slow();

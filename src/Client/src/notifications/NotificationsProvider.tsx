@@ -12,8 +12,7 @@ export default function NotificationsProvider({ children }: NotificationsProvide
     const { isAuthenticated } = useAuth();
     const [messages, setMessages] = useState<string[]>([]);
 
-    // Подстройка состояния под изменившийся вход, а не синхронизация с внешней
-    // системой: сама подписка живёт в эффекте ниже.
+    // Сброс состояния под изменившийся вход - в рендере, а не эффектом.
     const [wasAuthenticated, setWasAuthenticated] = useState(isAuthenticated);
 
     if (wasAuthenticated !== isAuthenticated) {
@@ -29,7 +28,6 @@ export default function NotificationsProvider({ children }: NotificationsProvide
             return;
         }
 
-        // Адрес относительный: хаб проксирует тот же nginx, что и API.
         const connection: HubConnection = new HubConnectionBuilder()
             .withUrl("/hubs/push", { accessTokenFactory: () => getStoredToken() ?? "" })
             .withAutomaticReconnect()

@@ -6,8 +6,6 @@ export interface CreatedOrder {
     jobDescription: string;
 }
 
-// Заполняет карточку нового заказа и сохраняет. Возвращает уникальное описание,
-// по которому заказ потом находится в сетке.
 export async function createOrder(page: Page): Promise<CreatedOrder> {
     const jobDescription = unique("e2e order");
 
@@ -25,7 +23,6 @@ export async function createOrder(page: Page): Promise<CreatedOrder> {
 
     await page.getByTestId("order-save").click();
 
-    //Карточка закрывается редиректом на /orders, сетка перезагружается сама.
     await expect(page.getByTestId("order-card")).toBeHidden();
     await expect(orderRow(page, jobDescription)).toBeVisible();
 

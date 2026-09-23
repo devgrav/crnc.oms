@@ -43,8 +43,7 @@ export default function OrderCardPage() {
 
     const loaded = query.data;
 
-    // Подстройка состояния под загруженные данные - в рендере, а не эффектом:
-    // React Query отдаёт стабильную ссылку, поэтому срабатывает один раз.
+    // Подстройка под загруженные данные - в рендере, а не эффектом.
     const [syncedFrom, setSyncedFrom] = useState<object | null>(null);
 
     if (loaded && loaded !== syncedFrom) {
@@ -94,7 +93,6 @@ export default function OrderCardPage() {
             size="lg"
             title={isEdit ? `Edit order ${id ?? ""}` : "Add new order"}
         >
-            {/* testid на содержимом: корень Mantine Modal не имеет своего бокса. */}
             <div data-testid="order-card">
             <LoadingOverlay visible={query.isLoading || isSaving} />
             <form onSubmit={(event) => void handleSubmit(event)} id="orderForm">

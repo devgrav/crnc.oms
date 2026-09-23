@@ -17,7 +17,6 @@ export interface UserItem {
 export interface UserFilter {
     fullName: string;
     login: string;
-    // undefined, а не пустой guid: пустой guid истинен и ломал фильтр по роли.
     roleId?: string;
     isActive: boolean;
 }

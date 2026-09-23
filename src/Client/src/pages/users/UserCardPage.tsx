@@ -40,8 +40,7 @@ export default function UserCardPage() {
 
     const { data: users = [], isLoading } = useServiceQuery(["users"], getUsers);
 
-    // Подстройка состояния под источник - в рендере, а не эффектом: ссылки
-    // стабильны, поэтому ветка срабатывает один раз на источник.
+    // Подстройка под загруженные данные - в рендере, а не эффектом.
     const source = isNew ? emptyUser : users.find((candidate) => candidate.id === id);
     const [syncedFrom, setSyncedFrom] = useState<UserItem | null>(null);
 
@@ -93,7 +92,6 @@ export default function UserCardPage() {
             size="lg"
             title={isNew ? "Add new user" : "Edit user"}
         >
-            {/* testid на содержимом: корень Mantine Modal не имеет своего бокса. */}
             <div data-testid="user-card-edit">
             <LoadingOverlay visible={isLoading || isSaving} />
             <form onSubmit={(event) => void handleSubmit(event)}>

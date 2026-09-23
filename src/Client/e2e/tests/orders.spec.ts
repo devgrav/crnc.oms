@@ -76,8 +76,7 @@ test.describe("Orders", () => {
         await expect(orderRow(page, order.jobDescription).getByTestId("order-status"))
             .toHaveText("Converted to job");
 
-        //Job создаётся Production'ом асинхронно, по событию из шины, а сетка jobs
-        //сама не перезапрашивается - поэтому опрашиваем её перезагрузкой страницы.
+        //Job создаётся асинхронно, а сетка сама не перезапрашивается - опрашиваем перезагрузкой
         await page.getByTestId("nav-jobs").click();
         await expect(page.getByTestId("jobs-grid")).toBeVisible();
         await expect.poll(

@@ -17,7 +17,6 @@ Object.defineProperty(window, "matchMedia", {
     }),
 });
 
-// Без глобального cleanup компонент предыдущего теста остаётся в DOM.
 afterEach(() => {
     cleanup();
     sessionStorage.clear();
