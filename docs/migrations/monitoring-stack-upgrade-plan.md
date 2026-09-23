@@ -92,6 +92,15 @@ curl -s http://localhost:9090/api/v1/targets | jq '[.data.activeTargets[] | {job
 Без этого «после» не с чем сравнивать: панель может остаться пустой и по причине,
 существовавшей до миграции.
 
+**Статус: сделано.** На v2.16.0 все шесть таргетов `up`. Метрики дашборда присутствуют
+(`http_requests_received_total`, `http_request_duration_seconds_bucket`,
+`http_requests_in_progress`, `dotnet_total_memory_bytes`, `dotnet_collection_count_total`,
+`process_num_threads`, `process_open_handles`, `process_working_set_bytes`), кроме двух:
+`notification_push_sent_total` и `notification_email_sent_total` на свежем стенде дают
+ноль серий — они появляются после первой отправки уведомления, и пустые панели в этих
+двух местах ожидаемы. `prometheus_request_total` — одна серия, что согласуется с
+неподключённым `MonitoringRequestMiddleware` в сервисах Notification.
+
 Отдельно зафиксировать в заметках: панель **Total count of requests for routes**
 (`prometheus_request_total`) показывает данные только по Security, Sales и Production.
 `MonitoringRequestMiddleware` в трёх сервисах Notification существует, но нигде не
@@ -118,14 +127,24 @@ curl -s http://localhost:9090/api/v1/targets | jq '[.data.activeTargets[] | {job
 `docker logs`. Аргументы командной строки по умолчанию образа (`--config.file`,
 `--storage.tsdb.path`) совпадают с тем, что нужно, поэтому `command:` не требуется.
 
-3. `prometheus.yml` не трогать. Можно добавить явную `global.scrape_interval: 5s` вместо
-   опоры на умолчание — README обещает пятисекундный интервал, а по умолчанию в
-   Prometheus он 15s, то есть документация сейчас расходится с конфигом. Это единственная
-   содержательная правка конфига, и она **меняет частоту сбора** — делать осознанно.
+3. `prometheus.yml` не трогать. Отдельно остаётся вопрос `global.scrape_interval`:
+   секции `global` в конфиге нет, и baseline на живом стенде показал, что фактический
+   интервал — **1 минута** (умолчание Prometheus), тогда как README и AGENTS.md обещают
+   5 секунд. Расхождение существует с самого начала и к обновлению версии отношения не
+   имеет, поэтому в фазу 1 не включено: это либо правка конфига (меняет нагрузку сбора),
+   либо правка документации. Решать отдельно.
 
 **Проверка фазы:** `docker-compose --profile monitoring up -d`, затем все шесть таргетов
 в состоянии `up` на `http://localhost:9090/targets`, и `/api/v1/query?query=up` отдаёт
 шесть серий. Отдельный коммит.
+
+**Статус: сделано.** На стенде `--profile server`: `buildinfo.version` = `3.5.5`, все
+шесть таргетов `up` (тот же набор, что в baseline на v2.16.0), `level=error`/`level=warn`
+в логах контейнера нет. Отдельно проверено ради цели перехода на volume: временный job,
+дописанный в `prometheus.yml`, появился в `/api/v1/targets` после
+`docker-compose restart prometheus` **без** пересборки образа; после проверки конфиг
+возвращён в исходное состояние. Имя контейнера сменилось с `crncoms-prometheus-1` на
+`crnc-oms-prometheus`.
 
 ## Фаза 2: провижининг Grafana в современный формат
 

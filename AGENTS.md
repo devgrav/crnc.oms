@@ -19,7 +19,7 @@ Each backend service is its own independently buildable/deployable solution and 
 
 - `src/Server/` — all backend microservices (see contexts above), each under `src/Server/src/Crnc.Oms.<Context>/`.
 - `src/Client/` — the React SPA (single frontend project, source under `src/Client/src/`).
-- `prometheus/`, `grafana/` — Docker build contexts for the monitoring stack.
+- `prometheus/` — Prometheus config, mounted into the pinned upstream image. `grafana/` — still a Docker build context until its own phase of `docs/migrations/monitoring-stack-upgrade-plan.md` lands.
 - `docker-compose.yml` (repo root) — wires every service, its DB, and the monitoring stack together for local runs.
 - `docs/migrations/` — written-up plans for cross-cutting migrations (e.g. `security-net10-migration-plan.md`, `monitoring-stack-upgrade-plan.md`). Put a plan here before starting a multi-service migration, and update it as steps land.
 - `docs/ci/` — how the pipelines are put together and why (`backend-ci.md`). Read it before changing `.github/workflows/`.
@@ -146,7 +146,7 @@ Databases, reachable from the host once `docker-compose up` is running (e.g. via
 
 These are the ports mapped in `docker-compose.yml`; inside the Docker network services reach each other by container name (`security-db`, `sales-db`, `production-db`) on the default port.
 
-**Inside the Docker network every API now listens on 8080**, not 80 — that is the default baked into `mcr.microsoft.com/dotnet/aspnet:10.0`. Host-side ports in the table above are unchanged, so the SPA and README need nothing, but any container-to-container URL must carry `:8080` explicitly, and so must every target in `prometheus/prometheus.yml`. Note that `prometheus.yml` is `ADD`ed at image build time: after editing it, `docker-compose build prometheus` is required or the targets keep the old config.
+**Inside the Docker network every API now listens on 8080**, not 80 — that is the default baked into `mcr.microsoft.com/dotnet/aspnet:10.0`. Host-side ports in the table above are unchanged, so the SPA and README need nothing, but any container-to-container URL must carry `:8080` explicitly, and so must every target in `prometheus/prometheus.yml`. Note that `prometheus.yml` is mounted into the container, not baked into an image: after editing it, `docker-compose restart prometheus` is enough (it used to need a rebuild).
 
 ### Backend (all contexts on .NET 10)
 

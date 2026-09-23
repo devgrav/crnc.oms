@@ -145,10 +145,15 @@ services:
       - security-api
       - message-broker
 
+  # Конфиг монтируется, а не запекается в образ: правка prometheus.yml подхватывается
+  # перезапуском контейнера, пересборка не нужна.
   prometheus:
-    build: prometheus/
+    image: prom/prometheus:v3.5.5
+    container_name: 'crnc-oms-prometheus'
     restart: always
     profiles: ["monitoring", "server", "full"]
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     ports:
       - "9090:9090"
 
