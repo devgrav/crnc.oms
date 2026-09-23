@@ -21,7 +21,7 @@ Each backend service is its own independently buildable/deployable solution and 
 - `src/Client/` — the React SPA (single frontend project, source under `src/Client/src/`).
 - `prometheus/`, `grafana/` — Docker build contexts for the monitoring stack.
 - `docker-compose.yml` (repo root) — wires every service, its DB, and the monitoring stack together for local runs.
-- `docs/migrations/` — written-up plans for cross-cutting migrations (e.g. `security-net10-migration-plan.md`). Put a plan here before starting a multi-service migration, and update it as steps land.
+- `docs/migrations/` — written-up plans for cross-cutting migrations (e.g. `security-net10-migration-plan.md`, `monitoring-stack-upgrade-plan.md`). Put a plan here before starting a multi-service migration, and update it as steps land.
 - `docs/ci/` — how the pipelines are put together and why (`backend-ci.md`). Read it before changing `.github/workflows/`.
 - `.github/workflows/` — CI. Today just `backend-ci.yml` (see "CI" under Commands).
 - `README.md` (Russian) — the product-level spec: what each bounded context is supposed to do, the messaging flows in prose, and links to the architecture diagrams / Miro context map. Read it for intent; this file for mechanics.
@@ -221,6 +221,19 @@ Details worth knowing before touching it:
 - Two defects the suite found in the old SPA are fixed in the rewritten one and now guarded by tests: user search filtered on `roleId === Guid.EMPTY` when no role was picked, so a login-only search always returned nothing, and a freshly created user landed on a page the UI could not reach.
 
 **Unit tests for the SPA (`src/Client/src/**/__tests__/`)** — Vitest + Testing Library + jsdom, run with `npm test` from `src/Client`. They test the brains, not the markup: the error normalizer (all three 400 shapes, network, 5xx, blob), `useFormValidation`, `tokenStorage`, the API client's interceptors (the `Authorization` header and the 401 sign-out), the users filter, and — the one exception, because the behaviour is non-obvious — the route guard's admin bypass. Conventions: same `Method_Condition_ExpectedResult` naming and `//Arrange`/`//Act`/`//Assert` blocks as the backend suites, data built through factories with overrides (`src/test/factories.ts`), global `cleanup()` in `src/test/setup.ts`. Note that setup also stubs `window.matchMedia`, which jsdom lacks and Mantine calls on init.
+
+## Branching
+
+**Work on a ticket happens on a branch, never on `master`.** Before the first edit, check
+which branch you are on; if the ticket has no branch yet, create one and switch to it.
+Branches are named `<issue-number>-<slugified-issue-title>` (`9-migrate-spa-to-modern-stack`,
+`18-update-prometeus-and-grafana`) — the same shape GitHub's "create a branch" button
+produces, typos in the issue title included, so the branch stays greppable from the issue.
+Work with no ticket behind it still gets a branch; name it after what it does.
+
+`master` takes changes through a pull request. GitHub deletes the head branch once the PR
+is merged, so a branch that is gone from the remote usually means its work already landed —
+check `master` before recreating it.
 
 ## Commit messages
 
