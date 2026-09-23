@@ -7,8 +7,6 @@ import { AuthContext, type AuthContextValue } from "@/auth/AuthContext";
 import { makeCurrentUser } from "@/test/factories";
 import { Roles, type UserRole } from "@/types/auth.types";
 
-// Единственный тест на разметку в наборе: поведение гарда нетривиально -
-// у админа есть обход объявленных ролей, и он должен пережить миграцию (§5.3).
 function renderGuard(role: UserRole | null, allowed: UserRole[]) {
     const value: AuthContextValue = {
         user: role ? makeCurrentUser({ role }) : null,

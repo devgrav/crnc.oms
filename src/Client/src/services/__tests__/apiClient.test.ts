@@ -4,8 +4,6 @@ import apiClient from "../apiClient";
 import { clearStoredUser, storeUser } from "@/auth/tokenStorage";
 import { makeCurrentUser } from "@/test/factories";
 
-// Интерцептор вызывается напрямую: важно не то, что axios умеет ходить в сеть,
-// а то, что токен читается на каждом запросе.
 function runRequestInterceptor(): InternalAxiosRequestConfig {
     const handler = apiClient.interceptors.request as unknown as {
         handlers: { fulfilled: (config: InternalAxiosRequestConfig) => InternalAxiosRequestConfig }[];

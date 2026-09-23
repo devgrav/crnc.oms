@@ -1,8 +1,7 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import type { ServiceResult } from "@/services/result";
 
-// Сервисы не бросают исключения, а React Query отличает ошибку от данных именно
-// по ним - здесь результат разворачивается обратно в throw.
+// Сервисы не бросают исключения, поэтому неуспех разворачивается в throw для React Query.
 export function useServiceQuery<T>(
     queryKey: unknown[],
     fetcher: () => Promise<ServiceResult<T>>,

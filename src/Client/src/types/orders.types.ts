@@ -13,7 +13,6 @@ export interface OrderRow {
     statusEnum: OrderStatus;
 }
 
-// Имена полей совпадают с ключами fieldErrors, которые отдаёт Sales.
 export interface OrderFormValues {
     jobType: number;
     jobDescription: string;
