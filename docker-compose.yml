@@ -157,12 +157,22 @@ services:
     ports:
       - "9090:9090"
 
+  # Как и у prometheus: конфиг и дашборды монтируются, а не запекаются в образ.
   grafana:
-    build: './grafana'
+    image: grafana/grafana:12.4.11
     container_name: 'crnc-oms-grafana'
+    restart: always
     profiles: ["monitoring", "server", "full"]
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=p@ssw0rd
+    volumes:
+      # Монтируются только свои подкаталоги провижининга: если подменить весь
+      # /etc/grafana/provisioning, пропадут пустые alerting/ и plugins/ из образа,
+      # и Grafana напишет level=error на каждый отсутствующий каталог.
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - ./grafana/config.ini:/etc/grafana/grafana.ini:ro
     ports:
       - '3000:3000'
 
