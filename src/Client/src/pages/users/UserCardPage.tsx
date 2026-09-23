@@ -3,10 +3,12 @@ import {
     Alert,
     Avatar,
     Button,
+    Center,
     Checkbox,
     FileButton,
     Group,
     List,
+    Loader,
     LoadingOverlay,
     Modal,
     PasswordInput,
@@ -21,38 +23,57 @@ import RoleSelect from "./RoleSelect";
 import { photoSrc, readPhoto } from "./userPhoto";
 import { useFormValidation } from "@/hooks/useFormValidation";
 import { useServiceQuery } from "@/hooks/useServiceQuery";
-import { createUser, getUsers, updateUser } from "@/services/users.service";
+import { createUser, getUser, updateUser } from "@/services/users.service";
 import { EMPTY_GUID, type UserItem } from "@/types/users.types";
 
 const emptyUser: UserItem = { id: EMPTY_GUID, isActive: true };
 
 export default function UserCardPage() {
-    const { id } = useParams<{ id: string }>();
     // У маршрута /users/new параметра :id нет вовсе: undefined здесь значит создание.
-    const isNew = id === undefined || id === "new";
-
+    const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const queryClient = useQueryClient();
-    const validation = useFormValidation();
-
-    const [user, setUser] = useState<UserItem>(emptyUser);
-    const [isSaving, setIsSaving] = useState(false);
-
-    const { data: users = [], isLoading } = useServiceQuery(["users"], getUsers);
-
-    // Подстройка состояния под источник - в рендере, а не эффектом: ссылки
-    // стабильны, поэтому ветка срабатывает один раз на источник.
-    const source = isNew ? emptyUser : users.find((candidate) => candidate.id === id);
-    const [syncedFrom, setSyncedFrom] = useState<UserItem | null>(null);
-
-    if (source && source !== syncedFrom) {
-        setSyncedFrom(source);
-        setUser(source);
-    }
 
     function close() {
         void navigate("/users");
     }
+
+    return (
+        <Modal opened onClose={close} size="lg" title={id ? "Edit user" : "Add new user"}>
+            <div data-testid="user-card-edit">
+                {id
+                    ? <ExistingUser id={id} onClose={close} />
+                    : <UserCardForm user={emptyUser} isNew onClose={close} />}
+            </div>
+        </Modal>
+    );
+}
+
+function ExistingUser({ id, onClose }: { id: string; onClose: () => void }) {
+    const { data, isLoading, error } = useServiceQuery(["user", id], () => getUser(id), { gcTime: 0 });
+
+    if (error) {
+        return <Alert color="red">{error.message}</Alert>;
+    }
+
+    if (isLoading || !data) {
+        return <Center p="lg"><Loader /></Center>;
+    }
+
+    return <UserCardForm user={data} isNew={false} onClose={onClose} />;
+}
+
+interface UserCardFormProps {
+    user: UserItem;
+    isNew: boolean;
+    onClose: () => void;
+}
+
+function UserCardForm({ user: loaded, isNew, onClose }: UserCardFormProps) {
+    const queryClient = useQueryClient();
+    const validation = useFormValidation();
+
+    const [user, setUser] = useState<UserItem>(loaded);
+    const [isSaving, setIsSaving] = useState(false);
 
     function change<K extends keyof UserItem>(field: K, value: UserItem[K]) {
         setUser((current) => ({ ...current, [field]: value }));
@@ -79,7 +100,7 @@ export default function UserCardPage() {
 
         if (result.success) {
             await queryClient.invalidateQueries({ queryKey: ["users"] });
-            close();
+            onClose();
             return;
         }
 
@@ -87,15 +108,8 @@ export default function UserCardPage() {
     }
 
     return (
-        <Modal
-            opened
-            onClose={close}
-            size="lg"
-            title={isNew ? "Add new user" : "Edit user"}
-        >
-            {/* testid на содержимом: корень Mantine Modal не имеет своего бокса. */}
-            <div data-testid="user-card-edit">
-            <LoadingOverlay visible={isLoading || isSaving} />
+        <>
+            <LoadingOverlay visible={isSaving} />
             <form onSubmit={(event) => void handleSubmit(event)}>
                 <Stack gap="sm">
                     <Group gap="md">
@@ -198,13 +212,12 @@ export default function UserCardPage() {
                         <Button type="submit" color="green" loading={isSaving} data-testid="user-save">
                             Save
                         </Button>
-                        <Button type="button" color="red" variant="outline" onClick={close}>
+                        <Button type="button" color="red" variant="outline" onClick={onClose}>
                             Cancel
                         </Button>
                     </Group>
                 </Stack>
             </form>
-            </div>
-        </Modal>
+        </>
     );
 }

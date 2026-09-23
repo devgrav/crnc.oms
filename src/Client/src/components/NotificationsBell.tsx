@@ -1,10 +1,9 @@
-import { use } from "react";
 import { ActionIcon, Badge, Group, List, Popover, Text } from "@mantine/core";
 import { IconBell } from "@tabler/icons-react";
-import { NotificationsContext } from "@/notifications/NotificationsContext";
+import { useNotifications } from "@/hooks/useNotifications";
 
 export default function NotificationsBell() {
-    const { messages, clear } = use(NotificationsContext);
+    const { messages, clear } = useNotifications();
 
     return (
         <Popover position="bottom-end" withArrow onClose={clear}>

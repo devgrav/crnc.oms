@@ -10,11 +10,8 @@ export default tseslint.config(
         files: ["**/*.{ts,tsx}"],
         extends: [
             js.configs.recommended,
-            // Типизированный линт, а не только синтаксический: правила, которым нужен
-            // компилятор, ловят как раз то, ради чего в этом проекте есть strict.
             ...tseslint.configs.recommendedTypeChecked,
-            // Именно configs.flat: configs["recommended-latest"] у этого плагина всё
-            // ещё в eslintrc-формате (plugins - массив), и ESLint 10 его не принимает.
+            // Именно configs.flat: eslintrc-вариант этого плагина ESLint 10 не принимает.
             reactHooks.configs.flat["recommended-latest"],
             reactRefresh.configs.vite,
         ],
@@ -27,8 +24,6 @@ export default tseslint.config(
             },
         },
         rules: {
-            // Логирование в продакшн-код не попадает; в старом клиенте console.log
-            // висел в config.ts, Notifications и ValidationInfo.
             "no-console": "error",
             "@typescript-eslint/no-explicit-any": "error",
         },
@@ -40,8 +35,7 @@ export default tseslint.config(
     {
         files: ["**/__tests__/**", "src/test/**"],
         rules: {
-            // Передача замоканного метода в expect() - нормальная практика, а не
-            // потеря this: vi.mocked возвращает ту же функцию, привязки здесь нет.
+            // vi.mocked возвращает ту же функцию, потери this в expect() здесь нет.
             "@typescript-eslint/unbound-method": "off",
         },
     },

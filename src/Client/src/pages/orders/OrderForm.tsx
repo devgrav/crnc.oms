@@ -11,16 +11,25 @@ export interface OrderFormProps {
     statuses: TextValue[];
     materialSources: TextValue[];
     signoffTypes: TextValue[];
-    // Статус, источник материала и тип подписи есть только у существующего заказа.
     isEdit: boolean;
     disabled: boolean;
     dateSentToCustomer?: string;
     jobNumber?: string | null;
 }
 
-export default function OrderForm(props: OrderFormProps) {
-    const { values, onChange, validation, isEdit, disabled } = props;
-
+export default function OrderForm({
+    values,
+    onChange,
+    validation,
+    jobTypes,
+    statuses,
+    materialSources,
+    signoffTypes,
+    isEdit,
+    disabled,
+    dateSentToCustomer,
+    jobNumber,
+}: OrderFormProps) {
     function numberField(field: keyof OrderFormValues) {
         return {
             value: values[field] == null ? null : String(values[field]),
@@ -37,7 +46,6 @@ export default function OrderForm(props: OrderFormProps) {
             value: (values[field] as string | undefined) ?? "",
             onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
                 onChange(field, event.currentTarget.value as OrderFormValues[typeof field]);
-                validation.clearFieldError(field);
             },
             error: validation.getErrorMessage(field),
             disabled,
@@ -50,7 +58,7 @@ export default function OrderForm(props: OrderFormProps) {
             <Select
                 label="Job type"
                 withAsterisk
-                data={toOptions(props.jobTypes)}
+                data={toOptions(jobTypes)}
                 data-testid="order-jobType"
                 {...numberField("jobType")}
             />
@@ -67,27 +75,27 @@ export default function OrderForm(props: OrderFormProps) {
                 <>
                     <Select
                         label="Status"
-                        data={toOptions(props.statuses)}
+                        data={toOptions(statuses)}
                         data-testid="order-status-select"
                         {...numberField("status")}
                     />
                     <TextInput
                         label="Date sent to customer"
-                        value={props.dateSentToCustomer ?? ""}
+                        value={dateSentToCustomer ?? ""}
                         disabled
                         readOnly
                     />
                     <Select
                         label="Material source"
                         withAsterisk
-                        data={toOptions(props.materialSources)}
+                        data={toOptions(materialSources)}
                         data-testid="order-materialSource"
                         {...numberField("materialSource")}
                     />
                     <Select
                         label="Sign off type"
                         withAsterisk
-                        data={toOptions(props.signoffTypes)}
+                        data={toOptions(signoffTypes)}
                         data-testid="order-signoffType"
                         {...numberField("signoffType")}
                     />
@@ -142,8 +150,8 @@ export default function OrderForm(props: OrderFormProps) {
                 {...textField("customerContactPersonPhone")}
             />
 
-            {props.jobNumber && (
-                <Badge color="blue">Order converted to job: {props.jobNumber}</Badge>
+            {jobNumber && (
+                <Badge color="blue">Order converted to job: {jobNumber}</Badge>
             )}
         </Stack>
     );

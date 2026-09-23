@@ -20,7 +20,6 @@ export function useFormValidation(): FormValidation {
         setGeneralError(result.generalError ?? "");
     }, []);
 
-    // Ошибка поля гаснет при первом вводе, а не держится до следующего сабмита.
     const clearFieldError = useCallback((field: string) => {
         setErrors((current) => {
             if (!(field in current)) {
@@ -34,7 +33,7 @@ export function useFormValidation(): FormValidation {
     }, []);
 
     const clearAllErrors = useCallback(() => {
-        setErrors({});
+        setErrors((current) => (Object.keys(current).length > 0 ? {} : current));
         setGeneralError("");
     }, []);
 

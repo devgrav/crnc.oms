@@ -20,22 +20,25 @@ export default function AppRoutes() {
         <Routes>
             <Route path="/login" element={<LoginPage />} />
 
-            <Route element={<ProtectedRoute roles={managerRoles} />}>
+            {/* Внешний гард проверяет только аутентификацию: Layout не должен мелькать
+                перед редиректом на /login. Роли сверяются уже внутри него. */}
+            <Route element={<ProtectedRoute />}>
                 <Route element={<Layout />}>
                     <Route index element={<Navigate to="/orders" replace />} />
-                    <Route path="orders" element={<OrdersPage />}>
-                        <Route path="new" element={<LazyOrderCard />} />
-                        <Route path=":id" element={<LazyOrderCard />} />
-                    </Route>
-                    <Route path="jobs" element={<JobsPage />} />
-                </Route>
-            </Route>
 
-            <Route element={<ProtectedRoute roles={[]} />}>
-                <Route element={<Layout />}>
-                    <Route path="users" element={<UsersPage />}>
-                        <Route path="new" element={<UserCardPage />} />
-                        <Route path=":id" element={<UserCardPage />} />
+                    <Route element={<ProtectedRoute roles={managerRoles} />}>
+                        <Route path="orders" element={<OrdersPage />}>
+                            <Route path="new" element={<LazyOrderCard />} />
+                            <Route path=":id" element={<LazyOrderCard />} />
+                        </Route>
+                        <Route path="jobs" element={<JobsPage />} />
+                    </Route>
+
+                    <Route element={<ProtectedRoute roles={[Roles.Admin]} />}>
+                        <Route path="users" element={<UsersPage />}>
+                            <Route path="new" element={<UserCardPage />} />
+                            <Route path=":id" element={<UserCardPage />} />
+                        </Route>
                     </Route>
                 </Route>
             </Route>

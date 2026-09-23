@@ -1,12 +1,11 @@
 import { useState, type FormEvent } from "react";
-import { Alert, Button, Group, List, LoadingOverlay, Modal } from "@mantine/core";
+import { Alert, Button, Center, Group, List, Loader, LoadingOverlay, Modal } from "@mantine/core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router";
 import OrderForm from "./OrderForm";
 import { useFormValidation } from "@/hooks/useFormValidation";
 import { useServiceQuery } from "@/hooks/useServiceQuery";
 import { createOrder, getNewOrder, getOrder, updateOrder } from "@/services/orders.service";
-import type { TextValue } from "@/types/api.types";
 import {
     isOrderReadOnly,
     type EditOrderResponse,
@@ -14,47 +13,52 @@ import {
     type OrderFormValues,
 } from "@/types/orders.types";
 
-const emptyValues: OrderFormValues = {
-    jobType: 0,
-    jobDescription: "",
-    customerTitle: "",
-    customerAbbreviation: "",
-    customerContactPersonFirstName: "",
-    customerContactPersonLastName: "",
-    customerContactPersonEmail: "",
-    customerContactPersonPhone: "",
-};
+type LoadedOrder = NewOrderResponse | EditOrderResponse;
 
 export default function OrderCardPage() {
+    // У маршрута /orders/new параметра :id нет вовсе: undefined здесь значит создание.
     const { id } = useParams<{ id: string }>();
-    const isEdit = id !== undefined && id !== "new";
-
     const navigate = useNavigate();
-    const queryClient = useQueryClient();
-    const validation = useFormValidation();
 
-    const [values, setValues] = useState<OrderFormValues>(emptyValues);
-    const [isSaving, setIsSaving] = useState(false);
-
-    const query = useServiceQuery<NewOrderResponse | EditOrderResponse>(
+    const { data, isLoading, error } = useServiceQuery<LoadedOrder>(
         ["order", id ?? "new"],
-        () => (isEdit && id ? getOrder(id) : getNewOrder()),
+        () => (id ? getOrder(id) : getNewOrder()),
+        { gcTime: 0 },
     );
-
-    const loaded = query.data;
-
-    // Подстройка состояния под загруженные данные - в рендере, а не эффектом:
-    // React Query отдаёт стабильную ссылку, поэтому срабатывает один раз.
-    const [syncedFrom, setSyncedFrom] = useState<object | null>(null);
-
-    if (loaded && loaded !== syncedFrom) {
-        setSyncedFrom(loaded);
-        setValues(pickFormValues(loaded));
-    }
 
     function close() {
         void navigate("/orders");
     }
+
+    return (
+        <Modal opened onClose={close} size="lg" title={id ? `Edit order ${id}` : "Add new order"}>
+            <div data-testid="order-card">
+                {error && <Alert color="red">{error.message}</Alert>}
+                {isLoading && <Center p="lg"><Loader /></Center>}
+                {data && <OrderCardForm loaded={data} orderId={id} onClose={close} />}
+            </div>
+        </Modal>
+    );
+}
+
+interface OrderCardFormProps {
+    loaded: LoadedOrder;
+    orderId: string | undefined;
+    onClose: () => void;
+}
+
+function OrderCardForm({ loaded, orderId, onClose }: OrderCardFormProps) {
+    const queryClient = useQueryClient();
+    const validation = useFormValidation();
+
+    const [values, setValues] = useState<OrderFormValues>(() => pickFormValues(loaded));
+    const [isSaving, setIsSaving] = useState(false);
+
+    const editResponse = "statuses" in loaded ? loaded : undefined;
+
+    // Считать по values.status нельзя: выбор "Converted to job" погасил бы форму
+    // вместе с кнопкой Save, и сохранить перевод стало бы невозможно.
+    const readOnly = isOrderReadOnly(editResponse?.status ?? undefined);
 
     function handleChange<K extends keyof OrderFormValues>(field: K, value: OrderFormValues[K]) {
         setValues((current) => ({ ...current, [field]: value }));
@@ -66,37 +70,24 @@ export default function OrderCardPage() {
         setIsSaving(true);
         validation.clearAllErrors();
 
-        const result = isEdit && loaded && "id" in loaded
-            ? await updateOrder({ ...values, id: loaded.id })
+        const result = orderId
+            ? await updateOrder({ ...values, id: orderId })
             : await createOrder(values);
 
         setIsSaving(false);
 
         if (result.success) {
             await queryClient.invalidateQueries({ queryKey: ["orders"] });
-            close();
+            onClose();
             return;
         }
 
         validation.setFromResult(result);
     }
 
-    const editResponse = loaded && "statuses" in loaded ? loaded : undefined;
-
-    // Считать по values.status нельзя: выбор "Converted to job" погасил бы форму
-    // вместе с кнопкой Save, и сохранить перевод стало бы невозможно.
-    const readOnly = isOrderReadOnly(editResponse?.status ?? undefined);
-
     return (
-        <Modal
-            opened
-            onClose={close}
-            size="lg"
-            title={isEdit ? `Edit order ${id ?? ""}` : "Add new order"}
-        >
-            {/* testid на содержимом: корень Mantine Modal не имеет своего бокса. */}
-            <div data-testid="order-card">
-            <LoadingOverlay visible={query.isLoading || isSaving} />
+        <>
+            <LoadingOverlay visible={isSaving} />
             <form onSubmit={(event) => void handleSubmit(event)} id="orderForm">
                 {validation.hasErrors && (
                     <Alert color="red" mb="sm" data-testid="order-validation-summary"
@@ -113,11 +104,11 @@ export default function OrderCardPage() {
                     values={values}
                     onChange={handleChange}
                     validation={validation}
-                    jobTypes={loaded?.jobTypes ?? []}
-                    statuses={optionsOf(editResponse?.statuses)}
-                    materialSources={optionsOf(editResponse?.materialSources)}
-                    signoffTypes={optionsOf(editResponse?.signoffTypes)}
-                    isEdit={isEdit}
+                    jobTypes={loaded.jobTypes}
+                    statuses={editResponse?.statuses ?? []}
+                    materialSources={editResponse?.materialSources ?? []}
+                    signoffTypes={editResponse?.signoffTypes ?? []}
+                    isEdit={editResponse !== undefined}
                     disabled={readOnly || isSaving}
                     dateSentToCustomer={editResponse?.dateSentToCustomer}
                     jobNumber={editResponse?.jobNumber}
@@ -128,21 +119,16 @@ export default function OrderCardPage() {
                             Save
                         </Button>
                     )}
-                    <Button type="button" color="red" variant="outline" onClick={close} data-testid="order-cancel">
+                    <Button type="button" color="red" variant="outline" onClick={onClose} data-testid="order-cancel">
                         Cancel
                     </Button>
                 </Group>
             </form>
-            </div>
-        </Modal>
+        </>
     );
 }
 
-function optionsOf(items: TextValue[] | undefined): TextValue[] {
-    return items ?? [];
-}
-
-function pickFormValues(source: NewOrderResponse | EditOrderResponse): OrderFormValues {
+function pickFormValues(source: LoadedOrder): OrderFormValues {
     return {
         jobType: source.jobType,
         jobDescription: source.jobDescription,

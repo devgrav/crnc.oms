@@ -1,15 +1,12 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// Базовый URL SPA. Стенд поднимается снаружи (`docker-compose --profile client up`),
-// поэтому `webServer` здесь намеренно не настраивается: тесты гоняются против того же
-// образа, который уезжает в прод, а не против dev-сервера.
+// Стенд поднимается снаружи (`docker-compose --profile client up`), поэтому без `webServer`:
+// тесты гоняются против образа, который уезжает в прод, а не против dev-сервера.
 const baseURL = process.env.E2E_BASE_URL ?? "http://localhost:8092";
 
 export default defineConfig({
     testDir: "./tests",
-    // Один воркер и никакого параллелизма: все контексты ходят в одну общую БД стенда,
-    // а сетки заказов/пользователей считают строки. Детерминированность baseline важнее
-    // скорости — набор из десяти сценариев и так проходит за минуты.
+    // Один воркер: общая БД стенда на все контексты, а сетки считают строки.
     fullyParallel: false,
     workers: 1,
     forbidOnly: !!process.env.CI,
@@ -30,9 +27,7 @@ export default defineConfig({
             name: "chromium",
             use: {
                 ...devices["Desktop Chrome"],
-                // По умолчанию — браузер, который ставит сам Playwright (так гоняется CI).
-                // Если его скачать нельзя (корпоративный прокси, офлайн-машина), можно
-                // подсунуть системный Chrome: E2E_BROWSER_CHANNEL=chrome npm test
+                // Пусто - браузер самого Playwright; E2E_BROWSER_CHANNEL=chrome берёт системный.
                 channel: process.env.E2E_BROWSER_CHANNEL,
             },
         },

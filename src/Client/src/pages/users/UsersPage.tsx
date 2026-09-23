@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import {
     Alert,
     Avatar,
+    Box,
     Button,
     Card,
     Group,
@@ -70,7 +71,7 @@ export default function UsersPage() {
     }
 
     return (
-        <div style={{ position: "relative" }}>
+        <Box pos="relative">
             <LoadingOverlay visible={isLoading} />
             {error && <Alert color="red" mb="sm">{error.message}</Alert>}
 
@@ -130,7 +131,7 @@ export default function UsersPage() {
             </Modal>
 
             <Outlet />
-        </div>
+        </Box>
     );
 }
 

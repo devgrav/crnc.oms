@@ -9,6 +9,5 @@ export interface AuthContextValue {
     signOut: () => void;
 }
 
-// Контекст отдельно от провайдера: react-refresh требует, чтобы модуль с
-// компонентом экспортировал только компоненты.
+// Контекст отдельно от провайдера: react-refresh требует от модуля только компоненты.
 export const AuthContext = createContext<AuthContextValue | null>(null);

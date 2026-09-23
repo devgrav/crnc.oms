@@ -8,7 +8,6 @@ interface ErrorBoundaryState {
     hasError: boolean;
 }
 
-// Единственный классовый компонент: хуковой замены componentDidCatch в React 19 нет.
 export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     public state: ErrorBoundaryState = { hasError: false };
 

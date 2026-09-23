@@ -25,7 +25,6 @@ export function clearStoredUser(): void {
     sessionStorage.removeItem(STORAGE_KEY);
 }
 
-// Интерцептор apiClient читает токен отсюда: он живёт вне дерева компонентов.
 export function getStoredToken(): string | null {
     return readStoredUser()?.jwt ?? null;
 }
