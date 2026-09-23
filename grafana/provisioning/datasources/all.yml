@@ -11,3 +11,11 @@ datasources:
     url: http://prometheus:9090
     isDefault: true
     editable: true
+    jsonData:
+      # Должен совпадать с global.scrape_interval в prometheus.yml: из него Grafana
+      # считает минимальный шаг и $__rate_interval. Если оставить умолчание (15s),
+      # графики сглаживаются сильнее, чем есть данных.
+      timeInterval: 5s
+      # POST не упирается в длину URL на запросах с длинными выражениями.
+      httpMethod: POST
+      prometheusType: Prometheus

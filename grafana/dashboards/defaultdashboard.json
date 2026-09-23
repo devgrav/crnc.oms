@@ -558,7 +558,7 @@
               }
             ]
           },
-          "unit": "short"
+          "unit": "bytes"
         },
         "overrides": []
       },
@@ -594,7 +594,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "dotnet_total_memory_bytes /1024/1024",
+          "expr": "dotnet_total_memory_bytes",
           "range": true,
           "refId": "A",
           "legendFormat": "{{job}}"
@@ -655,7 +655,7 @@
               }
             ]
           },
-          "unit": "short"
+          "unit": "bytes"
         },
         "overrides": []
       },
@@ -691,7 +691,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "process_working_set_bytes /1024/1024",
+          "expr": "process_working_set_bytes",
           "range": true,
           "refId": "A",
           "legendFormat": "{{job}}"

@@ -43,11 +43,62 @@ Cross-service integration is two-pronged:
 
 Test coverage today: `Crnc.Oms.Sales.Tests` (Sales `Domain` unit tests), plus `Crnc.Oms.Security.E2ETests`, `Crnc.Oms.Sales.E2ETests`, `Crnc.Oms.Production.E2ETests` and `Crnc.Oms.Notification.E2ETests` (those contexts over HTTP/messaging, via Testcontainers). Production has no `Domain` unit test project yet (the convention below expects one eventually). Notification has e2e but **cannot** have domain unit tests — it has no domain layer; that is a property of the context, not a debt. See "Test conventions" below.
 
-Monitoring: Prometheus scrapes each service's `/metrics` endpoint every 5s (via `prometheus-net`); Grafana ships with a default dashboard. Not collected for infra containers (Mongo/Postgres/RabbitMQ). Both run as pinned upstream images with their config mounted from `prometheus/` and `grafana/` — no Dockerfiles, so a config edit needs a container restart, not a rebuild. Three things to know before touching Grafana:
+Monitoring: Prometheus scrapes each service's `/metrics` endpoint every 5s (via `prometheus-net`); Grafana ships with a default dashboard. Not collected for infra containers (Mongo/Postgres/RabbitMQ). See "Monitoring" below before changing any of it.
 
-- **The provisioning directory is mounted whole**, the way Grafana's own examples do it — mounting subdirectories one by one is how people end up adding, say, `alerting/` on the host and silently never provisioning it. The cost is that `alerting/` and `plugins/` must exist even though this repo provisions neither: replacing `/etc/grafana/provisioning` hides the empty directories the image ships, and Grafana logs a `level=error` per missing one. They are kept with an `empty.yaml` holding just `apiVersion: 1` — a `.gitkeep` would be flagged as a file with an unknown suffix.
-- **The dashboard JSON on disk is what Grafana serves — verbatim.** Schema migration is a frontend concern, so the API returns whatever `schemaVersion` and panel types the file declares. A panel type the running version dropped (Angular `graph`, removed in 12) renders as a blank panel rather than being migrated for you: fix the file.
-- **The datasource's `uid` is pinned to `prometheus` in provisioning**, and every panel, target and template variable references it. The dashboard's own `uid` is `zyAf4i4Zz` and is linked from README.md and from the table below — keep both stable.
+## Monitoring
+
+`prom/prometheus` and `grafana/grafana` run as **pinned upstream images** — the versions
+live in `docker-compose.yml` and nowhere else, so don't restate them in prose. Neither has
+a Dockerfile: `prometheus/` and `grafana/` are configuration mounted into the containers,
+and a config edit takes `docker-compose restart <service>`, never a rebuild. Both sit in
+the `monitoring`, `server` and `full` profiles.
+
+**Scrape interval is declared in three places and they must agree**: `global.scrape_interval`
+in `prometheus/prometheus.yml`, `jsonData.timeInterval` on the Grafana datasource (Grafana
+derives the minimum step and `$__rate_interval` from it), and the sentence in README. It is
+5s. The config carried no `global` section at all until the stack was upgraded, so Prometheus
+silently used its own 1m default while both documents promised 5s — if you change the
+interval, change all three. Note `scrape_timeout` must stay `<=` the interval; the 10s
+default alone would make a 5s interval invalid.
+
+**Provisioning is mounted as a whole directory**, the way Grafana's own examples do it.
+Mounting subdirectories one by one is how people end up adding `alerting/` on the host and
+silently never provisioning it. The cost is that `alerting/` and `plugins/` must exist even
+though this repo provisions neither — replacing `/etc/grafana/provisioning` hides the empty
+directories the image ships, and Grafana logs a `level=error` per missing one. They are kept
+with an `empty.yaml` holding just `apiVersion: 1`; a `.gitkeep` gets flagged as a file with
+an unknown suffix.
+
+**The dashboard is code.** `grafana/dashboards/defaultdashboard.json` is the only source of
+truth, and the provider sets `allowUiUpdates: false` — editing a panel in the browser is a
+scratchpad, nothing you do there survives. To change a panel, change the file; Grafana picks
+it up within `updateIntervalSeconds` (10s), no restart needed. Two properties of that file
+are load-bearing:
+
+- **Grafana serves the JSON verbatim.** Schema migration is a frontend concern, so the API
+  returns whatever `schemaVersion` and panel types the file declares. A panel type the
+  running version dropped renders blank instead of being migrated for you — that is exactly
+  what the upgrade from Grafana 5 had to fix, where all nine panels were Angular `graph`.
+  Today they are eight `timeseries` and one `heatmap` at `schemaVersion: 41`.
+- **Two uids are pinned.** The datasource is `prometheus` (every panel, target and template
+  variable references it), and the dashboard itself is `zyAf4i4Zz`, linked from README.md
+  and from the endpoint table below. Keep both. The dashboard's own `id` must stay `null`,
+  and an exported `${DS_PROMETHEUS}` placeholder must be expanded back to the fixed uid, or
+  provisioning refuses the file.
+
+Units belong in the panel, not the query: the memory panels read `*_bytes` directly and set
+`unit: bytes`, rather than dividing by 1024 twice and labelling the axis `short`.
+
+Known gap, deliberately left alone: `prometheus_request_total` only has series for Security,
+Sales and Production. `MonitoringRequestMiddleware` exists in the three Notification WebApi
+projects too but is wired up in none of them, so the "Total count of requests for routes"
+panel is blank for those three. Switching it on changes the metric set and belongs to its
+own ticket.
+
+To check the stack is healthy: all six targets `up` at `http://localhost:9090/targets`, and
+the dashboard at `http://localhost:3000/d/zyAf4i4Zz/prometheus-net` drawing data. Panels
+stay empty until something actually generates traffic — running the SPA Playwright suite
+against the stand fills every one of them, including the notification counters.
 
 ## Architecture (frontend, `src/Client`)
 
