@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getStoredToken } from "@/auth/tokenStorage";
+import { clearStoredUser, getStoredToken } from "@/auth/tokenStorage";
 
 const apiClient = axios.create({
     baseURL: "/api",
@@ -16,6 +16,18 @@ apiClient.interceptors.request.use((config) => {
     }
 
     return config;
+});
+
+// Протухшая сессия не должна оставлять пользователя на экране с сообщением: токен
+// выбрасывается, и приложение уходит на /login. Проверка токена не даёт зациклиться
+// на 401 от неаутентифицированных запросов.
+apiClient.interceptors.response.use(undefined, (error: unknown) => {
+    if (axios.isAxiosError(error) && error.response?.status === 401 && getStoredToken()) {
+        clearStoredUser();
+        window.location.assign("/login");
+    }
+
+    throw error;
 });
 
 export default apiClient;

@@ -1,6 +1,6 @@
 import apiClient from "./apiClient";
-import { toFailure } from "./errorHandler";
-import { ok, type ServiceResult } from "./result";
+import { request, requestItems, requestVoid } from "./request";
+import type { ServiceResult } from "./result";
 import type { ItemsResponse } from "@/types/api.types";
 import type {
     EditOrderResponse,
@@ -10,47 +10,22 @@ import type {
     UpdateOrderPayload,
 } from "@/types/orders.types";
 
-export async function getOrders(): Promise<ServiceResult<OrderRow[]>> {
-    try {
-        const response = await apiClient.get<ItemsResponse<OrderRow>>("/sales/orders");
-        return ok(response.data.items ?? []);
-    } catch (error) {
-        return toFailure(error);
-    }
+export function getOrders(): Promise<ServiceResult<OrderRow[]>> {
+    return requestItems(() => apiClient.get<ItemsResponse<OrderRow>>("/sales/orders"));
 }
 
-export async function getNewOrder(): Promise<ServiceResult<NewOrderResponse>> {
-    try {
-        const response = await apiClient.get<NewOrderResponse>("/sales/orders/new");
-        return ok(response.data);
-    } catch (error) {
-        return toFailure(error);
-    }
+export function getNewOrder(): Promise<ServiceResult<NewOrderResponse>> {
+    return request(() => apiClient.get<NewOrderResponse>("/sales/orders/new"));
 }
 
-export async function getOrder(id: string): Promise<ServiceResult<EditOrderResponse>> {
-    try {
-        const response = await apiClient.get<EditOrderResponse>(`/sales/orders/${id}`);
-        return ok(response.data);
-    } catch (error) {
-        return toFailure(error);
-    }
+export function getOrder(id: string): Promise<ServiceResult<EditOrderResponse>> {
+    return request(() => apiClient.get<EditOrderResponse>(`/sales/orders/${id}`));
 }
 
-export async function createOrder(order: OrderFormValues): Promise<ServiceResult<void>> {
-    try {
-        await apiClient.post("/sales/orders", order);
-        return ok(undefined);
-    } catch (error) {
-        return toFailure(error);
-    }
+export function createOrder(order: OrderFormValues): Promise<ServiceResult<void>> {
+    return requestVoid(() => apiClient.post("/sales/orders", order));
 }
 
-export async function updateOrder(order: UpdateOrderPayload): Promise<ServiceResult<void>> {
-    try {
-        await apiClient.put("/sales/orders", order);
-        return ok(undefined);
-    } catch (error) {
-        return toFailure(error);
-    }
+export function updateOrder(order: UpdateOrderPayload): Promise<ServiceResult<void>> {
+    return requestVoid(() => apiClient.put("/sales/orders", order));
 }

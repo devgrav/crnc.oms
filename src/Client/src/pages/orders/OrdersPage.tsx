@@ -1,4 +1,4 @@
-import { Alert, Badge, Button, Group, LoadingOverlay, Table } from "@mantine/core";
+import { Alert, Badge, Box, Button, Group, LoadingOverlay, Table } from "@mantine/core";
 import { IconPencil, IconPlus } from "@tabler/icons-react";
 import { Link, Outlet } from "react-router";
 import { useServiceQuery } from "@/hooks/useServiceQuery";
@@ -9,7 +9,7 @@ export default function OrdersPage() {
     const { data: orders = [], isLoading, error } = useServiceQuery(["orders"], getOrders);
 
     return (
-        <div style={{ position: "relative" }}>
+        <Box pos="relative">
             <LoadingOverlay visible={isLoading} />
             {error && <Alert color="red" mb="sm">{error.message}</Alert>}
             <Group justify="flex-end" mb="sm">
@@ -63,7 +63,7 @@ export default function OrdersPage() {
                 </Table.Tbody>
             </Table>
             <Outlet />
-        </div>
+        </Box>
     );
 }
 
