@@ -1,0 +1,128 @@
+specification {
+    element actor {
+        style {
+            shape person
+        }
+    }
+    element system
+    element container
+    element service {
+        style {
+            shape component
+        }
+    }
+    element database {
+        style {
+            shape storage
+        }
+    }
+    element messageBroker {
+        style {
+            shape queue
+        }
+    }
+    element externalSystem{
+        style {
+            color gray
+        }
+    }    
+}
+
+model {
+    actor admin 'Administrator' {
+        description 'Admin of system'
+    }
+
+    admin -> OMS 'Manage users'
+
+    actor manager 'Manager'{
+        description 'User who handles orders and jobs'
+    }
+    
+    manager -> OMS 'Manage orders'
+
+    system OMS {
+        description 'Order Management System of CRNC company'
+        container notification 'Notification Domain'{
+            notification = service 'Crnc.Oms.Notification'{
+                description 'Service for notifications domain'
+            }            
+        }
+
+        notification -> emailGateway 'Send email'
+        notification -> client 'Send browser push'
+
+        container sales 'Sales Domain'{
+            sales = service 'Crnc.Oms.Sales'{
+                description 'Service for sales domain'
+            }
+            database salesDb {
+                technology 'PostgreSQL'
+            }
+
+            sales <-> salesDb 'Manage sales data'
+        }
+
+        sales -> broker 'Send notifications' 
+        broker -> notification 'Send notifications'
+
+        sales -> broker 'Convert order to job'
+        broker -> production 'Convert order to job'
+
+        sales -> security 'Get user info'
+
+        container production 'Production Domain'{
+            production = service 'Crnc.Oms.Production'{
+                description 'Service for production domain'
+            }
+            database productionDb {
+                technology 'PostgreSQL'
+            }
+
+            production <-> productionDb 'Manage production data'
+        }
+
+        production -> broker 'Job for order created event'
+        broker -> sales 'Job for order created event'
+
+        container security 'Securiry Domain'{
+            security = service 'Crnc.Oms.Security'{
+                description 'Service for security and user\'s management domain'
+            }
+            database securityDb {
+                technology 'MongoDb'
+            }            
+
+            security <-> securityDb 'Manage security data'
+        }
+
+        container client 'Client'{
+            style {
+                shape browser
+            }
+        }
+
+        
+        client -> security 'Manage users / Aut'
+        client -> sales 'Manage sales orders'
+        client -> production 'Manage production jobs'
+
+        messageBroker broker 'Message Broker' {
+            technology 'RabbitMq'
+        }               
+    }
+
+    externalSystem emailGateway 'External Email Gateway'
+}
+
+views {
+    view context{
+        title 'Context View'
+        include *
+    }
+
+    view of OMS{
+        title 'Containers View'
+        include *
+    }
+}
